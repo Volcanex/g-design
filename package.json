@@ -1,0 +1,13 @@
+{
+  "name": "g-system",
+  "version": "0.1.0",
+  "description": "g design language — tokens generated from @radix-ui/colors + framework-free UI layer",
+  "scripts": {
+    "build": "node scripts/build.mjs"
+  },
+  "dependencies": {
+    "@phosphor-icons/core": "^2.1.1",
+    "@radix-ui/colors": "^3.0.0"
+  },
+  "private": true
+}
