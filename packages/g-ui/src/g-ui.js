@@ -311,6 +311,100 @@
     }, 100);
   };
 
+  /* ---- feedback buttons: save, send, download, refresh -------------------
+     The taxonomy: destructive buttons show their icon before (the trash
+     warns); feedback buttons earn theirs after the action succeeds. */
+
+  const P = {
+    floppy: '<path d="M219.31,72,184,36.69A15.86,15.86,0,0,0,172.69,32H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V83.31A15.86,15.86,0,0,0,219.31,72ZM168,208H88V152h80Zm40,0H184V152a16,16,0,0,0-16-16H88a16,16,0,0,0-16,16v56H48V48H172.69L208,83.31ZM160,72a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h56A8,8,0,0,1,160,72Z"/>',
+    plane: '<path d="M227.32,28.68a16,16,0,0,0-15.66-4.08l-.15,0L19.57,82.84a16,16,0,0,0-2.49,29.8L102,154l41.3,84.87A15.86,15.86,0,0,0,157.74,248q.69,0,1.38-.06a15.88,15.88,0,0,0,14-11.51l58.2-191.94c0-.05,0-.1,0-.15A16,16,0,0,0,227.32,28.68ZM157.83,231.85l-.05.14,0-.07-40.06-82.3,48-48a8,8,0,0,0-11.31-11.31l-48,48L24.08,98.25l-.07,0,.14,0L216,40Z"/>',
+    download: '<path d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0Zm-101.66,5.66a8,8,0,0,0,11.32,0l40-40a8,8,0,0,0-11.32-11.32L136,124.69V32a8,8,0,0,0-16,0v92.69L93.66,98.34a8,8,0,0,0-11.32,11.32Z"/>',
+    check: '<path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/>',
+  };
+  const glyph = (name, cls) =>
+    `<svg class="${cls}" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">${P[name]}</svg>`;
+
+  function announcer(btn) {
+    let live = btn.querySelector(".g-live");
+    if (!live) {
+      live = document.createElement("span");
+      live.className = "sr-only g-live";
+      live.setAttribute("aria-live", "polite");
+      btn.append(live);
+    }
+    return live;
+  }
+
+  /* click → done state + label swap, reverting after 2s; a re-click resets
+     the timer, never stacks (the copy-button rule, everywhere) */
+  function doneCycle(btn, attr, label, apply) {
+    btn.style.minWidth = btn.offsetWidth + "px";
+    const live = announcer(btn);
+    btn.addEventListener("click", () => {
+      apply?.();
+      btn.setAttribute(attr, "");
+      const doneText = btn.getAttribute("data-label-done");
+      if (label && doneText) label.textContent = doneText;
+      live.textContent = doneText || "Done";
+      clearTimeout(btn._cycleTimer);
+      btn._cycleTimer = setTimeout(() => {
+        btn.removeAttribute(attr);
+        if (label) label.textContent = btn.getAttribute("data-label") || label.textContent;
+        live.textContent = "";
+      }, 2000);
+    });
+  }
+
+  function initSave(btn) {
+    if (!btn.querySelector(".i-floppy")) btn.insertAdjacentHTML("afterbegin", glyph("floppy", "i-floppy"));
+    doneCycle(btn, "data-saved", btn.querySelector(".save-label"));
+  }
+
+  function initSend(btn) {
+    if (!btn.querySelector(".send-icons"))
+      btn.insertAdjacentHTML("afterbegin",
+        `<span class="send-icons">${glyph("plane", "i-plane")}${glyph("check", "i-check")}</span>`);
+    doneCycle(btn, "data-sent", btn.querySelector(".send-label"));
+  }
+
+  function initDownload(btn) {
+    if (!btn.querySelector(".dl-icons"))
+      btn.insertAdjacentHTML("afterbegin",
+        `<span class="dl-icons">${glyph("download", "i-dl")}${glyph("check", "i-check")}</span>`);
+    const label = btn.querySelector(".dl-label");
+    const live = announcer(btn);
+    btn.style.minWidth = btn.offsetWidth + "px";
+    const wait = parseInt(btn.getAttribute("data-wait") || "1100", 10);
+    btn.addEventListener("click", () => {
+      clearTimeout(btn._dlTimer); clearTimeout(btn._cycleTimer);
+      btn.removeAttribute("data-done");
+      btn.setAttribute("data-active", "");
+      btn._dlTimer = setTimeout(() => {
+        btn.removeAttribute("data-active");
+        btn.setAttribute("data-done", "");
+        const doneText = btn.getAttribute("data-label-done");
+        if (label && doneText) label.textContent = doneText;
+        live.textContent = doneText || "Downloaded";
+        btn._cycleTimer = setTimeout(() => {
+          btn.removeAttribute("data-done");
+          if (label) label.textContent = btn.getAttribute("data-label") || label.textContent;
+          live.textContent = "";
+        }, 2000);
+      }, wait);
+    });
+  }
+
+  function initSpin(btn) {
+    btn.addEventListener("click", () => {
+      btn.removeAttribute("data-spinning");
+      void btn.offsetWidth; /* restart mid-spin cleanly */
+      btn.setAttribute("data-spinning", "");
+    });
+    btn.addEventListener("animationend", (e) => {
+      if (e.animationName === "g-revolve") btn.removeAttribute("data-spinning");
+    });
+  }
+
   /* ---- status badge: swap with a blink ---------------------------------- */
 
   g.status = (el, { kind, label }) => {
@@ -393,6 +487,10 @@
     root.querySelectorAll(".copy-btn").forEach(initCopy);
     root.querySelectorAll(".confirm-btn").forEach(initConfirm);
     root.querySelectorAll(".hold-btn").forEach(initHold);
+    root.querySelectorAll(".save-btn").forEach(initSave);
+    root.querySelectorAll(".send-btn").forEach(initSend);
+    root.querySelectorAll(".dl-btn").forEach(initDownload);
+    root.querySelectorAll(".spin-btn").forEach(initSpin);
     root.querySelectorAll("dialog.cmdk").forEach(initCmdk);
     root.querySelectorAll("dialog.dlg").forEach(initDialog);
   }

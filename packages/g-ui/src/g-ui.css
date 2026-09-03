@@ -602,6 +602,58 @@ dialog.cmdk {
 }
 .codeblock .copy-btn { position: absolute; top: 6px; right: 6px; }
 
+/* Save: the floppy is earned. It springs in on click, blinks twice as it
+   writes, and the label follows Save to Saved. */
+.save-btn .i-floppy {
+  width: 0; height: 15px;
+  opacity: 0;
+  translate: 0 -7px;
+  transition:
+    width var(--dur-base) var(--ease-out),
+    opacity var(--dur-base) var(--ease-out),
+    translate var(--spring-snap-dur) var(--spring-snap);
+}
+.save-btn[data-saved] .i-floppy {
+  width: 15px; opacity: 1; translate: 0 0;
+  animation: g-write 0.55s var(--ease-out) 0.2s;
+}
+@keyframes g-write {
+  0%, 100% { opacity: 1; }
+  30% { opacity: 0.35; }
+  55% { opacity: 1; }
+  75% { opacity: 0.45; }
+}
+
+/* Send: the plane shows intent up front, flies off on click, and a check
+   takes its place. */
+.send-btn .send-icons { position: relative; width: 15px; height: 15px; }
+.send-btn .send-icons svg { position: absolute; inset: 0; }
+.send-btn .i-plane { transition: translate 240ms var(--ease-out), opacity 200ms var(--ease-out); }
+.send-btn .send-icons .i-check {
+  opacity: 0; scale: 0.7;
+  transition: opacity 130ms var(--ease-out) 140ms, scale var(--spring-snap-dur) var(--spring-snap) 140ms;
+}
+.send-btn[data-sent] .i-plane { translate: 15px -11px; opacity: 0; }
+.send-btn[data-sent] .send-icons .i-check { opacity: 1; scale: 1; }
+
+/* Download: the arrow dips into its tray while working, then a check
+   takes over. */
+.dl-btn .dl-icons { position: relative; width: 15px; height: 15px; }
+.dl-btn .dl-icons svg { position: absolute; inset: 0; transition: opacity 130ms var(--ease-out), scale 130ms var(--ease-out); }
+.dl-btn .dl-icons .i-check { opacity: 0; scale: 0.7; }
+.dl-btn[data-active] .i-dl { animation: g-dip 0.4s var(--ease-out) infinite; }
+.dl-btn[data-done] .i-dl { opacity: 0; scale: 0.7; }
+.dl-btn[data-done] .dl-icons .i-check { opacity: 1; scale: 1; }
+@keyframes g-dip {
+  0%, 100% { translate: 0 0; }
+  40% { translate: 0 2.5px; }
+  70% { translate: 0 -1px; }
+}
+
+/* Refresh: one spring-timed revolution per click; a re-click restarts it. */
+.spin-btn[data-spinning] svg { animation: g-revolve var(--spring-smooth-dur) var(--spring-smooth); }
+@keyframes g-revolve { to { rotate: 360deg; } }
+
 /* Confirm button: no tick at rest; ticking draws one in. */
 .confirm-btn .i-tick { width: 0; height: 15px; transition: width var(--dur-base) var(--ease-out); overflow: visible; }
 .confirm-btn .i-tick path {
