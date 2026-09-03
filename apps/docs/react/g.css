@@ -1408,6 +1408,20 @@ dialog.cmdk {
   75% { rotate: 7deg; }
 }
 
+/* ---------------------------------------------------------------- view swap */
+
+/* Page change inside persistent chrome: the nav and top bar never move;
+   the content answers. Out in 100ms, then the new view staggers in with
+   the same entrance choreography as first load (g.swap in g-ui.js). */
+.view {
+  transition: opacity var(--dur-fast) var(--ease-out), translate var(--dur-fast) var(--ease-out);
+}
+.view[data-leaving] {
+  opacity: 0;
+  translate: 0 4px;
+  pointer-events: none;
+}
+
 /* ---------------------------------------------------------------- page entrance */
 
 /* One choreography, on load only. Never scroll-triggered. */

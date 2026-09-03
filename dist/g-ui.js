@@ -291,6 +291,26 @@
     });
   }
 
+  /* ---- view swap: page change inside persistent chrome ------------------ */
+
+  /* g.swap(el, update): fade the old content out (100ms), run `update` to
+     put the new view in, then replay the entrance stagger. Interruption
+     safe: rapid navigation cancels the pending swap and the last one wins. */
+  g.swap = (el, update) => {
+    clearTimeout(el._swapTimer);
+    el.setAttribute("data-leaving", "");
+    el._swapTimer = setTimeout(() => {
+      update(el);
+      el.removeAttribute("data-leaving");
+      if (el.classList.contains("enter")) {
+        el.classList.remove("enter");
+        void el.offsetWidth; /* restart the stagger */
+        el.classList.add("enter");
+      }
+      init(el);
+    }, 100);
+  };
+
   /* ---- status badge: swap with a blink ---------------------------------- */
 
   g.status = (el, { kind, label }) => {
