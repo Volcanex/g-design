@@ -252,7 +252,7 @@
         ?? document.querySelector(btn.getAttribute("data-copy-from"))?.textContent ?? "";
       try { await navigator.clipboard.writeText(text.trim()); } catch {}
       btn.setAttribute("data-copied", "");
-      if (label) label.textContent = "Copied";
+      if (label) { label.textContent = "Copied"; bridgeLabel(label); }
       live.textContent = "Copied to clipboard";
       clearTimeout(btn.timer); /* re-click resets the timer, never stacks */
       btn.timer = setTimeout(() => {
@@ -338,6 +338,13 @@
   /* Icons come from g-icons (concatenated ahead of this file by the build). */
   const icon = (name) => (g.icon ? g.icon(name) : "");
 
+  function bridgeLabel(el) {
+    if (!el) return;
+    el.classList.remove("g-label-bridge");
+    void el.offsetWidth;
+    el.classList.add("g-label-bridge");
+  }
+
   function announcer(btn) {
     let live = btn.querySelector(".g-live");
     if (!live) {
@@ -358,7 +365,7 @@
       apply?.();
       btn.setAttribute(attr, "");
       const doneText = btn.getAttribute("data-label-done");
-      if (label && doneText) label.textContent = doneText;
+      if (label && doneText) { label.textContent = doneText; bridgeLabel(label); }
       live.textContent = doneText || "Done";
       clearTimeout(btn._cycleTimer);
       btn._cycleTimer = setTimeout(() => {
@@ -393,7 +400,7 @@
         btn.removeAttribute("data-active");
         btn.setAttribute("data-done", "");
         const doneText = btn.getAttribute("data-label-done");
-        if (label && doneText) label.textContent = doneText;
+        if (label && doneText) { label.textContent = doneText; bridgeLabel(label); }
         live.textContent = doneText || "Downloaded";
         btn._cycleTimer = setTimeout(() => {
           btn.removeAttribute("data-done");
@@ -434,8 +441,9 @@
     if (!btn.querySelector(".gi-check")) btn.insertAdjacentHTML("afterbegin", icon("check"));
     btn.addEventListener("click", () => {
       /* one-way; a re-click resets the revert timer, never un-ticks */
+      const first = !btn.hasAttribute("data-done");
       btn.setAttribute("data-done", "");
-      if (label) label.textContent = btn.getAttribute("data-label-done") || label.textContent;
+      if (label && first) { label.textContent = btn.getAttribute("data-label-done") || label.textContent; bridgeLabel(label); }
       if (btn.hasAttribute("data-revert")) {
         clearTimeout(btn.timer);
         btn.timer = setTimeout(() => {

@@ -1270,6 +1270,7 @@ dialog.dlg[open]::backdrop { opacity: 1; }
   border-bottom: 1px solid var(--border-subtle);
 }
 .tab {
+  position: relative;
   height: 34px; padding: 0 11px;
   border: none; background: none;
   color: var(--text-secondary);
@@ -1278,6 +1279,9 @@ dialog.dlg[open]::backdrop { opacity: 1; }
   border-radius: var(--radius-sm) var(--radius-sm) 0 0;
   transition: color var(--dur-base) var(--ease-out), background var(--dur-base) var(--ease-out);
 }
+/* invisible detail: each tab's hit area bridges half the gap to its
+   neighbour, so hover never flickers off while crossing between tabs */
+.tab::before { content: ""; position: absolute; inset: 0 -1px; }
 .tab:hover { color: var(--text-primary); background: var(--fill-hover); }
 .tab[aria-selected="true"] { color: var(--text-primary); }
 .tab-indicator {
@@ -1342,6 +1346,14 @@ dialog.cmdk {
   color: var(--text-placeholder);
 }
 .cmdk-empty { padding: var(--sp-5); text-align: center; font-size: var(--font-size-ui); color: var(--text-secondary); }
+
+/* invisible detail: a swapped label blurs through the change instead of
+   snapping, bridging the two states (applied by the behaviour layer) */
+.g-label-bridge { animation: g-text-bridge 240ms var(--ease-out); }
+@keyframes g-text-bridge {
+  0%, 100% { filter: blur(0); opacity: 1; }
+  40% { filter: blur(2.5px); opacity: 0.45; }
+}
 
 /* ---------------------------------------------------------------- copy button */
 

@@ -12,6 +12,8 @@
   .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
   .cap { font-size: 12px; color: var(--text-secondary); }
   .skel-pair { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4); }
+  .skel-pair[data-overlay] { grid-template-columns: 1fr; position: relative; max-width: 360px; }
+  .skel-pair[data-overlay] > .card:first-child { position: absolute; inset: 0; opacity: 0.5; pointer-events: none; z-index: 1; }
   .line-item { display: flex; align-items: center; gap: 10px; }
   .line-item .lines { flex: 1; display: flex; flex-direction: column; gap: 6px; }
   .tabpanels { font-size: var(--font-size-ui); color: var(--text-secondary); padding: 10px 2px; }
@@ -35,7 +37,7 @@
     <span class="cap">A status blinks a few times as it flips, so the change registers.</span>
   </section>
   <section>
-    <span class="label">Skeleton mirrors its content</span>
+    <div class="row"><span class="label">Skeleton mirrors its content</span><button class="btn btn-tertiary btn-sm" onclick="document.querySelector('.skel-pair').toggleAttribute('data-overlay')">Prove it</button></div>
     <div class="skel-pair">
       <div class="card line-item">
         <span class="skeleton" style="width:26px;height:26px;border-radius:50%"></span>
@@ -46,7 +48,7 @@
         <span class="lines"><span style="font-size:13px;font-weight:500">Gabriel Penman</span><span style="font-size:11px;color:var(--text-secondary)">deployed g-site</span></span>
       </div>
     </div>
-    <span class="cap">Same layout tokens on both sides so they cannot drift. Shimmer runs left to right, and a 350ms delay stops quick loads flashing it.</span>
+    <span class="cap">Same layout tokens on both sides so they cannot drift. Prove it superimposes the skeleton on the loaded card; the shapes align exactly. Shimmer runs left to right, and a 350ms delay stops quick loads flashing it.</span>
   </section>
   <section>
     <span class="label">Tabs</span>

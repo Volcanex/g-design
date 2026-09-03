@@ -1,4 +1,4 @@
-<!-- @dsCard group="Guidelines" name="Motion" subtitle="Two curves, four durations, three springs generated as CSS linear()." viewport="760x460" -->
+<!-- @dsCard group="Guidelines" name="Motion" subtitle="Two curves, four durations, three springs generated as CSS linear()." viewport="760x600" -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -28,6 +28,13 @@
     <div class="rule"><span class="mono">no ambient</span>No scroll reveals, no ambient motion, none on frequent actions</div>
     <div class="rule"><span class="mono">interruptible</span>Transitions, not queued animations: five clicks is one movement</div>
     <div class="rule"><span class="mono">reduced motion</span>Falls back to crossfades, never to nothing</div>
+    <h3 style="margin-top:8px">When not to animate</h3>
+    <div class="rule"><span class="mono">frequent</span>Actions repeated many times an hour carry no motion: typing feedback, table row hover, plain navigation clicks</div>
+    <div class="rule"><span class="mono">hover</span>Hover states change colour and border, never position or size; the button's 2% growth is the single exception</div>
+    <div class="rule"><span class="mono">ambient</span>Nothing moves because a surface looked static; motion answers an action or shows what changed</div>
+    <h3 style="margin-top:8px">Named principles</h3>
+    <div class="rule"><span class="mono">anticipation</span>Hold-to-delete: the trash lid opens and the body wiggles before anything is destroyed</div>
+    <div class="rule"><span class="mono">follow-through</span>The bell's clapper trails its body by 60ms; toasts settle on a spring past their resting point</div>
   </div>
   <div class="demos">
     <h3>Springs</h3>
