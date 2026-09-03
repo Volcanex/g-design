@@ -815,6 +815,10 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
+/* components set their own display, which would otherwise beat the UA's
+   [hidden] rule; the hidden attribute must always win */
+[hidden] { display: none !important; }
+
 body {
   margin: 0;
   background: var(--surface-1);
