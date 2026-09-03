@@ -21,15 +21,15 @@
       <button class="btn btn-secondary">Preview</button>
       <button class="btn btn-tertiary">Cancel</button>
     </div>
-    <span class="cap">Primary is the far end of the neutral scale. Every neutral control keeps a visible border — no naked ghosts.</span>
+    <span class="cap">Primary is the far end of the neutral scale. Every neutral control keeps a visible border; no naked ghosts.</span>
   </section>
   <section>
     <span class="label">Meaning</span>
     <div class="row">
-      <button class="btn btn-go"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg>Confirm order</button>
-      <button class="btn btn-danger"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"/></svg>Delete project</button>
+      <button class="btn btn-go confirm-btn" data-revert data-label="Approve" data-label-done="Approved"><span class="confirm-label">Approve</span></button>
+      <button class="btn btn-danger hold-btn" data-hold-ms="900"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"/></svg><span>Hold to delete</span></button>
     </div>
-    <span class="cap">Green commits, red destroys. Always solid, never outlined, always an icon — colour alone is not a signal. A view never holds both a contrast primary and a go.</span>
+    <span class="cap">Green commits, red destroys; always solid, never used for emphasis. Approve starts bare and draws its tick when clicked. Delete only fires after a held press: the fill sweeps, the trash wiggles, and releasing early rewinds it. A view never holds both a contrast primary and a go.</span>
   </section>
   <section>
     <span class="label">Sizes &amp; shapes</span>
@@ -53,11 +53,16 @@
         <span class="copy-label">Copy</span>
       </button>
     </div>
-    <span class="cap">Loading overlays the spinner — the width never changes, nothing reflows. Copy cross-fades two icons in a fixed box and resets its timer on re-click instead of stacking timeouts.</span>
+    <span class="cap">Loading overlays the spinner, so the width never changes and nothing reflows. Copy cross-fades two icons in a fixed box and resets its timer on re-click instead of stacking timeouts.</span>
   </section>
   <section>
     <span class="label">Spec</span>
     <span class="cap mono" style="font-size:11px">32px · 0 12px · radius 6.5 · 13px/450/−0.003em · gap 6 · icon 15 · press scale(0.97) · 140ms ease-out</span>
   </section>
+<script>
+document.addEventListener("hold-complete", (e) => {
+  if (e.target.closest(".hold-btn")) g.toast({ title: "Project deleted", desc: "Held for 900ms, so no accidents", kind: "danger" });
+});
+</script>
 </body>
 </html>

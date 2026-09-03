@@ -6,38 +6,67 @@ fills and borders, motion that answers actions.
 
 ## Shape
 
-- `packages/g-tokens` — the product. `scripts/build-tokens.mjs` generates
-  `dist/tokens.css` from `@radix-ui/colors` (never hand-edit the output).
-  Fonts vendored from State: InterVariable, Space Grotesk, JetBrains Mono.
-- `packages/g-ui` — framework-free component layer: `g-ui.css` + `g-ui.js`.
-- `apps/docs` — reference cards, every example is the real component.
-- `dist/` — built artifacts. `g.css` is the one-link-tag path: a static
-  HTML page gets the whole system with `<link rel="stylesheet" href="g.css">`
-  and optionally `<script defer src="g-ui.js">`. No build step.
+- `packages/g-tokens` is the product. `scripts/build-tokens.mjs` generates
+  `dist/tokens.css` from `@radix-ui/colors`; never hand-edit the output.
+  Fonts are vendored from State: InterVariable, Space Grotesk, JetBrains Mono.
+- `packages/g-ui` is the framework-free component layer: `g-ui.css` plus
+  `g-ui.js`.
+- `packages/g-ui-react` is the React layer: thin wrappers over Base UI,
+  Sonner, Vaul, cmdk, NumberFlow and Motion, all painted with the same
+  tokens. `npm run build` there produces the React lab page in the docs.
+- `apps/docs` holds the reference cards; every example is the real
+  component. `apps/docs/r/` is a shadcn-compatible registry, generated.
+- `dist/` is the one-link-tag path: a static HTML page gets the whole
+  system with `<link rel="stylesheet" href="g.css">` and optionally
+  `<script defer src="g-ui.js">`. No build step. That path stays first-class.
 
-Build: `node scripts/build.mjs`
+Build everything: `node scripts/build.mjs`
+
+The build gates itself: AA contrast is verified by script in both themes
+(`scripts/check-contrast.mjs`), and stylelint enforces the greys rule.
+A failing gate fails the build.
 
 ## The load-bearing rules
 
 - **The greys rule.** Radix gives twelve slate steps; the system uses six.
-  Solid slate-3..7 are forbidden as backgrounds — every interaction fill and
-  every border is an alpha value, so nested surfaces compose.
-- **Colour means something.** Green commits, red destroys; both always solid,
-  always with an icon, never used for emphasis. Not overridable.
-- **The accent slot.** `--accent-fill`, `--accent-fill-hover`, `--accent-fg`,
-  `--accent-edge` are the entire per-app override surface; they default to the
-  contrast primary (far end of the neutral scale).
-- **Themes.** Dark is the default, unconditionally. `data-theme="light"` opts
-  a tree out, `data-theme="system"` follows the OS, any element can re-assert
-  a mode (theme islands compose). Aliases are re-declared on `[data-theme]`
-  because var() substitutes where a property is declared.
+  Solid slate 3 to 7 are forbidden as backgrounds. Every interaction fill
+  and every border is an alpha value, so nested surfaces compose.
+- **Colour means something.** Green commits, red destroys; both always
+  solid, always with an icon, never used for emphasis. Not overridable.
+- **The accent slot.** `--accent-fill`, `--accent-fill-hover`,
+  `--accent-fg` and `--accent-edge` are the entire per-app override
+  surface; they default to the contrast primary.
+- **Status text is derived, not picked.** Step 11 of each status scale is
+  walked toward step 12 at build time until it clears 4.5:1 on its own
+  wash. The solid go and danger fills hold 3:1 with a mandatory icon.
+- **Themes.** Dark is the default, unconditionally. `data-theme="light"`
+  opts a tree out, `data-theme="system"` follows the OS, and any element
+  can re-assert a mode, so theme islands compose. Aliases are re-declared
+  on `[data-theme]` because var() substitutes where a property is declared.
 - **Elevation** is a 1px alpha border plus an inset top highlight. Drop
-  shadows exist only on the floating layers (menu, dialog, toast).
-- **Motion.** Two curves, four durations (100/140/200/500ms), three springs
-  generated as CSS `linear()` at build time. 300ms ceiling except the sheet.
-  Reduced motion falls back to crossfades.
-- **Density.** `data-density="compact"` on the root remaps control heights,
-  paddings and font sizes. Never a per-component prop.
+  shadows exist only on the floating layers: menu, dialog, toast.
+- **Motion.** Two curves, four durations (100/140/200/500ms), three
+  springs generated as CSS `linear()` at build time. Nothing over 300ms
+  except the sheet. Transitions, never queued animations. Reduced motion
+  falls back to crossfades.
+- **Density.** `data-density="compact"` on the root remaps control
+  heights, paddings and font sizes. Never a per-component prop.
+- **Voice.** Sentence case everywhere; capitalisation is enforced, not
+  optional. Verb-first buttons. The same word survives the whole flow, so
+  Publish makes Published. Em dashes are banned; hyphens are discouraged
+  outside technical terms.
+
+## Signature interactions
+
+The stateful buttons set the tone for the rest: copy cross-fades its two
+icons in a fixed box and resets its timer on re-click; approve starts bare
+and draws its tick when clicked; destructive actions are hold-to-delete,
+a sweep that rewinds if released early. Status badges blink as they flip.
+Buttons grow by 2% on hover and compress to 97% on press. Tooltips share
+one 300ms warm-up and flip below when out of headroom. Toasts stack with
+scale and a 14px offset, pause on hover, carry actions, and a loading
+toast resolves in place. The robustness card runs the whole set under
+spammed input and interrupted animation, and must stay green.
 
 ## Using it in a project
 
@@ -48,4 +77,5 @@ design = "g-system@0.1.0"
 
 Copy `dist/` into the project's static assets. Override the four accent
 variables to rebrand. Components use the aliasing layer
-(`--surface-*`, `--border*`, `--fill-*`, `--text-*`) — never `slate-*` hex.
+(`--surface-*`, `--border*`, `--fill-*`, `--text-*`), never `slate-*` hex.
+React projects can pull components from the registry in `apps/docs/r/`.

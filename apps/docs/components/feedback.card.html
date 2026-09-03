@@ -21,16 +21,18 @@
   <section>
     <span class="label">Status</span>
     <div class="row">
-      <span class="badge badge-ok">Live</span>
+      <span class="badge badge-ok" id="status-demo">Live</span>
       <span class="badge badge-warn">Degraded</span>
       <span class="badge badge-danger">Down</span>
       <span class="badge badge-info">Beta</span>
       <span class="badge badge-plain">Archived</span>
+      <button class="btn btn-tertiary btn-sm" onclick="nextStatus()">Simulate change</button>
       <span style="flex:1"></span>
       <span class="avatar-stack"><span class="avatar">GP</span><span class="avatar">JK</span><span class="avatar">+3</span></span>
       <span class="spinner" role="status" aria-label="Loading"></span>
       <span class="kbd">⌘</span><span class="kbd">K</span>
     </div>
+    <span class="cap">A status blinks a few times as it flips, so the change registers.</span>
   </section>
   <section>
     <span class="label">Skeleton mirrors its content</span>
@@ -44,7 +46,7 @@
         <span class="lines"><span style="font-size:13px;font-weight:500">Gabriel Penman</span><span style="font-size:11px;color:var(--text-secondary)">deployed g-site</span></span>
       </div>
     </div>
-    <span class="cap">Same layout tokens on both sides so they cannot drift. Shimmer runs left-to-right; a 350ms show-delay stops sub-second loads flashing it.</span>
+    <span class="cap">Same layout tokens on both sides so they cannot drift. Shimmer runs left to right, and a 350ms delay stops quick loads flashing it.</span>
   </section>
   <section>
     <span class="label">Tabs</span>
@@ -54,7 +56,7 @@
       <button class="tab" role="tab" aria-controls="p-set">Settings</button>
     </div>
     <div class="tabpanels">
-      <div id="p-over" role="tabpanel">The indicator slides between tabs — 200ms ease-out on transform and width.</div>
+      <div id="p-over" role="tabpanel">The indicator slides between tabs: 200ms ease-out on transform and width.</div>
       <div id="p-logs" role="tabpanel" hidden>Nothing new in the last hour.</div>
       <div id="p-set" role="tabpanel" hidden>Settings live here.</div>
     </div>
@@ -66,7 +68,7 @@
       <button class="btn btn-secondary" onclick="document.getElementById('demo-dlg').showModal()">Delete service…</button>
       <button class="btn btn-secondary" onclick="g.toast({title:'Deployment started',desc:'g-site · edition 42',kind:'ok'})">Toast</button>
       <button class="btn btn-tertiary" data-tip="Tooltips share a warm-up: 300ms once, then instant between neighbours">Hover me</button>
-      <button class="btn btn-tertiary" data-tip="See — no wait this time">Then me</button>
+      <button class="btn btn-tertiary" data-tip="See, no wait this time">Then me</button>
     </div>
   </section>
 
@@ -87,5 +89,13 @@
       <button class="btn btn-danger" onclick="this.closest('dialog').close();g.toast({title:'state-api deleted',desc:'Restorable until 3 October',kind:'danger'})"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"/></svg>Delete service</button>
     </div>
   </dialog>
+<script>
+const STATES = [["danger", "Down"], ["ok", "Live"], ["warn", "Degraded"]];
+let si = 0;
+function nextStatus() {
+  const [kind, label] = STATES[si++ % STATES.length];
+  g.status(document.getElementById("status-demo"), { kind, label });
+}
+</script>
 </body>
 </html>

@@ -30,11 +30,11 @@
     </div>
     <div class="overlay-demo">
       <span class="card-title">Overlay</span>
-      <div class="spec">--overlay-bg · surface-2<br>--overlay-shadow<br>floating layers only</div>
+      <div class="spec">--overlay-bg · surface-2<br>--overlay-shadow<br>Floating layers only</div>
     </div>
     <div class="well">
       <span class="card-title">Well</span>
-      <div class="spec">--well-bg · slate-a3<br>--well-border · slate-a6<br>code, quiet regions</div>
+      <div class="spec">--well-bg · slate-a3<br>--well-border · slate-a6<br>Code, quiet regions</div>
     </div>
   </div>
   <div class="radii">
@@ -43,6 +43,6 @@
     <div class="r-demo"><div class="box" style="border-radius:var(--radius-card)"></div>9.5 · card</div>
     <div class="r-demo"><div class="box" style="border-radius:var(--radius-full);width:44px"></div>full · pill</div>
   </div>
-  <p class="note">In-flow elements never cast drop shadows — Linear's treatment: a 1px alpha border plus an <span class="mono">inset 0 1px 0</span> highlight reads as elevation without murk. Shadows are reserved for the two floating layers (menus, dialogs, toasts) that genuinely sit above the page. Translucency and glass are rejected: alpha is for composing borders and fills, not for blurring content behind surfaces.</p>
+  <p class="note">In-flow elements never cast drop shadows. Linear's treatment applies instead: a 1px alpha border plus an <span class="mono">inset 0 1px 0</span> highlight reads as elevation without murk. Shadows are reserved for the two floating layers (menus, dialogs, toasts) that genuinely sit above the page. Translucency and glass are rejected: alpha is for composing borders and fills, not for blurring content behind surfaces.</p>
 </body>
 </html>

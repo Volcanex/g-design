@@ -21,13 +21,13 @@
 <body>
   <div class="rules">
     <h3>The rules</h3>
-    <div class="rule"><span class="mono">ease-out</span>default for everything; ease-in-out only for on-screen movement</div>
-    <div class="rule"><span class="mono">≤ 300ms</span>hard ceiling — only the sheet (500ms) exceeds it</div>
-    <div class="rule"><span class="mono">transform, opacity</span>the only animated properties without written justification</div>
-    <div class="rule"><span class="mono">scale(0.97)</span>press feedback; nothing enters below scale(0.95)</div>
-    <div class="rule"><span class="mono">no ambient</span>no scroll reveals, no hover animation on every card, no motion on frequent actions</div>
-    <div class="rule"><span class="mono">interruptible</span>transitions, not queued animations — five clicks is one movement</div>
-    <div class="rule"><span class="mono">reduced motion</span>falls back to crossfades, never to nothing</div>
+    <div class="rule"><span class="mono">ease-out</span>Default for everything; ease-in-out only for movement on screen</div>
+    <div class="rule"><span class="mono">≤ 300ms</span>Hard ceiling. Only the sheet (500ms) exceeds it</div>
+    <div class="rule"><span class="mono">transform, opacity</span>The only animated properties without written justification</div>
+    <div class="rule"><span class="mono">scale(0.97)</span>Press feedback; nothing enters below scale(0.95)</div>
+    <div class="rule"><span class="mono">no ambient</span>No scroll reveals, no ambient motion, none on frequent actions</div>
+    <div class="rule"><span class="mono">interruptible</span>Transitions, not queued animations: five clicks is one movement</div>
+    <div class="rule"><span class="mono">reduced motion</span>Falls back to crossfades, never to nothing</div>
   </div>
   <div class="demos">
     <h3>Springs</h3>
@@ -35,7 +35,7 @@
     <div class="spring-demo" style="--_e:var(--spring-smooth);--_d:var(--spring-smooth-dur)"><span>smooth 300ms</span><div class="ball"></div></div>
     <div class="spring-demo" style="--_e:var(--spring-sheet);--_d:var(--spring-sheet-dur)"><span>sheet 500ms</span><div class="ball"></div></div>
     <button class="btn btn-secondary btn-sm" onclick="document.querySelectorAll('.spring-demo').forEach(d=>d.classList.toggle('run'))">Run springs</button>
-    <p style="font-size:12px;color:var(--text-secondary);line-height:1.55">Generated as CSS <span class="mono">linear()</span> from visualDuration and bounce at build time — zero JS at runtime, <span class="mono">ease-out</span> fallback where unsupported. Ad-hoc values are forbidden.</p>
+    <p style="font-size:12px;color:var(--text-secondary);line-height:1.55">Generated as CSS <span class="mono">linear()</span> from visualDuration and bounce at build time: zero JS at runtime, with an <span class="mono">ease-out</span> fallback where unsupported. Ad-hoc values are forbidden.</p>
   </div>
 </body>
 </html>

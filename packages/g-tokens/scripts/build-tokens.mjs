@@ -6,10 +6,12 @@ import {
   red, redA, redDark, redDarkA,
   green, greenA, greenDark, greenDarkA,
   blue, blueA, blueDark, blueDarkA,
+  amber, amberA, amberDark, amberDarkA,
 } from "@radix-ui/colors";
-import { writeFileSync, mkdirSync, readFileSync } from "node:fs";
+import { writeFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { deriveText } from "../../../scripts/color-math.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -36,6 +38,8 @@ function scaleBlock(mode) {
     vars(d ? greenDarkA : greenA, "green", true),
     vars(d ? blueDark : blue, "blue"),
     vars(d ? blueDarkA : blueA, "blue", true),
+    vars(d ? amberDark : amber, "amber"),
+    vars(d ? amberDarkA : amberA, "amber", true),
   ].join("\n");
 }
 
@@ -53,9 +57,20 @@ function p3Block(mode) {
 
 function semantics(mode) {
   const d = mode === "dark";
+  // Status text is derived, not picked: step 11 walked toward step 12 until
+  // it clears AA (4.5) on its own wash over the card surface (worst case).
+  const surface = d ? slateDark.slate2 : slate.slate2;
+  const okText = deriveText(d ? greenDark.green11 : green.green11, d ? greenDark.green12 : green.green12, d ? greenDarkA.greenA3 : greenA.greenA3, surface);
+  const warnText = deriveText(d ? amberDark.amber11 : amber.amber11, d ? amberDark.amber12 : amber.amber12, d ? amberDarkA.amberA3 : amberA.amberA3, surface);
+  const dangerText = deriveText(d ? redDark.red11 : red.red11, d ? redDark.red12 : red.red12, d ? redDarkA.redA3 : redA.redA3, surface);
+  const infoText = deriveText(d ? blueDark.blue11 : blue.blue11, d ? blueDark.blue12 : blue.blue12, d ? blueDarkA.blueA3 : blueA.blueA3, surface);
   return `  --contrast-fill: var(--slate-12);
   --contrast-fill-hover: ${d ? "#fcfcfd" : "#2b3036"};
   --contrast-fg: var(--slate-1);
+  --ok-text: ${okText};
+  --warn-text: ${warnText};
+  --danger-text: ${dangerText};
+  --info-text: ${infoText};
   --shadow-overlay: ${d
     ? "0 0 0 1px var(--slate-a6), 0 8px 24px rgb(0 0 0 / 0.42), 0 2px 8px rgb(0 0 0 / 0.32)"
     : "0 0 0 1px var(--slate-a4), 0 8px 24px rgb(0 10 30 / 0.10), 0 2px 8px rgb(0 10 30 / 0.06)"};`;
@@ -126,7 +141,6 @@ const staticTokens = `  /* ---- aliasing layer: components reference these, neve
   --danger-edge: var(--red-10);
   --danger-fill-hover: var(--red-10);
   --danger-fg: #ffffff;
-  --info-text: var(--blue-11);
 
   /* ---- materials: named surface presets (bg / border / highlight) ---- */
   --card-bg: var(--surface-2);
@@ -177,9 +191,9 @@ ${Object.entries(springs).map(([name, s]) =>
   --accent: var(--accent-fill);
   --accent-on: var(--accent-fg);
   --border-strong: var(--border);
-  --ok: var(--green-9);
-  --warn: #d9822b;
-  --danger: var(--red-9);`;
+  --ok: var(--ok-text);
+  --warn: var(--warn-text);
+  --danger: var(--danger-text);`;
 
 const css = `/* g-tokens — generated from @radix-ui/colors by scripts/build-tokens.mjs. Do not edit. */
 

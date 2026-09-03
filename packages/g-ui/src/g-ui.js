@@ -47,8 +47,12 @@
     const r = trigger.getBoundingClientRect();
     el.style.left = "0px"; el.style.top = "0px";
     const w = el.offsetWidth, h = el.offsetHeight;
+    /* Prefer above; flip below when there is no headroom. */
+    const above = r.top - h - 6 >= 8;
+    el.toggleAttribute("data-side", false);
+    if (!above) el.setAttribute("data-side", "bottom");
     el.style.left = Math.max(8, Math.min(innerWidth - w - 8, r.left + r.width / 2 - w / 2)) + "px";
-    el.style.top = Math.max(8, r.top - h - 6) + "px";
+    el.style.top = (above ? r.top - h - 6 : r.bottom + 6) + "px";
     el.setAttribute("data-open", "");
     trigger.setAttribute("aria-describedby", "g-tooltip");
     tipWarm = true;
@@ -148,30 +152,50 @@
 
   let toaster;
   const toasts = [];
-  g.toast = ({ title, desc, kind } = {}) => {
+  const TOAST_ICONS = {
+    ok: '<svg class="t-ok" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"/></svg>',
+    danger: '<svg class="t-danger" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-80V80a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,172Z"/></svg>',
+    loading: '<span class="spinner"></span>',
+  };
+  function toastBody(el, { title, desc, kind, action }) {
+    el.innerHTML = `${TOAST_ICONS[kind] || ""}<div class="t-body"><b>${title || ""}</b>${desc ? `<div class="t-desc">${desc}</div>` : ""}</div>`;
+    if (action) {
+      const b = document.createElement("button");
+      b.className = "btn btn-secondary btn-sm";
+      b.textContent = action.label;
+      b.addEventListener("click", () => { action.onClick?.(); dismiss(el); });
+      el.append(b);
+    }
+  }
+  g.toast = (opts = {}) => {
     if (!toaster) {
       toaster = document.createElement("div");
       toaster.className = "toaster";
       toaster.setAttribute("aria-live", "polite");
       document.body.append(toaster);
+      toaster.addEventListener("pointerenter", () => toasts.forEach((t) => clearTimeout(t.timer)));
+      toaster.addEventListener("pointerleave", () =>
+        toasts.forEach((t) => { if (!t.sticky) t.timer = setTimeout(() => dismiss(t), 2000); }));
     }
     const el = document.createElement("div");
     el.className = "toast";
     el.setAttribute("data-entering", "");
-    const icon = kind === "ok"
-      ? '<svg class="t-ok" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"/></svg>'
-      : kind === "danger"
-      ? '<svg class="t-danger" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-80V80a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,172Z"/></svg>'
-      : "";
-    el.innerHTML = `${icon}<div><b>${title || ""}</b>${desc ? `<div class="t-desc">${desc}</div>` : ""}</div>`;
+    toastBody(el, opts);
+    el.sticky = opts.kind === "loading" || opts.sticky;
     toaster.append(el);
     toasts.unshift(el);
     requestAnimationFrame(() => { el.removeAttribute("data-entering"); restack(); });
-    el.timer = setTimeout(() => dismiss(el), 4000);
-    toaster.addEventListener("pointerenter", () => toasts.forEach((t) => clearTimeout(t.timer)));
-    toaster.addEventListener("pointerleave", () =>
-      toasts.forEach((t) => { t.timer = setTimeout(() => dismiss(t), 2000); }));
-    return el;
+    if (!el.sticky) el.timer = setTimeout(() => dismiss(el), opts.duration || 4000);
+    return {
+      el,
+      update(next) {
+        toastBody(el, next);
+        el.sticky = next.kind === "loading" || next.sticky;
+        clearTimeout(el.timer);
+        if (!el.sticky) el.timer = setTimeout(() => dismiss(el), next.duration || 4000);
+      },
+      dismiss: () => dismiss(el),
+    };
   };
   function restack() {
     toasts.forEach((t, i) => {
@@ -267,6 +291,72 @@
     });
   }
 
+  /* ---- status badge: swap with a blink ---------------------------------- */
+
+  g.status = (el, { kind, label }) => {
+    el.className = "badge" + (kind ? " badge-" + kind : "");
+    if (label != null) el.textContent = label;
+    el.removeAttribute("data-flash");
+    void el.offsetWidth; /* restart the animation */
+    el.setAttribute("data-flash", "");
+  };
+
+  /* ---- confirm button: tick draws in on click --------------------------- */
+
+  function initConfirm(btn) {
+    const label = btn.querySelector(".confirm-label");
+    btn.style.minWidth = btn.offsetWidth + "px";
+    if (!btn.querySelector(".i-tick")) {
+      const s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      s.setAttribute("viewBox", "0 0 256 256");
+      s.setAttribute("aria-hidden", "true");
+      s.classList.add("i-tick");
+      s.innerHTML = '<path pathLength="1" d="M48 140 L100 190 L212 70"/>';
+      btn.prepend(s);
+    }
+    btn.addEventListener("click", () => {
+      /* one-way; a re-click resets the revert timer, never un-ticks */
+      btn.setAttribute("data-done", "");
+      if (label) label.textContent = btn.getAttribute("data-label-done") || label.textContent;
+      if (btn.hasAttribute("data-revert")) {
+        clearTimeout(btn.timer);
+        btn.timer = setTimeout(() => {
+          btn.removeAttribute("data-done");
+          if (label) label.textContent = btn.getAttribute("data-label") || label.textContent;
+        }, 2000);
+      }
+    });
+  }
+
+  /* ---- hold to delete ---------------------------------------------------- */
+
+  function initHold(btn) {
+    if (!btn.querySelector(".hold-fill")) {
+      const f = document.createElement("span");
+      f.className = "hold-fill";
+      btn.prepend(f);
+    }
+    const dur = parseInt(btn.getAttribute("data-hold-ms") || "900", 10);
+    btn.style.setProperty("--hold-dur", dur + "ms");
+    let timer;
+    const start = () => {
+      if (btn.disabled || btn.hasAttribute("data-holding")) return;
+      btn.setAttribute("data-holding", "");
+      timer = setTimeout(() => {
+        cancel();
+        btn.dispatchEvent(new CustomEvent("hold-complete", { bubbles: true }));
+      }, dur);
+    };
+    const cancel = () => { clearTimeout(timer); btn.removeAttribute("data-holding"); };
+    btn.addEventListener("pointerdown", start);
+    btn.addEventListener("pointerup", cancel);
+    btn.addEventListener("pointerleave", cancel);
+    btn.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); if (!e.repeat) start(); } });
+    btn.addEventListener("keyup", (e) => { if (e.key === "Enter" || e.key === " ") cancel(); });
+    /* a completed hold is the click; suppress the plain click action */
+    btn.addEventListener("click", (e) => e.preventDefault());
+  }
+
   /* ---- dialogs: light-dismiss ------------------------------------------ */
 
   function initDialog(dlg) {
@@ -281,6 +371,8 @@
     root.querySelectorAll(".tabs").forEach(initTabs);
     root.querySelectorAll(".menu[popover]").forEach(initMenu);
     root.querySelectorAll(".copy-btn").forEach(initCopy);
+    root.querySelectorAll(".confirm-btn").forEach(initConfirm);
+    root.querySelectorAll(".hold-btn").forEach(initHold);
     root.querySelectorAll("dialog.cmdk").forEach(initCmdk);
     root.querySelectorAll("dialog.dlg").forEach(initDialog);
   }

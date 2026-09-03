@@ -1,0 +1,132 @@
+/* React shim: Base UI and friends render their own structure, so the parts
+   that g-ui.css drives with pseudo-elements or the Popover API get element
+   equivalents here. Visual recipes are identical, tokens only. */
+
+/* Switch: element thumb instead of ::after */
+.rswitch {
+  width: 34px; height: 20px; padding: 0;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  background: var(--fill-active);
+  cursor: pointer;
+  position: relative;
+  transition: background var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
+}
+.rswitch[data-checked] { background: var(--accent-fill); border-color: var(--accent-edge); }
+.rswitch-thumb {
+  position: absolute; top: 2px; left: 2px;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--slate-11);
+  transition: translate var(--spring-snap-dur) var(--spring-snap), background var(--dur-base) var(--ease-out);
+}
+.rswitch[data-checked] .rswitch-thumb { translate: 14px 0; background: var(--accent-fg); }
+
+/* Dialog: Base UI popup + backdrop, states from data attributes */
+.rdlg-backdrop {
+  position: fixed; inset: 0;
+  background: rgb(0 0 0 / 0.44);
+  transition: opacity var(--dur-slow) var(--ease-out);
+}
+.rdlg-backdrop[data-starting-style], .rdlg-backdrop[data-ending-style] { opacity: 0; }
+.rdlg {
+  position: fixed; top: 50%; left: 50%;
+  translate: -50% -50%;
+  width: min(440px, calc(100vw - 32px));
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-card);
+  background: var(--overlay-bg);
+  color: var(--text-primary);
+  box-shadow: var(--overlay-shadow);
+  transition: opacity var(--dur-slow) var(--ease-out), scale var(--dur-slow) var(--ease-out);
+}
+.rdlg[data-starting-style], .rdlg[data-ending-style] { opacity: 0; scale: 0.97; }
+
+/* Menu and tooltip popups: Base UI positions them; only paint and enter/exit here */
+.rmenu, .rtip { position: static; }
+.rmenu {
+  transition: opacity var(--dur-base) var(--ease-out), scale var(--dur-base) var(--ease-out);
+}
+.rmenu[data-starting-style], .rmenu[data-ending-style] { opacity: 0; scale: 0.97; }
+.rtip {
+  pointer-events: none;
+  transition: opacity var(--dur-fast) var(--ease-out), scale var(--dur-fast) var(--ease-out);
+}
+.rtip[data-starting-style], .rtip[data-ending-style] { opacity: 0; scale: 0.97; }
+.rtip, .rmenu { opacity: 1; translate: 0 0; scale: 1; }
+
+/* Tabs: indicator driven by Base UI's CSS variables */
+.rtabs { position: relative; }
+.rtab-indicator {
+  position: absolute;
+  bottom: -1px;
+  left: var(--active-tab-left);
+  width: var(--active-tab-width);
+  height: 2px;
+  background: var(--text-primary);
+  transition: left var(--dur-slow) var(--ease-out), width var(--dur-slow) var(--ease-out);
+}
+.rtab-panel { padding: 10px 2px; font-size: var(--font-size-ui); color: var(--text-secondary); }
+
+/* Drawer (Vaul): the one 500ms surface, ease-ios, velocity dismissal */
+.rdrawer-overlay { position: fixed; inset: 0; background: rgb(0 0 0 / 0.44); }
+.rdrawer {
+  position: fixed; left: 0; right: 0; bottom: 0;
+  border-top: 1px solid var(--card-border);
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+  background: var(--overlay-bg);
+  box-shadow: var(--overlay-shadow);
+  padding: var(--sp-3) var(--sp-5) var(--sp-6);
+  display: flex; flex-direction: column; gap: var(--sp-3);
+  outline: none;
+}
+.rdrawer-handle {
+  width: 36px; height: 4px;
+  border-radius: var(--radius-full);
+  background: var(--fill-active);
+  margin: 0 auto var(--sp-2);
+}
+
+/* cmdk: embedded panel */
+.rcmdk { padding: 0; overflow: hidden; }
+.rcmdk .menu-item[data-selected="true"] { background: var(--fill-hover); }
+.rcmdk [cmdk-group-heading] {
+  padding: 7px 8px 4px;
+  font-size: 11px; font-weight: 500;
+  color: var(--text-placeholder);
+}
+
+/* Sonner: unstyled toasts painted with the g recipe */
+.rtoast {
+  display: flex; align-items: flex-start; gap: 9px;
+  width: 320px;
+  padding: 11px 12px;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-card);
+  background: var(--overlay-bg);
+  box-shadow: var(--overlay-shadow);
+  font-size: var(--font-size-ui);
+  font-family: var(--font-ui);
+  color: var(--text-primary);
+}
+.rtoast [data-title] { font-weight: 500; }
+.rtoast [data-description] { color: var(--text-secondary); font-size: 12px; margin-top: 1px; }
+.rtoast [data-icon] { margin-top: 1px; }
+.rtoast[data-type="success"] [data-icon] { color: var(--ok-text); }
+.rtoast[data-type="error"] [data-icon] { color: var(--danger-text); }
+
+/* Page scaffolding for the lab */
+.lab { max-width: 1080px; margin: 0 auto; padding: var(--sp-6) var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-5); }
+.lab section { display: flex; flex-direction: column; gap: 10px; }
+.lab .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.lab .cap { font-size: 12px; color: var(--text-secondary); max-width: 640px; line-height: 1.55; }
+.lab .cols { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-5); align-items: start; }
+.stat { display: flex; flex-direction: column; gap: 4px; }
+.stat .v { font-size: 22px; font-weight: 500; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.stat .k { font-size: 12px; color: var(--text-secondary); }
+
+/* Motion expander demo */
+.exp-list { display: flex; flex-direction: column; gap: 8px; }
+.exp-item { cursor: pointer; }
+.exp-item .line { display: flex; align-items: center; gap: 10px; }
+.exp-detail { margin-top: 10px; font-size: 12px; color: var(--text-secondary); line-height: 1.6; }

@@ -7,7 +7,14 @@
   },
   "dependencies": {
     "@phosphor-icons/core": "^2.1.1",
-    "@radix-ui/colors": "^3.0.0"
+    "@radix-ui/colors": "^3.0.0",
+    "number-flow": "^0.6.2"
   },
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.3",
+    "postcss-html": "^2.0.0",
+    "stylelint": "^17.14.1",
+    "tailwindcss": "^4.3.3"
+  }
 }

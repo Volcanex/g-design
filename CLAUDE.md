@@ -4,35 +4,40 @@
 **What:** The design language that replaces both `g-design-language`
 (OS-zine) and the discarded `g-design-neutral` draft as the base for new
 work. Built to the "g-system design language: build brief" (2026-09).
-`packages/g-tokens` is the product; `packages/g-ui` is the component
-layer; `apps/docs` demonstrates it.
+`packages/g-tokens` is the product; `packages/g-ui` the framework-free
+layer; `packages/g-ui-react` the React layer; `apps/docs` demonstrates it.
 
 ## Gotchas
 
-- `dist/tokens.css` and `apps/docs/assets/*` are **generated** — edit
-  `packages/g-tokens/scripts/build-tokens.mjs` or `packages/g-ui/src/*`
-  and run `node scripts/build.mjs`. Never hand-edit outputs.
-- Dark is the hard default (`:root`). The lock "dark is the default"
-  is implemented as: no attribute → dark, `data-theme="light"` → light,
-  `data-theme="system"` → follow OS. Diverges from the brief's snippet
-  (which was light-first under prefers-color-scheme) on purpose.
-- The aliasing layer is declared on `:root, [data-theme]`, not just
-  `:root` — var() substitutes where declared, so theme islands break if
-  aliases live only on the root. Keep it that way.
-- The greys rule: never a solid slate-3..7 background. Fills/borders are
-  the alpha steps via `--fill-*` / `--border*`. Stylelint enforcement is
-  still TODO (phase 2).
-- Springs are sampled into CSS `linear()` by the token build from
-  visualDuration + bounce. Change the parameters there, not the output.
-- Fonts are State's exact variable files (`state/app/assets/fonts`),
-  woff2-compressed here. Inter is the UI face; Space Grotesk is loaded
-  but opt-in via `--font-display`.
-- Icon SVGs are Phosphor Regular from `@phosphor-icons/core`, inlined
-  per use (tree-shaken by hand). The two CSS masks (check, caret-up-down)
-  are the same glyphs as data URIs.
-- `*.card.html` need the first-line `<!-- @dsCard ... -->` comment for
-  the Claude Design pane. Synced incrementally via DesignSync — never
-  wholesale replace.
-- Phase 2 (deferred by design): React/Base UI layer, Tailwind @theme
-  proof, shadcn registry, Sonner/Vaul/NumberFlow/cmdk as real deps,
-  stylelint greys rule, robustness page, AA contrast script.
+- `dist/`, `apps/docs/assets/`, `apps/docs/react/` and `apps/docs/r/` are
+  **generated**. Edit the sources under `packages/` and run
+  `node scripts/build.mjs`. The build fails on a contrast or lint failure;
+  that is intended, fix the token or style, never the gate.
+- Dark is the hard default (`:root`). No attribute means dark,
+  `data-theme="light"` means light, `data-theme="system"` follows the OS.
+  This diverges from the brief's snippet (light-first) on purpose.
+- The aliasing layer is declared on `:root, [data-theme]`, not `:root`
+  alone. var() substitutes where a property is declared, so theme islands
+  silently stay dark otherwise. Keep it that way.
+- Status text tokens (`--ok-text`, `--warn-text`, `--danger-text`,
+  `--info-text`) are derived by `scripts/color-math.mjs` at build time to
+  clear 4.5:1 on their wash. Never point badges at raw `--green-11` etc.
+- The greys rule is enforced by stylelint; `greys.card.html` is the one
+  ignored file because it documents the forbidden steps with swatches.
+- Springs are sampled into CSS `linear()` by the token build. Change the
+  visualDuration and bounce parameters there, not the output.
+- Voice rules are enforced in copy: sentence case with a leading capital,
+  no em dashes anywhere, hyphens only in technical terms.
+- Base UI is `@base-ui/react` (1.x stable). The `@base-ui-components/react`
+  name on npm only has prereleases and `npm install` fails on it.
+- number-flow is vendored into `assets/vendor/` for the vanilla shell; its
+  bare `esm-env` import resolves via an import map written by the build.
+  Module scripts need HTTP, so the shell keeps static text as fallback.
+- `*.card.html` need the first-line `<!-- @dsCard ... -->` comment; the
+  build re-pins it onto the vite-built `react/index.html` if stripped.
+- Synced to the "g-system" Claude Design project via DesignSync,
+  incrementally. Old hashed `react/assets/` files accumulate there; prune
+  them in a plan's deletes occasionally.
+- Verification pattern: serve `apps/docs` over local HTTP and screenshot
+  with Playwright (file:// blocks module scripts). The robustness card's
+  gauntlet must end "All pass".
