@@ -80,7 +80,7 @@
     <button class="nav-item" data-view="overview" aria-current="page"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M219.31,108.68l-80-80a16,16,0,0,0-22.62,0l-80,80A15.87,15.87,0,0,0,32,120v96a8,8,0,0,0,8,8h64a8,8,0,0,0,8-8V160h32v56a8,8,0,0,0,8,8h64a8,8,0,0,0,8-8V120A15.87,15.87,0,0,0,219.31,108.68ZM208,208H160V152a8,8,0,0,0-8-8H104a8,8,0,0,0-8,8v56H48V120l80-80,80,80Z"/></svg>Overview</button>
     <button class="nav-item" data-view="services"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M223.68,66.15,135.68,18h0a15.88,15.88,0,0,0-15.36,0l-88,48.17a16,16,0,0,0-8.32,14v95.64a16,16,0,0,0,8.32,14l88,48.17a15.88,15.88,0,0,0,15.36,0l88-48.17a16,16,0,0,0,8.32-14V80.18A16,16,0,0,0,223.68,66.15ZM128,32h0l80.34,44L128,120,47.66,76ZM40,90l80,43.78v85.79L40,175.82Zm96,129.57V133.82L216,90v85.78Z"/></svg>Services</button>
     <button class="nav-item" data-view="activity"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M240,128a8,8,0,0,1-8,8H204.94l-37.78,75.58A8,8,0,0,1,160,216h-.4a8,8,0,0,1-7.08-5.14L95.35,60.76,63.28,131.31A8,8,0,0,1,56,136H24a8,8,0,0,1,0-16H50.85L88.72,36.69a8,8,0,0,1,14.76.46l57.51,151,31.85-63.71A8,8,0,0,1,200,120h32A8,8,0,0,1,240,128Z"/></svg>Activity</button>
-    <button class="nav-item" data-view="alerts"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M221.8,175.94C216.25,166.38,208,139.33,208,104a80,80,0,1,0-160,0c0,35.34-8.26,62.38-13.81,71.94A16,16,0,0,0,48,200H88.81a40,40,0,0,0,78.38,0H208a16,16,0,0,0,13.8-24.06ZM128,216a24,24,0,0,1-22.62-16h45.24A24,24,0,0,1,128,216ZM48,184c7.7-13.24,16-43.92,16-80a64,64,0,1,1,128,0c0,36.05,8.28,66.73,16,80Z"/></svg>Alerts<span class="badge badge-plain" style="margin-left:auto;height:17px">1</span></button>
+    <button class="nav-item" data-view="alerts" data-icon="bell">Alerts<span class="badge badge-plain" style="margin-left:auto;height:17px">1</span></button>
     <div class="nav-head">Workspace</div>
     <button class="nav-item" data-view="members">Members</button>
     <button class="nav-item" data-view="billing">Billing</button>
@@ -142,7 +142,7 @@
       <span class="badge badge-plain">6</span>
       <span style="flex:1"></span>
       <input class="input" placeholder="Filter services" style="width:200px">
-      <button class="btn btn-secondary btn-icon spin-btn" aria-label="Refresh" data-tip="Refresh"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M224,48V96a8,8,0,0,1-8,8H168a8,8,0,0,1,0-16h28.69L182.06,73.37a79.56,79.56,0,0,0-56.13-23.43h-.45A79.52,79.52,0,0,0,69.59,72.71,8,8,0,0,1,58.41,61.27a96,96,0,0,1,135,.79L208,76.69V48a8,8,0,0,1,16,0ZM186.41,183.29a80,80,0,0,1-112.47-.66L59.31,168H88a8,8,0,0,0,0-16H40a8,8,0,0,0-8,8v48a8,8,0,0,0,16,0V179.31l14.63,14.63A95.43,95.43,0,0,0,130,222.06h.53a95.36,95.36,0,0,0,67.07-27.33,8,8,0,0,0-11.18-11.44Z"/></svg></button>
+      <button class="btn btn-secondary btn-icon spin-btn" aria-label="Refresh" data-tip="Refresh"></button>
       <button class="btn btn-primary"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg>New service</button>
     </div>
     <div class="card" style="padding: 4px var(--pad-card)">
@@ -242,7 +242,7 @@
     </div>
     <div class="well settings-row">
       <span class="meta"><span class="label" style="color:var(--danger-text)">Delete workspace</span><span>Removes every service, deployment and member. Held, not clicked, on purpose.</span></span>
-      <button class="btn btn-danger hold-btn" data-hold-ms="1200"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"/></svg><span>Hold to delete</span></button>
+      <button class="btn btn-danger hold-btn" data-hold-ms="1200"><span>Hold to delete</span></button>
     </div>
   </template>
 
@@ -287,6 +287,10 @@ function goto(name, viaSwap = true) {
   const view = document.getElementById("view");
   if (viaSwap) g.swap(view, () => render(name));
   else { render(name); window.g?.init?.(view); }
+  if (name === "alerts") {
+    const b = document.querySelector('[data-view="alerts"]');
+    b.removeAttribute("data-ring"); void b.offsetWidth; b.setAttribute("data-ring", "");
+  }
 }
 document.querySelectorAll(".nav-item[data-view]").forEach((b) =>
   b.addEventListener("click", () => goto(b.getAttribute("data-view"))));

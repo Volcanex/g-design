@@ -221,6 +221,8 @@
   /* ---- copy button ------------------------------------------------------ */
 
   function initCopy(btn) {
+    if (!btn.querySelector(".copy-icons"))
+      btn.insertAdjacentHTML("afterbegin", `<span class="copy-icons">${icon("copy")}${icon("check")}</span>`);
     const label = btn.querySelector(".copy-label");
     const live = document.createElement("span");
     live.className = "sr-only";
@@ -315,14 +317,8 @@
      The taxonomy: destructive buttons show their icon before (the trash
      warns); feedback buttons earn theirs after the action succeeds. */
 
-  const P = {
-    floppy: '<path d="M219.31,72,184,36.69A15.86,15.86,0,0,0,172.69,32H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V83.31A15.86,15.86,0,0,0,219.31,72ZM168,208H88V152h80Zm40,0H184V152a16,16,0,0,0-16-16H88a16,16,0,0,0-16,16v56H48V48H172.69L208,83.31ZM160,72a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h56A8,8,0,0,1,160,72Z"/>',
-    plane: '<path d="M227.32,28.68a16,16,0,0,0-15.66-4.08l-.15,0L19.57,82.84a16,16,0,0,0-2.49,29.8L102,154l41.3,84.87A15.86,15.86,0,0,0,157.74,248q.69,0,1.38-.06a15.88,15.88,0,0,0,14-11.51l58.2-191.94c0-.05,0-.1,0-.15A16,16,0,0,0,227.32,28.68ZM157.83,231.85l-.05.14,0-.07-40.06-82.3,48-48a8,8,0,0,0-11.31-11.31l-48,48L24.08,98.25l-.07,0,.14,0L216,40Z"/>',
-    download: '<path d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0Zm-101.66,5.66a8,8,0,0,0,11.32,0l40-40a8,8,0,0,0-11.32-11.32L136,124.69V32a8,8,0,0,0-16,0v92.69L93.66,98.34a8,8,0,0,0-11.32,11.32Z"/>',
-    check: '<path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/>',
-  };
-  const glyph = (name, cls) =>
-    `<svg class="${cls}" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">${P[name]}</svg>`;
+  /* Icons come from g-icons (concatenated ahead of this file by the build). */
+  const icon = (name) => (g.icon ? g.icon(name) : "");
 
   function announcer(btn) {
     let live = btn.querySelector(".g-live");
@@ -356,21 +352,17 @@
   }
 
   function initSave(btn) {
-    if (!btn.querySelector(".i-floppy")) btn.insertAdjacentHTML("afterbegin", glyph("floppy", "i-floppy"));
+    if (!btn.querySelector(".gi-save")) btn.insertAdjacentHTML("afterbegin", icon("save"));
     doneCycle(btn, "data-saved", btn.querySelector(".save-label"));
   }
 
   function initSend(btn) {
-    if (!btn.querySelector(".send-icons"))
-      btn.insertAdjacentHTML("afterbegin",
-        `<span class="send-icons">${glyph("plane", "i-plane")}${glyph("check", "i-check")}</span>`);
+    if (!btn.querySelector(".gi-send")) btn.insertAdjacentHTML("afterbegin", icon("send"));
     doneCycle(btn, "data-sent", btn.querySelector(".send-label"));
   }
 
   function initDownload(btn) {
-    if (!btn.querySelector(".dl-icons"))
-      btn.insertAdjacentHTML("afterbegin",
-        `<span class="dl-icons">${glyph("download", "i-dl")}${glyph("check", "i-check")}</span>`);
+    if (!btn.querySelector(".gi-download")) btn.insertAdjacentHTML("afterbegin", icon("download"));
     const label = btn.querySelector(".dl-label");
     const live = announcer(btn);
     btn.style.minWidth = btn.offsetWidth + "px";
@@ -395,6 +387,7 @@
   }
 
   function initSpin(btn) {
+    if (!btn.querySelector("svg")) btn.insertAdjacentHTML("afterbegin", icon("refresh"));
     btn.addEventListener("click", () => {
       btn.removeAttribute("data-spinning");
       void btn.offsetWidth; /* restart mid-spin cleanly */
@@ -420,14 +413,7 @@
   function initConfirm(btn) {
     const label = btn.querySelector(".confirm-label");
     btn.style.minWidth = btn.offsetWidth + "px";
-    if (!btn.querySelector(".i-tick")) {
-      const s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-      s.setAttribute("viewBox", "0 0 256 256");
-      s.setAttribute("aria-hidden", "true");
-      s.classList.add("i-tick");
-      s.innerHTML = '<path pathLength="1" d="M48 140 L100 190 L212 70"/>';
-      btn.prepend(s);
-    }
+    if (!btn.querySelector(".gi-check")) btn.insertAdjacentHTML("afterbegin", icon("check"));
     btn.addEventListener("click", () => {
       /* one-way; a re-click resets the revert timer, never un-ticks */
       btn.setAttribute("data-done", "");
@@ -445,6 +431,7 @@
   /* ---- hold to delete ---------------------------------------------------- */
 
   function initHold(btn) {
+    if (!btn.querySelector("svg")) btn.insertAdjacentHTML("afterbegin", icon("trash"));
     if (!btn.querySelector(".hold-fill")) {
       const f = document.createElement("span");
       f.className = "hold-fill";
@@ -482,6 +469,10 @@
   /* ---- wire up ----------------------------------------------------------- */
 
   function init(root = document) {
+    /* generic: any element can request an animated icon by name */
+    root.querySelectorAll("[data-icon]").forEach((el) => {
+      if (!el.querySelector(".gi")) el.insertAdjacentHTML("afterbegin", icon(el.getAttribute("data-icon")));
+    });
     root.querySelectorAll(".tabs").forEach(initTabs);
     root.querySelectorAll(".menu[popover]").forEach(initMenu);
     root.querySelectorAll(".copy-btn").forEach(initCopy);

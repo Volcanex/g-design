@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <g data-part="arc1"><path pathLength="1" d="M62 71 A80 80 0 0 1 196 100"/><path d="M196 58 v42 h-42"/></g>
+  <g data-part="arc2"><path pathLength="1" d="M194 185 A80 80 0 0 1 60 156"/><path d="M60 198 v-42 h42"/></g>
+</svg>

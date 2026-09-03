@@ -8,8 +8,9 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const run = (cmd, cwd = root) => execSync(cmd, { cwd, stdio: "inherit" });
 
-// 1. Tokens, then the two gates: AA contrast and the greys lint rule.
+// 1. Tokens and icons, then the two gates: AA contrast and the greys lint rule.
 run("node packages/g-tokens/scripts/build-tokens.mjs");
+run("node packages/g-icons/scripts/build-icons.mjs");
 run("node scripts/check-contrast.mjs");
 run('npx stylelint "packages/g-ui/src/*.css" "apps/docs/**/*.card.html" "apps/docs/ui_kits/**/*.html"');
 
@@ -17,12 +18,15 @@ run('npx stylelint "packages/g-ui/src/*.css" "apps/docs/**/*.card.html" "apps/do
 const tokens = readFileSync(join(root, "packages/g-tokens/dist/tokens.css"), "utf8");
 const fonts = readFileSync(join(root, "packages/g-tokens/dist/fonts.css"), "utf8");
 const ui = readFileSync(join(root, "packages/g-ui/src/g-ui.css"), "utf8");
+const iconsJs = readFileSync(join(root, "packages/g-icons/dist/g-icons.js"), "utf8");
+const uiJs = readFileSync(join(root, "packages/g-ui/src/g-ui.js"), "utf8");
 
 for (const out of [join(root, "dist"), join(root, "apps/docs/assets")]) {
   mkdirSync(join(out, "fonts"), { recursive: true });
   cpSync(join(root, "packages/g-tokens/fonts"), join(out, "fonts"), { recursive: true });
   writeFileSync(join(out, "g.css"), `${fonts}\n${tokens}\n${ui}`);
-  cpSync(join(root, "packages/g-ui/src/g-ui.js"), join(out, "g-ui.js"));
+  // icons first so g.icon() exists before the behaviour layer injects
+  writeFileSync(join(out, "g-ui.js"), `${iconsJs}\n${uiJs}`);
   writeFileSync(join(out, "tokens.css"), tokens);
 }
 

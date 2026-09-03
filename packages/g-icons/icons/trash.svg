@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <g data-part="lid"><path d="M40 72 h176 M100 72 v-16 a12 12 0 0 1 12 -12 h32 a12 12 0 0 1 12 12 v16"/></g>
+  <g data-part="body"><path d="M60 72 l8 138 a8 8 0 0 0 8 8 h104 a8 8 0 0 0 8 -8 l8 -138 M106 112 v58 M150 112 v58"/></g>
+</svg>
