@@ -7,13 +7,6 @@
 <link rel="stylesheet" href="../../assets/g.css">
 <script defer src="../../assets/g-ui.js"></script>
 <style>
-  body { display: grid; grid-template-columns: 224px 1fr; height: 100vh; overflow: hidden; }
-
-  aside {
-    display: flex; flex-direction: column; gap: 1px;
-    padding: var(--sp-3);
-    border-right: 1px solid var(--border-subtle);
-  }
   .brand { display: flex; align-items: center; gap: 8px; padding: 6px 8px 14px; }
   .brand .mark {
     width: 22px; height: 22px; border-radius: var(--radius-sm);
@@ -62,6 +55,13 @@
   .stat .d.flat { color: var(--text-placeholder); }
 
   .panel-head { display: flex; align-items: center; gap: 10px; padding-bottom: var(--sp-3); }
+  .page-head .badge { white-space: nowrap; }
+  @media (max-width: 720px) {
+    .stats { grid-template-columns: 1fr; }
+    header .btn-tertiary:not(.g-nav-toggle), header .avatar { display: none; }
+    .search { flex: 1; width: auto; }
+    .table th, .table td { white-space: nowrap; }
+  }
   .feed { display: flex; flex-direction: column; }
   .feed-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border-subtle); font-size: var(--font-size-ui); }
   .feed-item:last-child { border-bottom: none; }
@@ -74,7 +74,7 @@
   .settings-row .meta span:last-child { font-size: 12px; color: var(--text-secondary); }
 </style>
 </head>
-<body>
+<body class="g-shell">
   <aside>
     <div class="brand"><span class="mark">g</span><b>Console</b></div>
     <button class="nav-item" data-view="overview" aria-current="page"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M219.31,108.68l-80-80a16,16,0,0,0-22.62,0l-80,80A15.87,15.87,0,0,0,32,120v96a8,8,0,0,0,8,8h64a8,8,0,0,0,8-8V160h32v56a8,8,0,0,0,8,8h64a8,8,0,0,0,8-8V120A15.87,15.87,0,0,0,219.31,108.68ZM208,208H160V152a8,8,0,0,0-8-8H104a8,8,0,0,0-8,8v56H48V120l80-80,80,80Z"/></svg>Overview</button>
@@ -89,6 +89,7 @@
   </aside>
   <main>
     <header>
+      <button class="btn btn-tertiary btn-sm btn-icon g-nav-toggle" aria-label="Menu" aria-expanded="false" data-icon="list" onclick="toggleNav()"></button>
       <div class="search">
         <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"/></svg>
         <input class="input" placeholder="Search or jump to…" onfocus="this.blur();document.querySelector('.cmdk').showModal();document.querySelector('.cmdk-input').focus()">
@@ -112,8 +113,8 @@
       <button class="btn btn-primary" onclick="g.toast({title:'Deployment started',desc:'g-site · edition 42',kind:'ok'});window.bumpReq&amp;&amp;bumpReq()"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg>New deployment</button>
     </div>
     <div class="stats">
-      <div class="card stat"><span class="k">Requests · 24h</span><span class="v"><number-flow id="nf-req">1,241,082</number-flow></span><span class="d"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M200,64V168a8,8,0,0,1-16,0V83.31L69.66,197.66a8,8,0,0,1-11.32-11.32L172.69,72H88a8,8,0,0,1,0-16H192A8,8,0,0,1,200,64Z"/></svg>8.2% vs yesterday</span></div>
-      <div class="card stat"><span class="k">P95 latency</span><span class="v">118 ms</span><span class="d flat">Flat</span></div>
+      <div class="card stat"><span class="k">Requests · 24h</span><span class="v"><number-flow id="nf-req">1,241,082</number-flow></span><span class="d"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M200,64V168a8,8,0,0,1-16,0V83.31L69.66,197.66a8,8,0,0,1-11.32-11.32L172.69,72H88a8,8,0,0,1,0-16H192A8,8,0,0,1,200,64Z"/></svg>8.2% vs yesterday</span><div class="g-spark" data-values="38,41,40,44,43,47,52" style="height:24px;margin-top:4px"></div></div>
+      <div class="card stat"><span class="k">P95 latency</span><span class="v">118 ms</span><span class="d flat">Flat</span><div class="g-spark" data-values="121,118,124,117,119,118,118" data-color="3" style="height:24px;margin-top:4px"></div></div>
       <div class="card stat"><span class="k">Error rate</span><span class="v">0.03%</span><span class="d"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M200,64V168a8,8,0,0,1-16,0V83.31L69.66,197.66a8,8,0,0,1-11.32-11.32L172.69,72H88a8,8,0,0,1,0-16H192A8,8,0,0,1,200,64Z"/></svg>Improving</span></div>
     </div>
     <div class="card" style="padding: var(--pad-card) var(--pad-card) 4px">
@@ -291,6 +292,12 @@ function goto(name, viaSwap = true) {
     const b = document.querySelector('[data-view="alerts"]');
     b.removeAttribute("data-ring"); void b.offsetWidth; b.setAttribute("data-ring", "");
   }
+  toggleNav(false);
+}
+function toggleNav(force) {
+  const open = force !== undefined ? force : !document.body.hasAttribute("data-nav-open");
+  document.body.toggleAttribute("data-nav-open", open);
+  document.querySelector(".g-nav-toggle")?.setAttribute("aria-expanded", open);
 }
 document.querySelectorAll(".nav-item[data-view]").forEach((b) =>
   b.addEventListener("click", () => goto(b.getAttribute("data-view"))));
@@ -299,6 +306,7 @@ document.addEventListener("hold-complete", (e) => {
   if (e.target.closest(".hold-btn")) g.toast({ title: "Workspace deleted", desc: "This is the demo, so not really", kind: "danger" });
 });
 </script>
+<div class="g-scrim" onclick="toggleNav(false)"></div>
 <script type="importmap">{"imports":{"esm-env":"../../assets/vendor/esm-env.js"}}</script>
 <script type="module">
 /* NumberFlow (vendored): digits roll instead of swapping. The static text

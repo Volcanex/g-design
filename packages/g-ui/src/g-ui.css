@@ -596,7 +596,7 @@ dialog.cmdk {
 .copy-btn .gi-check path[pathLength] { transition-delay: 170ms; }
 .copy-btn[data-copied] .gi-copy [data-part="back"] { translate: 12px -12px; opacity: 0; }
 .copy-btn[data-copied] .gi-copy [data-part="front"] { translate: -5px 5px; opacity: 0; }
-.copy-btn[data-copied] .gi-check path[pathLength] { stroke-dashoffset: 0; }
+.copy-btn[data-copied] .gi-check [data-part="tick"] path { stroke-dashoffset: 0; }
 
 .codeblock {
   position: relative;
@@ -644,7 +644,7 @@ dialog.cmdk {
 }
 .save-btn .gi-save [data-part="label"] path { transition-delay: 220ms; }
 .save-btn[data-saved] .gi-save { width: 15px; opacity: 1; translate: 0 0; }
-.save-btn[data-saved] .gi-save path[pathLength] { stroke-dashoffset: 0; }
+.save-btn[data-saved] .gi-save [data-part="label"] path { stroke-dashoffset: 0; }
 .save-btn[data-saved] .gi-save [data-part="stripe"] { animation: g-blink 0.5s var(--ease-out) 0.5s; }
 @keyframes g-blink {
   0%, 100% { opacity: 1; }
@@ -657,11 +657,11 @@ dialog.cmdk {
    check draws in behind it. */
 .send-btn .gi-send [data-part="plane"] {
   transform-box: fill-box; transform-origin: center;
-  transition: translate 260ms var(--ease-out), rotate 260ms var(--ease-out), opacity 200ms var(--ease-out) 60ms;
+  transition: translate 380ms cubic-bezier(0.45, 0, 0.6, 1), rotate 380ms cubic-bezier(0.45, 0, 0.6, 1), opacity 220ms var(--ease-out) 160ms;
 }
-.send-btn .gi-send [data-part="check"] path { transition-delay: 180ms; }
+.send-btn .gi-send [data-part="check"] path { transition-delay: 260ms; }
 .send-btn[data-sent] .gi-send [data-part="plane"] { translate: 34px -34px; rotate: 10deg; opacity: 0; }
-.send-btn[data-sent] .gi-send path[pathLength] { stroke-dashoffset: 0; }
+.send-btn[data-sent] .gi-send [data-part="check"] path { stroke-dashoffset: 0; }
 
 /* Download: while working, arrows feed INTO the tray on a conveyor. Each one
    is swallowed behind the tray rim (a view-box clip), the tray flexes under
@@ -731,7 +731,7 @@ dialog.cmdk {
 .confirm-btn .gi-check { width: 0; transition: width var(--dur-base) var(--ease-out); }
 .confirm-btn .gi-check path[pathLength] { transition-delay: 70ms; }
 .confirm-btn[data-done] .gi-check { width: 15px; }
-.confirm-btn[data-done] .gi-check path[pathLength] { stroke-dashoffset: 0; }
+.confirm-btn[data-done] .gi-check [data-part="tick"] path { stroke-dashoffset: 0; }
 
 /* Hold to delete: a fill sweeps while held; release early and it rewinds. */
 .hold-btn { position: relative; overflow: hidden; }
@@ -768,6 +768,21 @@ dialog.cmdk {
   pointer-events: none;
 }
 
+/* ---------------------------------------------------------------- MPA page loads */
+
+/* Cross-document view transitions: real page navigations get the g.swap
+   choreography with zero JS wherever the browser supports it, and degrade
+   to a plain swap elsewhere. Pair with speculation-rules prerender for
+   instant server-rendered navigation. */
+@view-transition { navigation: auto; }
+::view-transition-old(root) { animation: g-vt-out var(--dur-fast) var(--ease-out) both; }
+::view-transition-new(root) { animation: g-vt-in var(--dur-slow) var(--ease-out) both; }
+@keyframes g-vt-out { to { opacity: 0; translate: 0 4px; } }
+@keyframes g-vt-in { from { opacity: 0; translate: 0 4px; } }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root), ::view-transition-new(root) { animation-duration: 1ms; }
+}
+
 /* ---------------------------------------------------------------- page entrance */
 
 /* One choreography, on load only. Never scroll-triggered. */
@@ -783,6 +798,108 @@ dialog.cmdk {
   from { opacity: 0; translate: 0 4px; }
   to { opacity: 1; translate: 0 0; }
 }
+
+/* ---------------------------------------------------------------- app shell */
+
+/* Persistent chrome as a reusable layout: sidebar + topbar + content.
+   Under 720px the sidebar becomes an off-canvas sheet behind a scrim,
+   opened by a .g-nav-toggle (hamburger morphs to an x). */
+.g-shell {
+  display: grid;
+  grid-template-columns: 224px 1fr;
+  height: 100vh;
+  overflow: hidden;
+}
+.g-shell > aside {
+  display: flex; flex-direction: column; gap: 1px;
+  padding: var(--sp-3);
+  border-right: 1px solid var(--border-subtle);
+  background: var(--surface-1);
+}
+.g-nav-toggle { display: none; }
+.g-scrim {
+  display: block;
+  position: fixed; inset: 0;
+  z-index: 39;
+  background: rgb(0 0 0 / 0.44);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-slow) var(--ease-out);
+}
+[data-nav-open] .g-scrim { opacity: 1; pointer-events: auto; }
+@media (max-width: 720px) {
+  .g-shell { grid-template-columns: 1fr; }
+  .g-shell > aside {
+    position: fixed; inset: 0 auto 0 0;
+    width: 248px;
+    z-index: 40;
+    translate: -100% 0;
+    transition: translate 280ms var(--ease-ios);
+  }
+  /* the scrim separates the sheet; a shadow here trips a software-raster
+     compositing bug that washes the whole layer light */
+  [data-nav-open].g-shell > aside,
+  [data-nav-open] .g-shell > aside { translate: 0 0; border-right-color: var(--border); }
+  .g-nav-toggle { display: inline-flex; }
+}
+
+/* hamburger morph */
+.gi-list [data-part] {
+  transform-box: view-box; transform-origin: 128px 128px;
+  transition: rotate var(--spring-snap-dur) var(--spring-snap), translate var(--spring-snap-dur) var(--spring-snap), opacity var(--dur-fast) var(--ease-out);
+}
+[aria-expanded="true"] .gi-list [data-part="top"] { rotate: 45deg; translate: 0 52px; }
+[aria-expanded="true"] .gi-list [data-part="mid"] { opacity: 0; }
+[aria-expanded="true"] .gi-list [data-part="bottom"] { rotate: -45deg; translate: 0 -52px; }
+
+/* ---------------------------------------------------------------- prose */
+
+/* Long-form rendered content: markdown output, docs, posts. */
+.prose {
+  max-width: 68ch;
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--text);
+}
+.prose h1, .prose h2, .prose h3 { color: var(--text-primary); margin: 1.6em 0 0.5em; }
+.prose h1:first-child, .prose h2:first-child { margin-top: 0; }
+.prose h1 { font-size: 22px; }
+.prose h2 { font-size: 17px; }
+.prose h3 { font-size: 14.5px; }
+.prose p { margin: 0 0 0.9em; }
+.prose a { color: var(--text-primary); }
+.prose strong { font-weight: 500; color: var(--text-primary); }
+.prose ul, .prose ol { margin: 0 0 0.9em; padding-left: 1.4em; }
+.prose li { margin: 0.25em 0; }
+.prose li::marker { color: var(--text-placeholder); }
+.prose blockquote {
+  margin: 1em 0;
+  padding: 2px 0 2px 14px;
+  border-left: 2px solid var(--border);
+  color: var(--text-secondary);
+}
+.prose code {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  background: var(--well-bg);
+  border: 1px solid var(--well-border);
+  border-radius: var(--radius-sm);
+  padding: 1px 5px;
+}
+.prose pre {
+  background: var(--well-bg);
+  border: 1px solid var(--well-border);
+  border-radius: var(--radius);
+  padding: var(--sp-3) var(--sp-4);
+  overflow-x: auto;
+  line-height: 1.6;
+}
+.prose pre code { background: none; border: none; padding: 0; font-size: 12.5px; }
+.prose hr { border: none; border-top: 1px solid var(--border-subtle); margin: 1.6em 0; }
+.prose img { max-width: 100%; border-radius: var(--radius); }
+.prose table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 13px; }
+.prose th { text-align: left; font-weight: 500; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+.prose td { padding: 6px 10px; border-bottom: 1px solid var(--border-subtle); }
 
 /* ---------------------------------------------------------------- a11y + adaptation */
 

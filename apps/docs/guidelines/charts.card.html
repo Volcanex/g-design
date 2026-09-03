@@ -1,0 +1,95 @@
+<!-- @dsCard group="Guidelines" name="Charts" subtitle="Four SVG renderers on one palette. No axes furniture, no hover layer, no gridlines." viewport="760x620" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Charts</title>
+<link rel="stylesheet" href="../assets/g.css">
+<script defer src="../assets/g-ui.js"></script>
+<style>
+  body { padding: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-3); }
+  .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--sp-3); }
+  .stat { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; }
+  .stat .k { font-size: 12px; color: var(--text-secondary); }
+  .stat .v { font-size: 20px; font-weight: 500; letter-spacing: -0.01em; }
+  .stat .g-spark { margin-top: 6px; }
+
+  .panel { display: flex; flex-direction: column; gap: 10px; }
+  .panel .head { display: flex; align-items: baseline; gap: 8px; }
+  .panel .sub { font-size: 11px; color: var(--text-placeholder); margin-left: auto; }
+  .row { display: grid; grid-template-columns: 1fr 262px; gap: var(--sp-3); }
+  .plot-line { height: 118px; }
+  .plot-bar { height: 120px; }
+  .plot-donut { height: 120px; }
+  .cap { font-size: 12px; color: var(--text-secondary); line-height: 1.55; }
+</style>
+</head>
+<body>
+  <div class="stats">
+    <div class="card stat">
+      <span class="k">Requests today</span>
+      <span class="v num">318k</span>
+      <div class="g-spark" data-values="41,44,39,52,58,54,61" data-color="1"></div>
+    </div>
+    <div class="card stat">
+      <span class="k">Errors today</span>
+      <span class="v num">204</span>
+      <div class="g-spark" data-values="31,26,29,22,25,18,14" data-color="5"></div>
+    </div>
+    <div class="card stat">
+      <span class="k">Latency p95</span>
+      <span class="v num">140 ms</span>
+      <div class="g-spark" data-values="128,133,131,146,139,144,140" data-color="3"></div>
+    </div>
+  </div>
+
+  <div class="card panel">
+    <div class="head">
+      <span class="card-title">Requests by service</span>
+      <span class="sub">Thousands per day, last 7 days</span>
+    </div>
+    <div class="plot-line" id="requests"></div>
+  </div>
+
+  <div class="row">
+    <div class="card panel">
+      <div class="head">
+        <span class="card-title">Latency p95 by service</span>
+        <span class="sub">ms</span>
+      </div>
+      <div class="plot-bar" id="latency"></div>
+    </div>
+    <div class="card panel">
+      <div class="head"><span class="card-title">Storage</span></div>
+      <div class="plot-donut" id="storage"></div>
+    </div>
+  </div>
+
+  <p class="cap">The six categorical colours live in the token layer as <span class="mono">--chart-1</span> to <span class="mono">--chart-6</span>, contrast-derived per theme so a series keeps its identity in both. A renderer writes them into the markup as var() strings rather than resolving them, which is why a theme switch recolours a chart in place with no re-render.</p>
+
+<script>
+  addEventListener("DOMContentLoaded", () => {
+    g.chart.line(document.getElementById("requests"), {
+      labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+      series: [
+        { label: "api", values: [42, 45, 39, 51, 58, 54, 61] },
+        { label: "web", values: [28, 31, 27, 33, 36, 35, 30] },
+        { label: "worker", values: [12, 11, 14, 13, 16, 15, 14] },
+      ],
+    });
+
+    g.chart.bar(document.getElementById("latency"), {
+      labels: ["gateway", "api", "search", "media", "auth"],
+      values: [82, 140, 210, 96, 64],
+    }, { values: true });
+
+    g.chart.donut(document.getElementById("storage"), [
+      { label: "media", value: 420 },
+      { label: "backups", value: 260 },
+      { label: "logs", value: 120 },
+      { label: "artefacts", value: 60 },
+    ], { legend: "side", center: "860", caption: "GB" });
+  });
+</script>
+</body>
+</html>

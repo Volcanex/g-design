@@ -476,7 +476,17 @@
 
   /* ---- wire up ----------------------------------------------------------- */
 
+  /* Component fragments (packages/g-ui/src/components/*.js) register here;
+     they run once immediately and again for every g.swap'd view. */
+  g.plugins = [];
+  g.use = (fn) => {
+    g.plugins.push(fn);
+    if (document.readyState !== "loading") fn(document);
+    else document.addEventListener("DOMContentLoaded", () => fn(document), { once: true });
+  };
+
   function init(root = document) {
+    g.plugins.forEach((fn) => { if (root !== document) fn(root); });
     /* generic: any element can request an animated icon by name */
     root.querySelectorAll("[data-icon]").forEach((el) => {
       if (!el.querySelector(".gi")) el.insertAdjacentHTML("afterbegin", icon(el.getAttribute("data-icon")));

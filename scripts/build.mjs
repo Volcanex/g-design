@@ -21,12 +21,27 @@ const ui = readFileSync(join(root, "packages/g-ui/src/g-ui.css"), "utf8");
 const iconsJs = readFileSync(join(root, "packages/g-icons/dist/g-icons.js"), "utf8");
 const uiJs = readFileSync(join(root, "packages/g-ui/src/g-ui.js"), "utf8");
 
+// component fragments: self-contained css/js pairs, concatenated in
+const fragDir = join(root, "packages/g-ui/src/components");
+const frags = (ext) => readdirSync(fragDir).filter((f) => f.endsWith(ext)).sort()
+  .map((f) => readFileSync(join(fragDir, f), "utf8")).join("\n");
+
+// Fonts ship subsetted: latin + latin-ext (keeps aeoe and the Nordic set),
+// punctuation, arrows and the command glyph; cv05/cv11/tnum retained.
+// Originals stay untouched in packages/g-tokens/fonts/.
+const subsetDir = join(root, "packages/g-tokens/dist/fonts");
+mkdirSync(subsetDir, { recursive: true });
+const UNICODES = "U+0020-007E,U+00A0-00FF,U+0100-017F,U+2013-2026,U+20AC,U+2212,U+2318,U+2190-2199";
+for (const f of readdirSync(join(root, "packages/g-tokens/fonts"))) {
+  run(`pyftsubset "packages/g-tokens/fonts/${f}" --output-file="packages/g-tokens/dist/fonts/${f}" --flavor=woff2 --unicodes="${UNICODES}" --layout-features+=cv05,cv11,tnum 2>/dev/null`);
+}
+
 for (const out of [join(root, "dist"), join(root, "apps/docs/assets")]) {
   mkdirSync(join(out, "fonts"), { recursive: true });
-  cpSync(join(root, "packages/g-tokens/fonts"), join(out, "fonts"), { recursive: true });
-  writeFileSync(join(out, "g.css"), `${fonts}\n${tokens}\n${ui}`);
+  cpSync(subsetDir, join(out, "fonts"), { recursive: true });
+  writeFileSync(join(out, "g.css"), `${fonts}\n${tokens}\n${ui}\n${frags(".css")}`);
   // icons first so g.icon() exists before the behaviour layer injects
-  writeFileSync(join(out, "g-ui.js"), `${iconsJs}\n${uiJs}`);
+  writeFileSync(join(out, "g-ui.js"), `${iconsJs}\n${uiJs}\n${frags(".js")}`);
   writeFileSync(join(out, "tokens.css"), tokens);
 }
 
@@ -43,7 +58,7 @@ writeFileSync(join(root, "apps/docs/assets/vendor/esm-env.js"),
 const reactDir = join(root, "packages/g-ui-react");
 mkdirSync(join(reactDir, "demo/public/fonts"), { recursive: true });
 cpSync(join(root, "apps/docs/assets/g.css"), join(reactDir, "demo/public/g.css"));
-cpSync(join(root, "packages/g-tokens/fonts"), join(reactDir, "demo/public/fonts"), { recursive: true });
+cpSync(subsetDir, join(reactDir, "demo/public/fonts"), { recursive: true });
 run("npm run build --silent", reactDir);
 const reactHtmlPath = join(root, "apps/docs/react/index.html");
 let reactHtml = readFileSync(reactHtmlPath, "utf8");
@@ -89,5 +104,20 @@ writeFileSync(join(regDir, "registry.json"), JSON.stringify({
   homepage: "https://github.com/Volcanex/g-system",
   items,
 }, null, 2));
+
+// Perf budget: warn over budget, fail only at double. Sometimes going over
+// is the right call; silently bloating never is.
+const { gzipSync } = await import("node:zlib");
+const gcssGz = gzipSync(readFileSync(join(root, "dist/g.css"))).length;
+const fontsTotal = readdirSync(subsetDir)
+  .reduce((n, f) => n + readFileSync(join(subsetDir, f)).length, 0);
+const budget = (name, actual, limit) => {
+  const kb = (n) => (n / 1024).toFixed(1) + "KB";
+  if (actual > limit * 2) { console.error(`BUDGET FAIL ${name}: ${kb(actual)} is over double the ${kb(limit)} budget`); process.exit(1); }
+  if (actual > limit) console.warn(`budget warn ${name}: ${kb(actual)} (budget ${kb(limit)})`);
+  else console.log(`budget ok ${name}: ${kb(actual)} of ${kb(limit)}`);
+};
+budget("g.css gzip", gcssGz, 18 * 1024);
+budget("fonts total", fontsTotal, 200 * 1024);
 
 console.log("built dist/, apps/docs/assets/, apps/docs/react/, apps/docs/r/");

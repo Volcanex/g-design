@@ -1,0 +1,32 @@
+<!-- @dsCard group="Guidelines" name="Prose" subtitle="Long-form rendered content: one class, calm rhythm." viewport="760x640" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Prose</title>
+<link rel="stylesheet" href="../assets/g.css">
+<style>
+  body { padding: var(--sp-6) var(--sp-5); display: flex; justify-content: center; }
+</style>
+</head>
+<body>
+  <article class="prose">
+    <h1>Shipping the edition</h1>
+    <p>Rendered markdown gets the <code>.prose</code> class and nothing else. Width caps at 68 characters, the line height opens up to 1.65, and headings keep the interface scale so documents and dashboards feel like one product.</p>
+    <h2>How publishing works</h2>
+    <p>An edition is a frozen static build. The pipeline compiles every post, stamps the grid, and swaps the symlink; <strong>nothing is rendered at request time</strong>. Rolling back is pointing the symlink at the previous edition.</p>
+    <blockquote>Publish is the same word the whole way through: the Publish button makes a Published toast and a published edition.</blockquote>
+    <ul>
+      <li>Posts are files under <code>pages/</code>, one directory per post</li>
+      <li>Drafts never leave the machine they were written on</li>
+      <li>Images are downscaled at compile time, not upload time</li>
+    </ul>
+    <pre><code>g edition publish
+# builds, verifies, swaps the symlink in one step</code></pre>
+    <h3>Numbers in text</h3>
+    <p>Inline figures such as 1,241,082 requests or a P95 of 118 ms stay in the text face; tabular alignment is for columns, not sentences.</p>
+    <hr>
+    <p>Everything above is default element styling inside one wrapper class. No per-page CSS.</p>
+  </article>
+</body>
+</html>

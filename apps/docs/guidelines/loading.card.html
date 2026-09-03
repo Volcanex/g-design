@@ -36,6 +36,7 @@
     <div class="rule"><span class="mono">slow data</span>A skeleton mirrors the final layout exactly, waits 350ms before appearing so quick loads never flash it, and shimmers left to right. Lists and tables get skeletons; compact elements get an inline spinner; under about a second, nothing at all.</div>
     <div class="rule"><span class="mono">reduced motion</span>Everything above falls back to crossfades. Feedback stays, movement goes.</div>
     <div class="rule"><span class="mono">api</span><span><span class="mono">g.swap(view, update)</span> is the whole mechanism: mark the container <span class="mono">.view.enter</span> and hand it new content.</span></div>
+    <div class="rule"><span class="mono">real pages</span><span>Full document navigations get the same choreography from CSS alone via <span class="mono">@view-transition</span>, with speculation-rules prerender for instant arrival. <a href="vt/a.html">Try the two-page demo</a>.</span></div>
   </div>
   <div>
     <div class="mini" aria-label="Miniature app frame">

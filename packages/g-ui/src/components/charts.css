@@ -1,0 +1,64 @@
+/* ---- charts (g.chart) --------------------------------------------------
+   Dependency-free SVG renderers. Colour stays in the markup as
+   var(--chart-N) strings, so a theme switch recolours a chart live and no
+   re-render is needed. Everything that is not colour or geometry is here. */
+
+.g-chart { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.g-chart > svg { display: block; flex: 1 1 auto; min-height: 0; overflow: visible; }
+.g-chart text {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  fill: var(--text-placeholder);
+}
+.g-chart .num { font-variant-numeric: tabular-nums; }
+.g-chart .center-value { fill: var(--text-primary); font-weight: 500; }
+
+/* Donut with its legend beside rather than under it. */
+.g-chart[data-layout="side"] { flex-direction: row; align-items: center; gap: var(--sp-4); }
+.g-chart[data-layout="side"] .g-chart-legend { flex-direction: column; flex-wrap: nowrap; gap: 7px; }
+
+.g-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+.g-chart-key { display: inline-flex; align-items: baseline; gap: 6px; white-space: nowrap; }
+.g-chart-key i {
+  width: 7px; height: 7px;
+  flex: none;
+  border-radius: 50%;
+  translate: 0 -1px;
+}
+.g-chart-key b {
+  margin-left: 2px;
+  color: var(--text-primary);
+  font-weight: 450;
+  font-variant-numeric: tabular-nums;
+}
+
+.g-spark { display: block; height: 28px; }
+
+/* Entrance: lines draw themselves, bars rise off the baseline. Once per
+   element, applied by the renderer, never replayed on a re-render. */
+.g-chart [data-draw] {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 300ms var(--ease-out);
+}
+.g-chart [data-draw][data-on] { stroke-dashoffset: 0; }
+.g-chart [data-rise] {
+  transform: scaleY(0);
+  transform-box: view-box;
+  transition: transform 200ms var(--ease-out);
+}
+.g-chart [data-rise][data-on] { transform: scaleY(1); }
+.g-chart [data-fade] { opacity: 0; transition: opacity 300ms var(--ease-out); }
+.g-chart [data-fade][data-on] { opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .g-chart [data-draw] { stroke-dasharray: none; stroke-dashoffset: 0; }
+  .g-chart [data-rise] { transform: none; }
+  .g-chart [data-fade] { opacity: 1; }
+}

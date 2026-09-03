@@ -7,11 +7,23 @@ import {
   green, greenA, greenDark, greenDarkA,
   blue, blueA, blueDark, blueDarkA,
   amber, amberA, amberDark, amberDarkA,
+  violet, violetDark, teal, tealDark, crimson, crimsonDark, grass, grassDark,
 } from "@radix-ui/colors";
+import { ratio, mix, hex } from "../../../scripts/color-math.mjs";
 import { writeFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { deriveText } from "../../../scripts/color-math.mjs";
+
+// Chart strokes: step 9 walked toward step 11 until the colour clears 3:1
+// (WCAG graphical objects) on the page surface. Categorical, six of them.
+function deriveChart(step9, step11, surface) {
+  for (let t = 0; t <= 1.0001; t += 0.02) {
+    const c = mix(step9, step11, t);
+    if (ratio(c, surface) >= 3) return hex(c);
+  }
+  return step11;
+}
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -64,9 +76,17 @@ function semantics(mode) {
   const warnText = deriveText(d ? amberDark.amber11 : amber.amber11, d ? amberDark.amber12 : amber.amber12, d ? amberDarkA.amberA3 : amberA.amberA3, surface);
   const dangerText = deriveText(d ? redDark.red11 : red.red11, d ? redDark.red12 : red.red12, d ? redDarkA.redA3 : redA.redA3, surface);
   const infoText = deriveText(d ? blueDark.blue11 : blue.blue11, d ? blueDark.blue12 : blue.blue12, d ? blueDarkA.blueA3 : blueA.blueA3, surface);
+  const surf1 = d ? slateDark.slate1 : slate.slate1;
+  const chartScales = d
+    ? [[blueDark.blue9, blueDark.blue11], [violetDark.violet9, violetDark.violet11], [tealDark.teal9, tealDark.teal11], [amberDark.amber9, amberDark.amber11], [crimsonDark.crimson9, crimsonDark.crimson11], [grassDark.grass9, grassDark.grass11]]
+    : [[blue.blue9, blue.blue11], [violet.violet9, violet.violet11], [teal.teal9, teal.teal11], [amber.amber9, amber.amber11], [crimson.crimson9, crimson.crimson11], [grass.grass9, grass.grass11]];
+  const chartVars = chartScales
+    .map(([s9, s11], i) => `  --chart-${i + 1}: ${deriveChart(s9, s11, surf1)};`)
+    .join("\n");
   return `  --contrast-fill: var(--slate-12);
   --contrast-fill-hover: ${d ? "#fcfcfd" : "#2b3036"};
   --contrast-fg: var(--slate-1);
+${chartVars}
   --ok-text: ${okText};
   --warn-text: ${warnText};
   --danger-text: ${dangerText};
@@ -295,10 +315,20 @@ const fontsCss = `/* g-tokens fonts — Inter (UI), Space Grotesk (display, opti
   font-style: normal;
   font-display: swap;
 }
+/* Metric-matched fallback: Arial adjusted to Inter's metrics so the swap
+   never shifts layout. */
+@font-face {
+  font-family: "Inter Fallback";
+  src: local("Arial");
+  size-adjust: 107%;
+  ascent-override: 90.44%;
+  descent-override: 22.52%;
+  line-gap-override: 0%;
+}
 
 :root {
   /* One-variable family swap: point --font-ui elsewhere and everything follows. */
-  --font-ui: "InterVariable", ui-sans-serif, system-ui, sans-serif;
+  --font-ui: "InterVariable", "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-ui); /* opt in to Space Grotesk per app */
   --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
 

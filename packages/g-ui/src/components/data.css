@@ -1,0 +1,118 @@
+/* data - navigation and table upgrades over the base .table recipe.
+   Every upgrade is opt-in by class, so a plain .table is untouched. */
+
+/* ---------------------------------------------------------------- breadcrumb */
+
+/* Separators are drawn, never authored, so copy stays free of stray glyphs. */
+.g-crumbs ol {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--font-size-ui);
+}
+.g-crumbs li { display: flex; align-items: center; }
+.g-crumbs li + li::before {
+  content: "/";
+  margin: 0 7px;
+  color: var(--text-placeholder);
+}
+.g-crumbs a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color var(--dur-base) var(--ease-out);
+}
+.g-crumbs a:hover { color: var(--text-primary); }
+.g-crumbs [aria-current="page"] { color: var(--text-primary); }
+
+/* ---------------------------------------------------------------- pagination */
+
+.g-pages { display: flex; align-items: center; gap: 4px; }
+.g-pages [aria-current="page"] {
+  --_fill: var(--fill-active);
+  --_fg: var(--text-primary);
+  --_edge: var(--border-subtle);
+}
+.g-pages .g-gap {
+  width: var(--h-control-sm);
+  text-align: center;
+  color: var(--text-placeholder);
+  font-size: var(--font-size-ui);
+  user-select: none;
+}
+
+/* ---------------------------------------------------------------- context menu */
+
+[data-context-menu] { cursor: context-menu; }
+
+/* ---------------------------------------------------------------- sortable */
+
+.table.g-sortable th[data-sort] {
+  position: relative;
+  padding-right: calc(var(--sp-3) + 12px);
+  cursor: pointer;
+  user-select: none;
+  transition: color var(--dur-base) var(--ease-out);
+}
+.table.g-sortable th[data-sort]:hover { color: var(--text-primary); }
+/* One caret, rotated rather than swapped, so the direction reads as a turn. */
+.table.g-sortable th[data-sort]::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: var(--sp-3);
+  width: 0;
+  height: 0;
+  border-left: 3.5px solid transparent;
+  border-right: 3.5px solid transparent;
+  border-bottom: 4px solid currentColor;
+  translate: 0 -50%;
+  opacity: 0;
+  transition:
+    opacity var(--dur-base) var(--ease-out),
+    rotate var(--dur-base) var(--ease-out);
+}
+.table.g-sortable th[data-sort]:hover::after { opacity: 0.4; }
+.table.g-sortable th[aria-sort="ascending"],
+.table.g-sortable th[aria-sort="descending"] { color: var(--text-primary); }
+.table.g-sortable th[aria-sort="ascending"]::after,
+.table.g-sortable th[aria-sort="descending"]::after { opacity: 1; }
+.table.g-sortable th[aria-sort="descending"]::after { rotate: 180deg; }
+
+/* ---------------------------------------------------------------- sticky head */
+
+.table-wrap:has(> .table.g-sticky) {
+  max-height: var(--table-max-h, 260px);
+  overflow-y: auto;
+}
+.table.g-sticky thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--surface-2);
+  /* the hairline is a shadow: collapsed table borders do not travel with a
+     sticky row, so the drawn border vanishes the moment the body scrolls */
+  border-bottom: none;
+  box-shadow: inset 0 -1px 0 var(--border-subtle);
+}
+
+/* ---------------------------------------------------------------- selectable */
+
+.table.g-selectable th:first-child,
+.table.g-selectable td:first-child {
+  width: 1px;
+  padding-right: 0;
+}
+.table.g-selectable tbody tr[data-selected] { background: var(--fill-hover); }
+
+/* Select-all in its third state: a dash, not a tick. */
+.checkbox:indeterminate {
+  background: var(--accent-fill);
+  border-color: var(--accent-edge);
+}
+.checkbox:indeterminate::after {
+  scale: 1;
+  mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128Z"/></svg>');
+}

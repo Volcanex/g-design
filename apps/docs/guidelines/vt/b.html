@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Page B</title>
+<link rel="stylesheet" href="../../assets/g.css">
+<script type="speculationrules">{"prerender":[{"urls":["a.html"]}]}</script>
+<style>
+  body { padding: var(--sp-6); display: flex; flex-direction: column; gap: var(--sp-4); }
+  nav { display: flex; gap: 10px; }
+</style>
+</head>
+<body>
+  <div class="enter">
+    <h1>Page B</h1>
+    <p style="color:var(--text-secondary);max-width:46ch;margin-top:8px">Same choreography on the way back. Server-rendered pages get an app-like feel with no framework and no client router: the chrome can even persist visually by giving shared elements a <span class="mono">view-transition-name</span>.</p>
+  </div>
+  <nav><a class="btn btn-primary" href="a.html">Back to page A</a></nav>
+</body>
+</html>
