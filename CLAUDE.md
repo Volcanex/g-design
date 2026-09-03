@@ -1,13 +1,43 @@
 # g-system
 
 **Owner:** Gabriel Penman
-**What:** The design language that replaces both `g-design-language`
-(OS-zine) and the discarded `g-design-neutral` draft as the base for new
-work. Built to the "g-system design language: build brief" (2026-09).
+**What:** The house design language. It replaces `g-design-language`
+(OS-zine) and the discarded `g-design-neutral` draft as the base for ALL
+new g work. Built to the "g-system design language: build brief" (2026-09).
 `packages/g-tokens` is the product; `packages/g-icons` the animated icon
 set; `packages/g-ui` the framework-free layer (plus `src/components/`
 fragments); `packages/g-ui-react` the React layer; `apps/docs`
 demonstrates it.
+
+## Using g-system in a project
+
+One command vendors the built assets into a consumer:
+
+    node scripts/vendor.mjs <target-static-dir>
+
+That copies `g.css`, `g-ui.js` and `fonts/` (stamped with the version) into
+the target. The consumer links two files and is done. Copying is deliberate:
+no runtime coupling back to this repo, the redundancy is safe. Re-run to
+update. Declare `design = "g-system@<version>"` in the consumer's
+`[tool.gcore]`.
+
+**The component hierarchy is not a suggestion.** When designing with
+g-system, in strict order:
+
+1. Use the existing component as it ships.
+2. Adjust what it exposes: size classes, density, text, spacing tokens,
+   the accent slot for a rebrand.
+3. Extend it: a new variant built from the same tokens and patterns.
+4. Build new ONLY when nothing close exists, and then build it here in
+   `packages/g-ui/src/components/` with a docs card, so the next project
+   gets it for free. New one-off components living in a consumer repo are
+   a defect.
+
+Hard rules that travel with the assets: sentence case everywhere (a
+leading capital, then lowercase; no title case, no ALL CAPS), em dashes
+banned, greys only through the alias tokens, verb-first buttons, dark is
+the default. The reference is `apps/docs` (every component has a card);
+the full contract is the `g-design` skill in genv.
 
 ## Gotchas
 

@@ -1,6 +1,6 @@
 [project]
 name = "g-system"
-version = "0.1.0"
+version = "1.0.0"
 description = "The g design language — Radix slate tokens, framework-free component layer, reference docs"
 
 [tool.gcore]
