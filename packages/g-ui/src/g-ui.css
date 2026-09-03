@@ -80,19 +80,19 @@ a:hover { text-decoration-color: currentColor; }
 .btn-sm.btn-icon { width: var(--h-control-sm); }
 
 .btn-primary { --_fill: var(--accent-fill); --_fg: var(--accent-fg); --_edge: var(--accent-edge); }
-.btn-primary:hover:not(:disabled) { --_fill: var(--accent-fill-hover); }
+.btn-primary:hover:not(:disabled) { background: var(--accent-fill-hover); }
 
 .btn-secondary { --_edge: var(--border); }
-.btn-secondary:hover:not(:disabled) { background: var(--fill-hover); --_edge: var(--border-hover); }
+.btn-secondary:hover:not(:disabled) { background: var(--fill-hover); border-color: var(--border-hover); }
 
 .btn-tertiary { --_fg: var(--text-secondary); --_edge: var(--border-subtle); }
-.btn-tertiary:hover:not(:disabled) { background: var(--fill-hover); --_fg: var(--text-primary); --_edge: var(--border); }
+.btn-tertiary:hover:not(:disabled) { background: var(--fill-hover); color: var(--text-primary); border-color: var(--border); }
 
 /* Meaning colours are always solid and always carry an icon. */
 .btn-go { --_fill: var(--go-fill); --_fg: var(--go-fg); --_edge: var(--go-edge); }
-.btn-go:hover:not(:disabled) { --_fill: var(--go-fill-hover); }
+.btn-go:hover:not(:disabled) { background: var(--go-fill-hover); }
 .btn-danger { --_fill: var(--danger-fill); --_fg: var(--danger-fg); --_edge: var(--danger-edge); }
-.btn-danger:hover:not(:disabled) { --_fill: var(--danger-fill-hover); }
+.btn-danger:hover:not(:disabled) { background: var(--danger-fill-hover); }
 
 /* Loading: spinner overlays, content fades — width never changes, so no reflow. */
 .btn[data-loading] { pointer-events: none; }
@@ -223,7 +223,7 @@ a:hover { text-decoration-color: currentColor; }
 }
 .switch::after {
   content: "";
-  position: absolute; top: 2px; left: 2px;
+  position: absolute; top: 0; bottom: 0; left: 2px; margin: auto 0;
   width: 14px; height: 14px;
   border-radius: 50%;
   background: var(--slate-11);
@@ -239,7 +239,6 @@ a:hover { text-decoration-color: currentColor; }
   background: var(--card-bg);
   border: 1px solid var(--card-border);
   border-radius: var(--radius-card);
-  box-shadow: var(--card-highlight);
   padding: var(--pad-card);
 }
 .card-title { font-size: var(--font-size-ui); font-weight: 500; }
@@ -264,21 +263,44 @@ a:hover { text-decoration-color: currentColor; }
   background: var(--fill-hover);
   color: var(--_c);
   font-size: 12px; font-weight: 450; line-height: 1;
+  white-space: nowrap; overflow: hidden; box-sizing: border-box;
+  transition:
+    background var(--spring-smooth-dur) var(--ease-out),
+    border-color var(--spring-smooth-dur) var(--ease-out),
+    color var(--spring-smooth-dur) var(--ease-out),
+    width var(--spring-smooth-dur) var(--spring-smooth);
 }
 .badge::before {
-  content: ""; width: 5px; height: 5px; border-radius: 50%;
+  content: ""; width: 5px; height: 5px; border-radius: 50%; flex: none;
   background: var(--_c);
+  transition: background var(--spring-smooth-dur) var(--ease-out), box-shadow var(--dur-slow) var(--ease-out);
 }
 .badge-ok    { --_c: var(--ok-text); background: var(--green-a3); border-color: var(--green-a4); }
 .badge-warn  { --_c: var(--warn-text); background: var(--amber-a3); border-color: var(--amber-a4); }
 .badge-danger{ --_c: var(--danger-text); background: var(--red-a3); border-color: var(--red-a4); }
 .badge-info  { --_c: var(--info-text); background: var(--blue-a3); border-color: var(--blue-a4); }
 .badge-plain::before { display: none; }
-/* Status change: the badge blinks a few times as it flips (g.status()). */
-.badge[data-flash] { animation: g-status-flash 0.75s var(--ease-out); }
-@keyframes g-status-flash {
-  0%, 36%, 72%, 100% { opacity: 1; }
-  18%, 54% { opacity: 0.2; }
+/* Status change (g.status()): the pill swells to its new width while the
+   colours crossfade and the label blurs through. Then it blinks: three soft
+   beats of the new colour, each quieter than the last, so the eye is pulled
+   to the pill precisely because something just changed. No halo: the flash
+   stays inside the pill's own shape. */
+.badge[data-flash] { animation: g-status-blink 1.4s var(--ease-out) 0.15s; }
+.badge[data-flash]::before { animation: g-status-dot 1.4s var(--ease-out) 0.15s; }
+@keyframes g-status-blink {
+  0%, 100% { filter: brightness(1) saturate(1); }
+  10% { filter: brightness(1.28) saturate(1.5); }
+  22% { filter: brightness(1) saturate(1); }
+  38% { filter: brightness(1.2) saturate(1.35); }
+  52% { filter: brightness(1) saturate(1); }
+  70% { filter: brightness(1.12) saturate(1.2); }
+  86% { filter: brightness(1) saturate(1); }
+}
+@keyframes g-status-dot {
+  0%, 22%, 52%, 86%, 100% { opacity: 1; box-shadow: 0 0 0 0 transparent; }
+  10% { opacity: 1; box-shadow: 0 0 0 3px color-mix(in oklab, var(--_c) 40%, transparent); }
+  38% { box-shadow: 0 0 0 2.5px color-mix(in oklab, var(--_c) 30%, transparent); }
+  70% { box-shadow: 0 0 0 2px color-mix(in oklab, var(--_c) 20%, transparent); }
 }
 
 .avatar {
@@ -292,14 +314,14 @@ a:hover { text-decoration-color: currentColor; }
   font-size: 11px; font-weight: 500;
   flex: none;
 }
-.avatar-stack { display: inline-flex; --ring: var(--surface-1); }
-.card .avatar-stack, .toast .avatar-stack { --ring: var(--card-bg); }
+.avatar-stack { display: inline-flex; }
 .avatar-stack .avatar {
   margin-left: -6px;
-  box-shadow: 0 0 0 2px var(--ring);
+  box-shadow: 0 0 0 2px var(--surface-1);
   transition: margin var(--dur-base) var(--ease-out);
 }
 .avatar-stack .avatar:first-child { margin-left: 0 !important; }
+.card .avatar-stack .avatar, .toast .avatar-stack .avatar { box-shadow: 0 0 0 2px var(--card-bg); }
 .avatar-stack:hover .avatar { margin-left: 3px; }
 
 .kbd {
@@ -492,6 +514,9 @@ dialog.dlg[open]::backdrop { opacity: 1; }
 .toast .t-desc { color: var(--text-secondary); font-size: 12px; margin-top: 1px; }
 .toast .t-body { flex: 1; min-width: 0; }
 .toast .btn { margin-left: auto; align-self: center; flex: none; }
+.toast[data-progress] { padding-bottom: 14px; }
+.toast .g-progress.t-bar { position: absolute; left: 0; right: 0; bottom: 0; width: auto; height: 3px; border-radius: 0 0 var(--radius-card) var(--radius-card); background: transparent; }
+.toast .t-bar .g-progress-fill { border-radius: 0; }
 
 /* ---------------------------------------------------------------- tabs */
 
@@ -636,14 +661,16 @@ dialog.cmdk {
 /* Save: the floppy springs in, its label rectangle draws (the write), and
    the top stripe blinks as the heads settle. */
 .save-btn .gi-save {
-  width: 0; opacity: 0; translate: 0 -7px;
+  width: 0; opacity: 0; translate: 0 -7px; margin-right: -6px; /* cancels the flex gap while collapsed */
   transition:
-    width var(--dur-base) var(--ease-out),
-    opacity var(--dur-base) var(--ease-out),
+    width var(--dur-slow) var(--ease-out),
+    margin-right var(--dur-slow) var(--ease-out),
+    opacity var(--dur-slow) var(--ease-out),
     translate var(--spring-snap-dur) var(--spring-snap);
 }
 .save-btn .gi-save [data-part="label"] path { transition-delay: 220ms; }
-.save-btn[data-saved] .gi-save { width: 15px; opacity: 1; translate: 0 0; }
+.save-btn .gi-save [data-part="label"] path:not(:is([data-saved] *)) { transition-delay: 0ms; transition-duration: var(--dur-slow); }
+.save-btn[data-saved] .gi-save { width: 15px; opacity: 1; translate: 0 0; margin-right: 0; }
 .save-btn[data-saved] .gi-save [data-part="label"] path { stroke-dashoffset: 0; }
 .save-btn[data-saved] .gi-save [data-part="stripe"] { animation: g-blink 0.5s var(--ease-out) 0.5s; }
 @keyframes g-blink {
@@ -660,7 +687,8 @@ dialog.cmdk {
   transition: translate 380ms cubic-bezier(0.45, 0, 0.6, 1), rotate 380ms cubic-bezier(0.45, 0, 0.6, 1), opacity 220ms var(--ease-out) 160ms;
 }
 .send-btn .gi-send [data-part="check"] path { transition-delay: 260ms; }
-.send-btn[data-sent] .gi-send [data-part="plane"] { translate: 34px -34px; rotate: 10deg; opacity: 0; }
+/* translate on an SVG group is in user units (256 grid), so a real launch needs ~a full glyph */
+.send-btn[data-sent] .gi-send [data-part="plane"] { translate: 260px -260px; rotate: 10deg; opacity: 0; }
 .send-btn[data-sent] .gi-send [data-part="check"] path { stroke-dashoffset: 0; }
 
 /* Download: while working, arrows feed INTO the tray on a conveyor. Each one
@@ -728,9 +756,9 @@ dialog.cmdk {
 [aria-expanded="true"] .gi-plus [data-part="cross"] { rotate: 45deg; }
 
 /* Confirm button: no tick at rest; ticking draws one in. */
-.confirm-btn .gi-check { width: 0; transition: width var(--dur-base) var(--ease-out); }
+.confirm-btn .gi-check { width: 0; margin-right: -6px; transition: width var(--dur-base) var(--ease-out), margin-right var(--dur-base) var(--ease-out); }
 .confirm-btn .gi-check path[pathLength] { transition-delay: 70ms; }
-.confirm-btn[data-done] .gi-check { width: 15px; }
+.confirm-btn[data-done] .gi-check { width: 15px; margin-right: 0; }
 .confirm-btn[data-done] .gi-check [data-part="tick"] path { stroke-dashoffset: 0; }
 
 /* Hold to delete: a fill sweeps while held; release early and it rewinds. */
@@ -788,12 +816,15 @@ dialog.cmdk {
 /* One choreography, on load only. Never scroll-triggered. */
 .enter > * {
   animation: g-rise var(--dur-slow) var(--ease-out) backwards;
-  animation-delay: calc(var(--i, 0) * 30ms);
 }
-.enter > *:nth-child(1) { --i: 0; } .enter > *:nth-child(2) { --i: 1; }
-.enter > *:nth-child(3) { --i: 2; } .enter > *:nth-child(4) { --i: 3; }
-.enter > *:nth-child(5) { --i: 4; } .enter > *:nth-child(6) { --i: 5; }
-.enter > *:nth-child(7) { --i: 6; } .enter > *:nth-child(8) { --i: 7; }
+.enter > *:nth-child(1) { animation-delay: 0ms; }
+.enter > *:nth-child(2) { animation-delay: 30ms; }
+.enter > *:nth-child(3) { animation-delay: 60ms; }
+.enter > *:nth-child(4) { animation-delay: 90ms; }
+.enter > *:nth-child(5) { animation-delay: 120ms; }
+.enter > *:nth-child(6) { animation-delay: 150ms; }
+.enter > *:nth-child(7) { animation-delay: 180ms; }
+.enter > *:nth-child(8) { animation-delay: 210ms; }
 @keyframes g-rise {
   from { opacity: 0; translate: 0 4px; }
   to { opacity: 1; translate: 0 0; }

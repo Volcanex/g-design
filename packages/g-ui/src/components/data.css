@@ -30,11 +30,7 @@
 /* ---------------------------------------------------------------- pagination */
 
 .g-pages { display: flex; align-items: center; gap: 4px; }
-.g-pages [aria-current="page"] {
-  --_fill: var(--fill-active);
-  --_fg: var(--text-primary);
-  --_edge: var(--border-subtle);
-}
+.g-pages [aria-current="page"] { background: var(--fill-active); color: var(--text-primary); border-color: var(--border-subtle); }
 .g-pages .g-gap {
   width: var(--h-control-sm);
   text-align: center;

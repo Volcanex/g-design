@@ -248,3 +248,11 @@
   }
   .g-dropzone-file { animation: none; }
 }
+
+/* Pinned: the bar is an edge of its panel, not an object in it. */
+.g-progress-pinned { position: sticky; top: 0; z-index: 1; height: 3px; border-radius: 0; background: transparent; }
+.g-progress-pinned .g-progress-fill { border-radius: 0; }
+/* Readout: percent first, then whatever the job can honestly report. */
+.progress-readout { display: inline-flex; align-items: baseline; gap: 5px; font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.progress-readout .pct { font-weight: 500; color: var(--text-primary); }
+.progress-readout .sep { color: var(--text-placeholder); }

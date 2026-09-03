@@ -186,6 +186,27 @@
       el.append(b);
     }
   }
+  /* patch the body in place when the shape is unchanged, so a loading
+     spinner keeps turning across updates instead of restarting */
+  function patchBody(el, next) {
+    const same = el._kind === next.kind && !!el.querySelector(".t-body") && !next.action && !el.querySelector(".btn");
+    if (!same) { el._kind = next.kind; toastBody(el, next); return; }
+    const body = el.querySelector(".t-body");
+    body.querySelector("b").textContent = next.title || "";
+    let d = body.querySelector(".t-desc");
+    if (next.desc) {
+      if (!d) { d = document.createElement("div"); d.className = "t-desc"; body.append(d); }
+      d.textContent = next.desc;
+    } else d?.remove();
+  }
+  /* The toast's bar is the same progress component, pinned to its bottom edge. */
+  function toastProgress(el, p) {
+    let bar = el.querySelector(".t-bar");
+    if (p == null || p === false) { bar?.remove(); el.removeAttribute("data-progress"); return; }
+    if (!bar) { bar = document.createElement("div"); bar.className = "g-progress t-bar"; el.append(bar); }
+    el.setAttribute("data-progress", "");
+    g.progress(bar, p);
+  }
   g.toast = (opts = {}) => {
     if (!toaster) {
       toaster = document.createElement("div");
@@ -199,7 +220,9 @@
     const el = document.createElement("div");
     el.className = "toast";
     el.setAttribute("data-entering", "");
-    toastBody(el, opts);
+    el.opts = Object.assign({}, opts);
+    patchBody(el, opts);
+    toastProgress(el, opts.progress);
     el.sticky = opts.kind === "loading" || opts.sticky;
     toaster.append(el);
     toasts.unshift(el);
@@ -207,12 +230,16 @@
     if (!el.sticky) el.timer = setTimeout(() => dismiss(el), opts.duration || 4000);
     return {
       el,
+      /* update merges, so a running job can move one field at a time */
       update(next) {
-        toastBody(el, next);
-        el.sticky = next.kind === "loading" || next.sticky;
+        const o = Object.assign(el.opts, next);
+        patchBody(el, o);
+        toastProgress(el, o.progress);
+        el.sticky = o.kind === "loading" || o.sticky;
         clearTimeout(el.timer);
-        if (!el.sticky) el.timer = setTimeout(() => dismiss(el), next.duration || 4000);
+        if (!el.sticky) el.timer = setTimeout(() => dismiss(el), o.duration || 4000);
       },
+      progress(p) { el.opts.progress = p; toastProgress(el, p); },
       dismiss: () => dismiss(el),
     };
   };
@@ -371,7 +398,7 @@
       clearTimeout(btn._cycleTimer);
       btn._cycleTimer = setTimeout(() => {
         btn.removeAttribute(attr);
-        if (label) label.textContent = btn.getAttribute("data-label") || label.textContent;
+        if (label) { label.textContent = btn.getAttribute("data-label") || label.textContent; bridgeLabel(label); }
         live.textContent = "";
       }, 2000);
     });
@@ -426,12 +453,34 @@
 
   /* ---- status badge: swap with a blink ---------------------------------- */
 
+  /* One swell: the pill resizes to its new label while colours crossfade and
+     the text types through a blur, then the dot glows once to say "changed".
+     Width is measured in px at both ends so the transition has real numbers. */
   g.status = (el, { kind, label }) => {
-    el.className = "badge" + (kind ? " badge-" + kind : "");
+    const nextClass = "badge" + (kind ? " badge-" + kind : "");
+    const sameClass = el.className.replace(/\s*g-swelling\s*/, " ").trim() === nextClass;
+    const sameText = label == null || el.textContent === label;
+    if (sameClass && sameText) return;
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce || !el.isConnected) {
+      el.className = nextClass;
+      if (label != null) el.textContent = label;
+      return;
+    }
+    const from = el.getBoundingClientRect().width;
+    el.className = nextClass + " g-swelling";
     if (label != null) el.textContent = label;
+    el.style.width = "";
+    const to = el.getBoundingClientRect().width;
+    el.style.width = from + "px";
+    void el.offsetWidth;
+    el.style.width = to + "px";
     el.removeAttribute("data-flash");
     void el.offsetWidth; /* restart the animation */
     el.setAttribute("data-flash", "");
+    if (label != null && !sameText) bridgeLabel(el);
+    clearTimeout(el._swell);
+    el._swell = setTimeout(() => { el.style.width = ""; el.classList.remove("g-swelling"); }, 700);
   };
 
   /* ---- confirm button: tick draws in on click --------------------------- */
@@ -1190,6 +1239,45 @@
 
     render();
   }
+
+  /* g.progress(el, p, parts): the imperative face of .g-progress. p is 0..1 for
+     measurable work, true for a sweep. parts fill the readout the bar reports
+     to: the .progress-readout beside it, or the id its data-readout names (a
+     bar pinned to a panel's top edge often reports in the footer). */
+  g.progress = (el, p, parts) => {
+    if (!el.classList.contains("g-progress")) el.classList.add("g-progress");
+    if (!el.hasAttribute("data-progress-init")) { el.setAttribute("data-progress-init", ""); initProgress(el); }
+    if (p === true) el.setAttribute("data-indeterminate", "");
+    else {
+      el.removeAttribute("data-indeterminate");
+      el.setAttribute("aria-valuenow", Math.round(clamp(p || 0) * 100));
+    }
+    const ref = el.getAttribute("data-readout");
+    const out = (ref && document.getElementById(ref)) || el.closest(".progress-row")?.querySelector(".progress-readout") || el.parentElement?.querySelector(".progress-readout");
+    if (!out) return;
+    const bits = [];
+    if (p !== true) {
+      const pct = document.createElement("b");
+      pct.className = "pct";
+      pct.textContent = Math.round(clamp(p || 0) * 100) + "%";
+      bits.push(pct);
+    }
+    for (const part of [].concat(parts || []).filter(Boolean)) {
+      if (bits.length) { const sep = document.createElement("span"); sep.className = "sep"; sep.textContent = "·"; bits.push(sep); }
+      const s = document.createElement("span"); s.textContent = part; bits.push(s);
+    }
+    out.replaceChildren(...bits);
+  };
+
+  /* One set of units for every readout in the system. */
+  g.bytes = (n) => {
+    const u = ["B", "KB", "MB", "GB", "TB"];
+    let i = 0;
+    while (n >= 1024 && i < u.length - 1) { n /= 1024; i++; }
+    return (i > 0 && n < 10 ? n.toFixed(1) : Math.round(n)) + " " + u[i];
+  };
+  g.rate = (bps) => g.bytes(bps) + "/s";
+  g.eta = (s) => (s >= 60 ? Math.round(s / 60) + "m left" : Math.max(1, Math.round(s)) + "s left");
 
   /* ---- wire up ---------------------------------------------------------- */
 

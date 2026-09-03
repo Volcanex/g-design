@@ -146,6 +146,12 @@ const staticTokens = `  /* ---- aliasing layer: components reference these, neve
   --text-placeholder: var(--slate-9);
   --focus-ring: var(--slate-8);
 
+  /* ---- control slots: per-variant fill/fg/edge, overridden on .btn-* and
+     friends; registered here so overrides resolve to known tokens ---- */
+  --_fill: transparent;
+  --_fg: var(--text-primary);
+  --_edge: var(--border);
+
   /* ---- accent slot: the entire per-app override surface ---- */
   --accent-fill: var(--contrast-fill);
   --accent-fill-hover: var(--contrast-fill-hover);
