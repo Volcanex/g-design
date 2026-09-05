@@ -435,7 +435,7 @@
   /* ---- status badge: swap with a blink ---------------------------------- */
 
   /* One swell: the pill resizes to its new label while colours crossfade and
-     the text types through a blur, then the dot glows once to say "changed".
+     the text types through a blur; once settled, the pill blinks three times.
      Width is measured in px at both ends so the transition has real numbers. */
   g.status = (el, { kind, label }) => {
     const nextClass = "badge" + (kind ? " badge-" + kind : "");
@@ -494,7 +494,7 @@
       f.className = "hold-fill";
       btn.prepend(f);
     }
-    const dur = parseInt(btn.getAttribute("data-hold-ms") || "900", 10);
+    const dur = parseInt(btn.getAttribute("data-hold-ms") || "2000", 10);
     btn.style.setProperty("--hold-dur", dur + "ms");
     let timer;
     const start = () => {

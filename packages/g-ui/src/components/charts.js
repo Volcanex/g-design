@@ -61,6 +61,9 @@
       (host._gchartFrame = requestAnimationFrame(() => marked.forEach((el) => el.setAttribute("data-on", "")))));
   }
 
+  /* Re-arm the entrance so the next render animates again. */
+  chart.replay = (host) => { host._gchartEntered = false; };
+
   function legend(items) {
     const box = document.createElement("div");
     box.className = "g-chart-legend";

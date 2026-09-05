@@ -87,7 +87,8 @@
   position: sticky;
   top: 0;
   z-index: 1;
-  background: var(--surface-2);
+  background: var(--card-bg, var(--surface-2));
+  background-clip: padding-box;
   /* the hairline is a shadow: collapsed table borders do not travel with a
      sticky row, so the drawn border vanishes the moment the body scrolls */
   border-bottom: none;
@@ -101,14 +102,18 @@
   width: 1px;
   padding-right: 0;
 }
-.table.g-selectable tbody tr[data-selected] { background: var(--fill-hover); }
+.table.g-selectable tbody tr[data-selected] td { background: var(--fill-hover); }
 
-/* Select-all in its third state: a dash, not a tick. */
+/* Select-all in its third state: a dash, not a tick. Outlined rather than
+   filled, so a partial selection reads as "some": a filled box in the sticky
+   corner would shout louder than the fully-selected rows beneath it. */
 .checkbox:indeterminate {
-  background: var(--accent-fill);
+  background: transparent;
   border-color: var(--accent-edge);
 }
 .checkbox:indeterminate::after {
-  scale: 1;
-  mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128Z"/></svg>');
+  clip-path: inset(0 0 0 0);
+  opacity: 1;
+  background: var(--accent-fill);
+  mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><path d="M228,128a12,12,0,0,1-12,12H40a12,12,0,0,1,0-24H216A12,12,0,0,1,228,128Z"/></svg>');
 }

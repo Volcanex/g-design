@@ -25,7 +25,13 @@
       const min = num(input.min, 0);
       const max = num(input.max, 100);
       wrap.style.setProperty("--_p", max === min ? 0 : clamp((input.value - min) / (max - min)));
-      if (out) out.textContent = input.value + (wrap.getAttribute("data-suffix") || "");
+      if (out) {
+        const suf = wrap.getAttribute("data-suffix") || "";
+        /* the number is what sits over the thumb; the suffix hangs off its
+           right edge without pulling the centre, so 5% and 100% both align */
+        out.textContent = input.value;
+        out.dataset.suffix = suf;
+      }
     };
     input.addEventListener("input", sync);
     sync();
