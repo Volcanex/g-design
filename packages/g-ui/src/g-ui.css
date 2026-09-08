@@ -768,7 +768,9 @@ dialog.cmdk {
 .confirm-btn[data-done] .gi-check { width: 15px; margin-right: 0; }
 .confirm-btn[data-done] .gi-check [data-part="tick"] path { stroke-dashoffset: 0; }
 
-/* Hold to delete: a fill sweeps while held; release early and it rewinds. */
+/* Hold to delete: a fill sweeps while held; release early and it rewinds.
+   Only on fine pointers. Touch gets [data-mode="confirm"], where the same
+   guard is a second tap, so the fill never appears and the label carries it. */
 .hold-btn { position: relative; overflow: hidden; }
 .hold-btn .hold-fill {
   content: "";
@@ -783,6 +785,8 @@ dialog.cmdk {
   transform: scaleX(1);
   transition: transform var(--hold-dur, 900ms) linear;
 }
+.hold-btn[data-mode="confirm"] .hold-fill { display: none; }
+.hold-btn[data-confirming] { background: var(--danger-fill-hover); }
 @keyframes g-wiggle {
   0%, 100% { rotate: 0deg; }
   25% { rotate: -9deg; }

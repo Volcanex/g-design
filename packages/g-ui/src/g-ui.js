@@ -487,6 +487,14 @@
 
   /* ---- hold to delete ---------------------------------------------------- */
 
+  /* Holding a button down is a pointer gesture: it wants a cursor that can rest
+     on a target without the finger covering it, and a press that is distinct
+     from a tap. Touch has neither, so a held finger there reads as a stuck tap.
+     Fine-pointer devices get the hold; everything else gets a two-step confirm
+     ("Delete" then "Really delete?"), which is the same guard by other means.
+     Both paths end in one `hold-complete` event, so consumers never branch. */
+  const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
+
   function initHold(btn) {
     if (!btn.querySelector("svg")) btn.insertAdjacentHTML("afterbegin", icon("trash"));
     if (!btn.querySelector(".hold-fill")) {
@@ -494,25 +502,66 @@
       f.className = "hold-fill";
       btn.prepend(f);
     }
+    const label = btn.querySelector("span:not(.hold-fill)");
+    const holdLabel = btn.getAttribute("data-hold-label") || (label && label.textContent) || "Hold to delete";
+    const tapLabel = btn.getAttribute("data-tap-label") || "Delete";
+    const confirmLabel = btn.getAttribute("data-confirm-label") || "Really delete?";
     const dur = parseInt(btn.getAttribute("data-hold-ms") || "2000", 10);
     btn.style.setProperty("--hold-dur", dur + "ms");
+
+    const fire = () => btn.dispatchEvent(new CustomEvent("hold-complete", { bubbles: true }));
+
+    /* --- hold path (fine pointer) --- */
     let timer;
     const start = () => {
       if (btn.disabled || btn.hasAttribute("data-holding")) return;
       btn.setAttribute("data-holding", "");
-      timer = setTimeout(() => {
-        cancel();
-        btn.dispatchEvent(new CustomEvent("hold-complete", { bubbles: true }));
-      }, dur);
+      timer = setTimeout(() => { cancel(); fire(); }, dur);
     };
     const cancel = () => { clearTimeout(timer); btn.removeAttribute("data-holding"); };
-    btn.addEventListener("pointerdown", start);
+
+    /* --- confirm path (coarse pointer) --- */
+    let armed;
+    const disarm = () => {
+      clearTimeout(armed);
+      armed = null;
+      btn.removeAttribute("data-confirming");
+      if (label) label.textContent = tapLabel;
+    };
+    const arm = () => {
+      btn.setAttribute("data-confirming", "");
+      if (label) label.textContent = confirmLabel;
+      /* an unanswered confirm goes back to rest rather than sitting armed */
+      armed = setTimeout(disarm, 3000);
+    };
+
+    btn.addEventListener("pointerdown", (e) => { if (btn.dataset.mode === "hold" && e.pointerType !== "touch") start(); });
     btn.addEventListener("pointerup", cancel);
     btn.addEventListener("pointerleave", cancel);
-    btn.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); if (!e.repeat) start(); } });
+    btn.addEventListener("keydown", (e) => {
+      if (btn.dataset.mode !== "hold") return;
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); if (!e.repeat) start(); }
+    });
     btn.addEventListener("keyup", (e) => { if (e.key === "Enter" || e.key === " ") cancel(); });
-    /* a completed hold is the click; suppress the plain click action */
-    btn.addEventListener("click", (e) => e.preventDefault());
+    btn.addEventListener("blur", () => { cancel(); if (armed) disarm(); });
+    btn.addEventListener("click", (e) => {
+      e.preventDefault(); /* a completed hold is the click; never the plain action */
+      if (btn.dataset.mode === "hold" || btn.disabled) return;
+      if (armed) { disarm(); fire(); } else arm();
+    });
+
+    /* Mode is an attribute so the button describes its own behaviour in the
+       DOM, and so a hybrid device that gains or loses a mouse re-decides. */
+    const setMode = () => {
+      const hold = finePointer.matches;
+      if (btn.dataset.mode === (hold ? "hold" : "confirm")) return;
+      cancel();
+      if (armed) disarm();
+      btn.dataset.mode = hold ? "hold" : "confirm";
+      if (label) label.textContent = hold ? holdLabel : tapLabel;
+    };
+    setMode();
+    finePointer.addEventListener("change", setMode);
   }
 
   /* ---- dialogs: light-dismiss ------------------------------------------ */

@@ -29,7 +29,7 @@
       <button class="btn btn-go confirm-btn" data-revert data-label="Approve" data-label-done="Approved"><span class="confirm-label">Approve</span></button>
       <button class="btn btn-danger hold-btn" data-hold-ms="900"><span>Hold to delete</span></button>
     </div>
-    <span class="cap">Green commits, red destroys; always solid, never used for emphasis. Approve starts bare and draws its tick when clicked. Delete only fires after a held press: the fill sweeps, the trash wiggles, and releasing early rewinds it. A view never holds both a contrast primary and a go.</span>
+    <span class="cap">Green commits, red destroys; always solid, never used for emphasis. Approve starts bare and draws its tick when clicked. Delete guards itself two ways, chosen from the pointer: on a mouse it is a held press, where the fill sweeps, the trash wiggles and releasing early rewinds it; on touch, where holding reads as a stuck tap, it is a second tap instead, "Delete" then "Really delete?". Both end in one hold-complete event. A view never holds both a contrast primary and a go.</span>
   </section>
   <section>
     <span class="label">Feedback buttons</span>
@@ -67,7 +67,7 @@
   </section>
 <script>
 document.addEventListener("hold-complete", (e) => {
-  if (e.target.closest(".hold-btn")) g.toast({ title: "Project deleted", desc: "Held for 900ms, so no accidents", kind: "danger" });
+  if (e.target.closest(".hold-btn")) g.toast({ title: "Project deleted", desc: "Guarded by a held press or a second tap, so no accidents", kind: "danger" });
 });
 </script>
 </body>

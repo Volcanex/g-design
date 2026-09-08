@@ -60,8 +60,10 @@ A failing gate fails the build.
 
 The stateful buttons set the tone for the rest: copy cross-fades its two
 icons in a fixed box and resets its timer on re-click; approve starts bare
-and draws its tick when clicked; destructive actions are hold-to-delete,
-a sweep that rewinds if released early. Status badges blink as they flip.
+and draws its tick when clicked; destructive actions are hold-to-delete on
+a mouse, a sweep that rewinds if released early, and a two-step tap confirm
+on touch, where a held finger reads as a stuck tap. Status badges blink as
+they flip.
 Buttons grow by 2% on hover and compress to 97% on press. Tooltips share
 one 300ms warm-up and flip below when out of headroom. Toasts stack with
 scale and a 14px offset, pause on hover, carry actions, and a loading
