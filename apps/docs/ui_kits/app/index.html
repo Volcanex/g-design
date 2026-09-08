@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="../../assets/g.css">
 <script defer src="../../assets/g-ui.js"></script>
 <style>
-  .brand { display: flex; align-items: center; gap: 8px; padding: 6px 8px 14px; }
+  .brand { display: flex; align-items: center; gap: 8px; padding: var(--sp-2) var(--sp-2) var(--sp-4); }
   .brand .mark {
     width: 22px; height: 22px; border-radius: var(--radius-sm);
     background: var(--accent-fill); color: var(--accent-fg);
@@ -16,8 +16,8 @@
   }
   .brand b { font-size: 13px; font-weight: 500; }
   .nav-item {
-    display: flex; align-items: center; gap: 9px;
-    height: 30px; padding: 0 8px;
+    display: flex; align-items: center; gap: var(--sp-2);
+    height: var(--h-3); padding: 0 8px;
     border: none; border-radius: var(--radius-sm);
     background: none; color: var(--text-secondary);
     font-family: var(--font-ui); font-size: var(--font-size-ui); font-weight: 450;
@@ -27,25 +27,25 @@
   .nav-item svg { width: 15px; height: 15px; }
   .nav-item:hover { background: var(--fill-hover); color: var(--text-primary); }
   .nav-item[aria-current] { background: var(--fill-active); color: var(--text-primary); font-weight: 500; }
-  .nav-head { padding: 14px 8px 5px; font-size: 11px; font-weight: 500; color: var(--text-placeholder); }
+  .nav-head { padding: var(--sp-4) var(--sp-2) var(--sp-1); font-size: 11px; font-weight: 500; color: var(--text-placeholder); }
   .side-foot { margin-top: auto; display: flex; align-items: center; gap: 8px; padding: 8px; font-size: 12px; }
   .side-foot .who { display: flex; flex-direction: column; }
   .side-foot .who span:last-child { color: var(--text-placeholder); font-size: 11px; }
 
   main { display: flex; flex-direction: column; overflow: auto; }
   header {
-    display: flex; align-items: center; gap: 10px;
-    padding: 10px var(--sp-5);
+    display: flex; align-items: center; gap: var(--sp-3);
+    padding: var(--sp-3) var(--sp-5);
     border-bottom: 1px solid var(--border-subtle);
     position: sticky; top: 0; background: var(--surface-1); z-index: 5;
   }
   .search { position: relative; width: 260px; }
   .search svg { position: absolute; left: 9px; top: 50%; translate: 0 -50%; width: 14px; height: 14px; color: var(--text-placeholder); }
   .search .input { padding-left: 30px; padding-right: 54px; }
-  .search .keys { position: absolute; right: 7px; top: 50%; translate: 0 -50%; display: flex; gap: 3px; }
+  .search .keys { position: absolute; right: 7px; top: 50%; translate: 0 -50%; display: flex; gap: var(--sp-1); }
 
   .content { padding: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-4); max-width: 980px; }
-  .page-head { display: flex; align-items: center; gap: 10px; }
+  .page-head { display: flex; align-items: center; gap: var(--sp-3); }
   .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-4); }
   .stat { display: flex; flex-direction: column; gap: 4px; }
   .stat .v { font-size: 22px; font-weight: 500; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
@@ -54,7 +54,7 @@
   .stat .d svg { width: 12px; height: 12px; }
   .stat .d.flat { color: var(--text-placeholder); }
 
-  .panel-head { display: flex; align-items: center; gap: 10px; padding-bottom: var(--sp-3); }
+  .panel-head { display: flex; align-items: center; gap: var(--sp-3); padding-bottom: var(--sp-3); }
   .page-head .badge { white-space: nowrap; }
   @media (max-width: 720px) {
     .stats { grid-template-columns: 1fr; }
@@ -63,14 +63,14 @@
     .table th, .table td { white-space: nowrap; }
   }
   .feed { display: flex; flex-direction: column; }
-  .feed-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border-subtle); font-size: var(--font-size-ui); }
+  .feed-item { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-3) 0; border-bottom: 1px solid var(--border-subtle); font-size: var(--font-size-ui); }
   .feed-item:last-child { border-bottom: none; }
   .feed-item .when { margin-left: auto; font-size: 12px; color: var(--text-placeholder); font-variant-numeric: tabular-nums; }
-  .alert-row { display: flex; align-items: center; gap: 10px; }
-  .alert-row .meta { display: flex; flex-direction: column; gap: 2px; }
+  .alert-row { display: flex; align-items: center; gap: var(--sp-3); }
+  .alert-row .meta { display: flex; flex-direction: column; gap: var(--sp-1); }
   .alert-row .meta span:last-child { font-size: 12px; color: var(--text-secondary); }
   .settings-row { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4); }
-  .settings-row .meta { display: flex; flex-direction: column; gap: 2px; max-width: 420px; }
+  .settings-row .meta { display: flex; flex-direction: column; gap: var(--sp-1); max-width: 420px; }
   .settings-row .meta span:last-child { font-size: 12px; color: var(--text-secondary); }
 </style>
 </head>
@@ -110,10 +110,10 @@
       <span class="badge badge-ok">All systems live</span>
       <span style="flex:1"></span>
       <button class="btn btn-secondary">Export</button>
-      <button class="btn btn-primary" onclick="g.toast({title:'Deployment started',desc:'g-site · edition 42',kind:'ok'});window.bumpReq&amp;&amp;bumpReq()"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg>New deployment</button>
+      <button class="btn btn-primary" onclick="g.toast({title:'Deployment started',desc:'g-site, edition 42',kind:'ok'});window.bumpReq&amp;&amp;bumpReq()"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg>New deployment</button>
     </div>
     <div class="stats">
-      <div class="card stat"><span class="k">Requests · 24h</span><span class="v"><number-flow id="nf-req">1,241,082</number-flow></span><span class="d"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M200,64V168a8,8,0,0,1-16,0V83.31L69.66,197.66a8,8,0,0,1-11.32-11.32L172.69,72H88a8,8,0,0,1,0-16H192A8,8,0,0,1,200,64Z"/></svg>8.2% vs yesterday</span><div class="g-spark" data-values="38,41,40,44,43,47,52" style="height:24px;margin-top:4px"></div></div>
+      <div class="card stat"><span class="k">Requests, last 24h</span><span class="v"><number-flow id="nf-req">1,241,082</number-flow></span><span class="d"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M200,64V168a8,8,0,0,1-16,0V83.31L69.66,197.66a8,8,0,0,1-11.32-11.32L172.69,72H88a8,8,0,0,1,0-16H192A8,8,0,0,1,200,64Z"/></svg>8.2% vs yesterday</span><div class="g-spark" data-values="38,41,40,44,43,47,52" style="height:24px;margin-top:4px"></div></div>
       <div class="card stat"><span class="k">P95 latency</span><span class="v">118 ms</span><span class="d flat">Flat</span><div class="g-spark" data-values="121,118,124,117,119,118,118" data-color="3" style="height:24px;margin-top:4px"></div></div>
       <div class="card stat"><span class="k">Error rate</span><span class="v">0.03%</span><span class="d"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M200,64V168a8,8,0,0,1-16,0V83.31L69.66,197.66a8,8,0,0,1-11.32-11.32L172.69,72H88a8,8,0,0,1,0-16H192A8,8,0,0,1,200,64Z"/></svg>Improving</span></div>
     </div>

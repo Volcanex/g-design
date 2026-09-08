@@ -89,8 +89,8 @@
   z-index: 1;
   background: var(--card-bg, var(--surface-2));
   background-clip: padding-box;
-  /* the hairline is a shadow: collapsed table borders do not travel with a
-     sticky row, so the drawn border vanishes the moment the body scrolls */
+  /* the hairline is a shadow rather than a border: a border on a sticky row
+     is painted before the row is offset, so it drifts as the body scrolls */
   border-bottom: none;
   box-shadow: inset 0 -1px 0 var(--border-subtle);
 }

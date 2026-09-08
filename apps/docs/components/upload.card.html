@@ -9,10 +9,10 @@
 <style>
   body { padding: var(--sp-5); display: grid; grid-template-columns: 1fr 236px; gap: var(--sp-5); align-items: start; }
   .panel { border: 1px solid var(--card-border); border-top-color: var(--card-highlight); border-radius: var(--radius-card); background: var(--card-bg); overflow: hidden; }
-  .panel-head { display: flex; align-items: center; gap: 10px; padding: 12px var(--sp-4); border-bottom: 1px solid var(--border-subtle); }
+  .panel-head { display: flex; align-items: center; gap: var(--sp-3); padding: 12px var(--sp-4); border-bottom: 1px solid var(--border-subtle); }
   .panel-head .card-title { flex: 1; }
   .scroller { max-height: 268px; overflow-y: auto; position: relative; }
-  .file { display: grid; grid-template-columns: 1fr 76px 104px 72px; gap: var(--sp-3); align-items: center; padding: 11px var(--sp-4); border-bottom: 1px solid var(--border-subtle); font-size: var(--font-size-ui); }
+  .file { display: grid; grid-template-columns: 1fr 76px 104px 72px; gap: var(--sp-3); align-items: center; padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--border-subtle); font-size: var(--font-size-ui); }
   .file:last-child { border-bottom: none; }
   .file .name { display: flex; align-items: center; gap: 8px; min-width: 0; }
   .file .name span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -20,10 +20,10 @@
   .file .size { font-size: 11px; color: var(--text-placeholder); font-variant-numeric: tabular-nums; flex: none; }
   .file .progress-readout { min-width: 0; }
   .file .badge { justify-self: end; }
-  .foot { display: flex; align-items: center; gap: 10px; padding: 12px var(--sp-4); border-top: 1px solid var(--border-subtle); }
+  .foot { display: flex; align-items: center; gap: var(--sp-3); padding: 12px var(--sp-4); border-top: 1px solid var(--border-subtle); }
   .foot .mono { font-size: 11px; color: var(--text-secondary); font-variant-numeric: tabular-nums; margin-left: auto; }
   .aside { display: flex; flex-direction: column; gap: var(--sp-3); font-size: 12px; color: var(--text-secondary); }
-  .aside .card { display: flex; flex-direction: column; gap: 6px; line-height: 1.55; }
+  .aside .card { display: flex; flex-direction: column; gap: var(--sp-2); line-height: 1.55; }
 </style>
 </head>
 <body>
@@ -114,7 +114,7 @@ function upload() {
       g.rate(rate),
       g.eta((TOTAL - sent) / Math.max(rate, 1)),
     ]);
-    toast.update({ progress: done, desc: Math.round(done * 100) + "% · " + g.rate(rate) });
+    toast.update({ progress: done, desc: Math.round(done * 100) + "%, " + g.rate(rate) });
 
     if (p[i] === 1) {
       g.status(badge(rows[i]), { kind: "ok", label: "Done" });

@@ -9,7 +9,7 @@
 <style>
   body { padding: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-5); }
   .cols { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-5); align-items: start; }
-  section { display: flex; flex-direction: column; gap: 10px; }
+  section { display: flex; flex-direction: column; gap: var(--sp-3); }
   .cap { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
   .readout { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); font-size: var(--font-size-ui); }
   .readout .keys { display: flex; align-items: center; gap: 4px; color: var(--text-secondary); font-size: 12px; }
@@ -59,32 +59,32 @@
         <div class="g-combobox" data-name="region">
           <input class="input" id="cb-region" placeholder="Search regions">
           <div class="g-listbox" data-empty-text="No region matches that.">
-            <div class="g-option" data-value="eu-central" data-label="eu-central · Nuremberg">
-              <span class="g-option-text">eu-central · Nuremberg</span>
+            <div class="g-option" data-value="eu-central" data-label="eu-central, Nuremberg">
+              <span class="g-option-text">eu-central, Nuremberg</span>
               <span class="g-option-meta">4 ms</span>
             </div>
-            <div class="g-option" data-value="eu-north" data-label="eu-north · Helsinki">
-              <span class="g-option-text">eu-north · Helsinki</span>
+            <div class="g-option" data-value="eu-north" data-label="eu-north, Helsinki">
+              <span class="g-option-text">eu-north, Helsinki</span>
               <span class="g-option-meta">22 ms</span>
             </div>
-            <div class="g-option" data-value="eu-west" data-label="eu-west · Dublin">
-              <span class="g-option-text">eu-west · Dublin</span>
+            <div class="g-option" data-value="eu-west" data-label="eu-west, Dublin">
+              <span class="g-option-text">eu-west, Dublin</span>
               <span class="g-option-meta">31 ms</span>
             </div>
-            <div class="g-option" data-value="uk-south" data-label="uk-south · London">
-              <span class="g-option-text">uk-south · London</span>
+            <div class="g-option" data-value="uk-south" data-label="uk-south, London">
+              <span class="g-option-text">uk-south, London</span>
               <span class="g-option-meta">18 ms</span>
             </div>
-            <div class="g-option" data-value="us-east" data-label="us-east · Ashburn">
-              <span class="g-option-text">us-east · Ashburn</span>
+            <div class="g-option" data-value="us-east" data-label="us-east, Ashburn">
+              <span class="g-option-text">us-east, Ashburn</span>
               <span class="g-option-meta">88 ms</span>
             </div>
-            <div class="g-option" data-value="us-west" data-label="us-west · Portland">
-              <span class="g-option-text">us-west · Portland</span>
+            <div class="g-option" data-value="us-west" data-label="us-west, Portland">
+              <span class="g-option-text">us-west, Portland</span>
               <span class="g-option-meta">141 ms</span>
             </div>
-            <div class="g-option" data-value="ap-south" data-label="ap-south · Singapore">
-              <span class="g-option-text">ap-south · Singapore</span>
+            <div class="g-option" data-value="ap-south" data-label="ap-south, Singapore">
+              <span class="g-option-text">ap-south, Singapore</span>
               <span class="badge badge-warn">Busy</span>
             </div>
           </div>

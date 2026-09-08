@@ -128,7 +128,7 @@ function App() {
         <div className="cols">
           <section>
             <span className="label">NumberFlow</span>
-            <Stat label="Requests · 24h" value={requests} />
+            <Stat label="Requests, last 24h" value={requests} />
             <div className="row">
               <Button size="sm" onClick={() => setRequests((r) => r + Math.floor(1000 + Math.random() * 9000))}>Simulate traffic</Button>
             </div>

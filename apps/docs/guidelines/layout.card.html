@@ -1,0 +1,163 @@
+<!-- @dsCard group="Guidelines" name="Layout" subtitle="A 4px grid, pixel line-heights, one height scale. Spacing is a decision the system already made." viewport="760x1000" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Layout</title>
+<link rel="stylesheet" href="../assets/g.css">
+<script defer src="../assets/g-ui.js"></script>
+<style>
+  body { padding: var(--sp-5); display: grid; grid-template-columns: 1fr 300px; gap: var(--sp-6); align-items: start; }
+  .col { display: flex; flex-direction: column; gap: var(--sp-4); }
+  h3 { color: var(--text-primary); }
+  .note { font-size: 12px; line-height: var(--lh-1); color: var(--text-secondary); }
+
+  /* the ruling is the grid itself: one hairline every 4px behind the sample */
+  .ruled {
+    background-color: var(--surface-1);
+    background-image: repeating-linear-gradient(to bottom, var(--border-subtle) 0 1px, transparent 1px 4px);
+    padding: var(--sp-2) var(--sp-3);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-card);
+    display: flex; flex-direction: column; gap: var(--sp-2);
+  }
+  .ruled .strip {
+    background: var(--fill-active);
+    border-radius: var(--radius-sm);
+    display: flex; align-items: center;
+    padding: 0 var(--sp-2);
+    font-family: var(--font-mono); font-size: 11px; line-height: var(--lh-1);
+    color: var(--text-secondary);
+  }
+
+  .rows { display: flex; flex-direction: column; gap: var(--sp-1); }
+  .r { display: grid; grid-template-columns: 92px 68px 1fr; gap: var(--sp-2); align-items: center; font-size: var(--font-size-ui); }
+  .r .tok { font-family: var(--font-mono); font-size: 11px; color: var(--text-placeholder); }
+  .r .px { font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+
+  .heights { display: flex; align-items: flex-end; gap: var(--sp-2); }
+  .h { display: flex; flex-direction: column; align-items: center; gap: var(--sp-1); }
+  .h i {
+    display: block; width: 44px;
+    background: var(--fill-active); border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+  }
+  .h span { font-family: var(--font-mono); font-size: 11px; line-height: var(--lh-1); color: var(--text-placeholder); }
+
+  .share { display: flex; align-items: flex-end; gap: var(--sp-2); }
+  .gutters { display: flex; flex-direction: column; gap: var(--sp-2); }
+  .g-row { display: flex; align-items: center; gap: var(--sp-3); font-size: 12px; line-height: var(--lh-1); }
+  .g-row i { display: block; height: var(--sp-1); background: var(--fill-active); border-radius: var(--radius-full); }
+  .g-row b { font-weight: 500; width: 56px; }
+  .g-row .px { font-family: var(--font-mono); color: var(--text-placeholder); }
+
+  .cols-demo { display: flex; flex-direction: column; gap: var(--sp-2); }
+  .cw { display: flex; align-items: center; gap: var(--sp-3); font-size: 12px; line-height: var(--lh-1); }
+  .cw i { display: block; height: var(--sp-2); background: var(--fill-hover); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); }
+
+  .rule-block { display: flex; flex-direction: column; gap: var(--sp-2); font-size: var(--font-size-ui); }
+  .rule-block p { color: var(--text-secondary); }
+  .rule-block b { color: var(--text-primary); font-weight: 500; }
+  .slot-demo { display: flex; align-items: center; gap: var(--sp-3); }
+  .slot { min-height: var(--h-2); display: flex; align-items: center; }
+  .banned { display: flex; flex-direction: column; gap: var(--sp-1); font-size: 12px; line-height: var(--lh-1); }
+  .banned .no { color: var(--danger-text); }
+  .banned .yes { color: var(--ok-text); }
+</style>
+</head>
+<body>
+  <div class="col">
+    <div>
+      <h3>Everything lands on 4px</h3>
+      <p class="note">One base step, and a spacing scale built from it: 4, 8, 12, 16, 24, 32, 48, 64. Nothing between them. A page that keeps to it stays aligned as it grows, and two authors working on neighbouring panels reach the same number without a conversation.</p>
+    </div>
+    <div class="ruled">
+      <div class="strip" style="height:var(--h-3)">A control, --h-3, 32</div>
+      <div class="strip" style="height:var(--lh-2)">A text row, --lh-2, 20</div>
+      <div class="strip" style="height:var(--h-4)">A table row, --h-4, 40</div>
+    </div>
+
+    <div>
+      <h3>Vertical rhythm</h3>
+      <p class="note">Line-heights are pixels, not ratios. The ratio 1.5 puts a 13px row on 19.5px and a 15px row on 22.5px, and after that nothing beneath them can sit on the grid. Half-pixel edges also make Safari draw a hairline border at double weight.</p>
+    </div>
+    <div class="rows">
+      <div class="r"><span>Caption</span><span class="px">11 to 12</span><span class="tok">--lh-1, 16px</span></div>
+      <div class="r"><span>Body, label</span><span class="px">13 to 15</span><span class="tok">--lh-2, 20px</span></div>
+      <div class="r"><span>Heading</span><span class="px">16 to 18</span><span class="tok">--lh-3, 24px</span></div>
+      <div class="r"><span>Large head</span><span class="px">20 to 22</span><span class="tok">--lh-4, 28px</span></div>
+      <div class="r"><span>Page title</span><span class="px">24 and up</span><span class="tok">--lh-5, 32px</span></div>
+    </div>
+
+    <div>
+      <h3>Height scale</h3>
+      <p class="note">Controls and rows take a height from one scale, so neighbours share a bottom edge without anyone measuring. Density remaps which step a control lands on, never the scale itself.</p>
+    </div>
+    <div class="heights">
+      <div class="h"><i style="height:var(--h-1)"></i><span>--h-1 24</span></div>
+      <div class="h"><i style="height:var(--h-2)"></i><span>--h-2 28</span></div>
+      <div class="h"><i style="height:var(--h-3)"></i><span>--h-3 32</span></div>
+      <div class="h"><i style="height:var(--h-4)"></i><span>--h-4 40</span></div>
+      <div class="h"><i style="height:var(--h-5)"></i><span>--h-5 48</span></div>
+    </div>
+    <div class="share">
+      <button class="btn btn-secondary">Save changes</button>
+      <div class="select-wrap" style="width:160px"><select class="select"><option>Production</option></select></div>
+      <span class="badge badge-ok">Live</span>
+    </div>
+    <p class="note">A button, a select and a badge on one row: the first two are --h-3 and end on the same line, the badge is centred in it.</p>
+
+    <div class="rule-block">
+      <h3>The separator</h3>
+      <p>The middle dot is banned in all interface copy, in every reskin, on the same standing as the em dash. It is a glyph doing a layout job.</p>
+      <div class="banned">
+        <span class="no">Requests · 24h · eu-central</span>
+        <span class="yes">Requests, last 24h, from eu-central</span>
+      </div>
+      <p>Separate two facts with a gap off the spacing scale, a second column, or a new line. If they need reading as one sentence, join them with words.</p>
+    </div>
+  </div>
+
+  <div class="col">
+    <div>
+      <h3>Page gutter</h3>
+      <p class="note">One token, three breakpoints. The 720px step is the one the app shell folds its sidebar at, so chrome and content move together.</p>
+    </div>
+    <div class="gutters">
+      <div class="g-row"><b>Phone</b><i style="width:16px"></i><span class="px">16</span></div>
+      <div class="g-row"><b>Tablet</b><i style="width:24px"></i><span class="px">24</span></div>
+      <div class="g-row"><b>Desktop</b><i style="width:32px"></i><span class="px">32</span></div>
+    </div>
+    <p class="note">Read it as <span class="mono">--gutter</span>, or take the whole container: <span class="mono">.g-page</span> centres itself, insets by the gutter and stacks its children on --sp-4.</p>
+
+    <div>
+      <h3>Columns</h3>
+      <p class="note">A page picks a measure, never a number.</p>
+    </div>
+    <div class="cols-demo">
+      <div class="cw"><i style="width:56px"></i><span class="mono">--col-narrow</span></div>
+      <div class="cw"><i style="width:84px"></i><span class="mono">--col-text</span></div>
+      <div class="cw"><i style="width:112px"></i><span class="mono">--col-content</span></div>
+      <div class="cw"><i style="width:148px"></i><span class="mono">--col-page</span></div>
+    </div>
+
+    <div class="rule-block">
+      <h3>The reserved slot</h3>
+      <p>A slot that is empty most of the time keeps its size. An error line, a count, a status badge, a spinner: give the slot its height before anything arrives, so its neighbours never move when it does.</p>
+      <div class="slot-demo">
+        <button class="btn btn-sm btn-secondary">Check</button>
+        <span class="slot"><span class="badge badge-plain">Waiting</span></span>
+      </div>
+      <p>The test is a layout-shift observer, not an opinion. Watch the page while the data lands, and nothing that was already on screen may move.</p>
+    </div>
+
+    <div class="rule-block">
+      <h3>Audit it</h3>
+      <p>The audit renders a page and reports every edge off the grid, every half-pixel edge and every sibling gap off the scale, grouped by selector.</p>
+    </div>
+    <div class="codeblock">node packages/g-ui/scripts/rhythm-audit.mjs \
+  http://localhost:8080/ --viewport 1280x800</div>
+    <p class="note">A consumer with playwright installed can copy the script into its own e2e suite and gate on it with <span class="mono">--max</span>.</p>
+  </div>
+</body>
+</html>

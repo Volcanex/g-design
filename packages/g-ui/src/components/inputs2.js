@@ -206,7 +206,6 @@
       bits.push(pct);
     }
     for (const part of [].concat(parts || []).filter(Boolean)) {
-      if (bits.length) { const sep = document.createElement("span"); sep.className = "sep"; sep.textContent = "·"; bits.push(sep); }
       const s = document.createElement("span"); s.textContent = part; bits.push(s);
     }
     out.replaceChildren(...bits);

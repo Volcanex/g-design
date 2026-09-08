@@ -35,11 +35,31 @@ g-system, in strict order:
 
 Hard rules that travel with the assets: sentence case everywhere (a
 leading capital, then lowercase; no title case, no ALL CAPS), em dashes
-banned, greys only through the alias tokens, verb-first buttons, dark is
-the default, and **markdown renders only inside `.prose`** (everywhere
-else is plain text, flattened with `g.plain()`). The reference is
-`apps/docs` (every component has a card); the full contract is the
-`g-design` skill in genv.
+and middle dots banned, greys only through the alias tokens, verb-first
+buttons, dark is the default, layout on the 4px grid, and **markdown
+renders only inside `.prose`** (everywhere else is plain text, flattened
+with `g.plain()`). The reference is `apps/docs` (every component has a
+card); the full contract is the `g-design` skill in genv.
+
+## Layout discipline
+
+Everything vertical comes off one 4px grid: the spacing scale `--sp-1` to
+`--sp-8`, pixel line-heights `--lh-1` to `--lh-5` (never a ratio, which is
+what put 13px rows on 19.5px), the control and row height scale `--h-1` to
+`--h-5`, the breakpoint-aware `--gutter` and the `--col-*` measures.
+`.g-page` is the container that applies them. The guideline card is
+`apps/docs/guidelines/layout.card.html`.
+
+Check a page against it, here or in a consumer:
+
+    node packages/g-ui/scripts/rhythm-audit.mjs <url> [--viewport 1280x800]
+                                                [--theme light] [--max N]
+
+It reports edges off the grid (from their own container, and from the top
+of the page), half-pixel edges, and sibling gaps off the spacing scale,
+grouped by selector. `--max` makes it a gate for an e2e suite. It needs
+playwright, which is a devDependency here and is expected to be one in the
+consumer that runs it.
 
 ## Gotchas
 
@@ -88,7 +108,9 @@ else is plain text, flattened with `g.plain()`). The reference is
   (gi-list morphs to an x). Do NOT put a box-shadow on the open sheet: a
   software-raster compositing bug washes the whole layer light.
 - Voice rules are enforced in copy: sentence case with a leading capital,
-  no em dashes anywhere, hyphens only in technical terms.
+  no em dashes and no middle dots anywhere, hyphens only in technical
+  terms. The middle dot is a separator doing a layout job: use a gap off
+  the spacing scale, a column, a new line, or words.
 - Base UI is `@base-ui/react` (1.x stable), not `@base-ui-components/react`.
 - number-flow is vendored; its bare `esm-env` import resolves via an
   import map the build writes. Module scripts need HTTP.

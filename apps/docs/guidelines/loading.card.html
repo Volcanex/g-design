@@ -8,22 +8,22 @@
 <script defer src="../assets/g-ui.js"></script>
 <style>
   body { padding: var(--sp-5); display: grid; grid-template-columns: 1fr 320px; gap: var(--sp-6); align-items: start; }
-  .rules { display: flex; flex-direction: column; gap: 9px; font-size: var(--font-size-ui); }
-  .rule { display: flex; gap: 9px; align-items: baseline; }
+  .rules { display: flex; flex-direction: column; gap: var(--sp-2); font-size: var(--font-size-ui); }
+  .rule { display: flex; gap: var(--sp-2); align-items: baseline; }
   .rule .mono { color: var(--text-placeholder); font-size: 11px; white-space: nowrap; min-width: 102px; flex: none; }
 
   .mini { border: 1px solid var(--border-subtle); border-radius: var(--radius-card); overflow: hidden; }
-  .mini-top { height: 30px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 6px; padding: 0 10px; }
+  .mini-top { height: var(--h-3); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: var(--sp-2); padding: 0 var(--sp-3); }
   .mini-top .dot { width: 16px; height: 16px; border-radius: var(--radius-sm); background: var(--accent-fill); }
   .mini-top .pill { height: 14px; width: 90px; border-radius: var(--radius-full); background: var(--fill-active); }
   .mini-body { display: grid; grid-template-columns: 64px 1fr; min-height: 220px; }
-  .mini-nav { border-right: 1px solid var(--border-subtle); padding: 8px 6px; display: flex; flex-direction: column; gap: 4px; }
+  .mini-nav { border-right: 1px solid var(--border-subtle); padding: var(--sp-2); display: flex; flex-direction: column; gap: 4px; }
   .mini-nav span { height: 14px; border-radius: var(--radius-sm); background: var(--fill-hover); }
   .mini-nav span.on { background: var(--fill-active); }
-  .mini-view { padding: 10px; display: flex; flex-direction: column; gap: 8px; }
-  .mini-view .card { padding: 8px 10px; font-size: 12px; display: flex; align-items: center; gap: 8px; }
-  .controls { display: flex; gap: 8px; margin-top: 10px; }
-  .cap { font-size: 12px; color: var(--text-secondary); line-height: 1.55; margin-top: 10px; }
+  .mini-view { padding: var(--sp-3); display: flex; flex-direction: column; gap: 8px; }
+  .mini-view .card { padding: var(--sp-2) var(--sp-3); font-size: 12px; display: flex; align-items: center; gap: 8px; }
+  .controls { display: flex; gap: 8px; margin-top: var(--sp-3); }
+  .cap { font-size: 12px; color: var(--text-secondary); line-height: 1.55; margin-top: var(--sp-3); }
 </style>
 </head>
 <body>

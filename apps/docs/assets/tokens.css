@@ -199,17 +199,40 @@
   --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px;
   --sp-5: 24px; --sp-6: 32px; --sp-7: 48px; --sp-8: 64px;
 
+  /* ---- vertical rhythm: line-heights in pixels, one per size band, all
+     multiples of 4. A ratio puts a 13px row on 19.5px and a 15px row on
+     22.5px, so nothing beneath them can land on the grid and half-pixel
+     y positions draw hairlines at double weight in Safari. ---- */
+  --lh-1: 16px;   /* 11 to 12px: caption, meta, hint */
+  --lh-2: 20px;   /* 13 to 15px: ui, body, label, subheading */
+  --lh-3: 24px;   /* 16 to 18px: heading, prose body */
+  --lh-4: 28px;   /* 20 to 22px */
+  --lh-5: 32px;   /* 24px and over: page title */
+
+  /* ---- height scale: every control and every row picks from these, so
+     neighbours share a bottom edge without anyone measuring ---- */
+  --h-1: 24px; --h-2: 28px; --h-3: 32px; --h-4: 40px; --h-5: 48px;
+
+  /* ---- page gutter: one token, three breakpoints (widened below) ---- */
+  --gutter: var(--sp-4);
+
+  /* ---- content columns: a page picks a measure, never a number ---- */
+  --col-narrow: 480px;    /* a form, a dialog body, a sign-in */
+  --col-text: 68ch;       /* reading measure, what .prose uses */
+  --col-content: 720px;   /* one column of panels */
+  --col-page: 980px;      /* a dashboard inside the shell */
+
   /* ---- density: remapped by [data-density="compact"] only ---- */
-  --h-control: 32px;
-  --h-control-sm: 28px;
-  --h-control-lg: 38px;
+  --h-control: var(--h-3);
+  --h-control-sm: var(--h-2);
+  --h-control-lg: var(--h-4);
   --pad-control-x: 12px;
   --pad-control-x-sm: 10px;
   --pad-control-x-lg: 16px;
   --pad-card: 16px;
   --font-size-ui: 13px;
   --font-size-body: 14px;
-  --row-h: 40px;
+  --row-h: var(--h-4);
 
   /* ---- motion: two curves, four durations, three springs ---- */
   --ease-out: cubic-bezier(0.2, 0, 0, 1);
@@ -739,18 +762,27 @@
   }
 }
 
+/* Page gutter widens with the viewport. The 720px step is the same one the
+   app shell folds its sidebar at, so chrome and content move together. */
+@media (min-width: 720px) {
+  :root, [data-theme] { --gutter: var(--sp-5); }
+}
+@media (min-width: 1200px) {
+  :root, [data-theme] { --gutter: var(--sp-6); }
+}
+
 /* Density: one attribute on the root, never a per-component prop. */
 [data-density="compact"] {
-  --h-control: 28px;
-  --h-control-sm: 24px;
-  --h-control-lg: 34px;
+  --h-control: var(--h-2);
+  --h-control-sm: var(--h-1);
+  --h-control-lg: var(--h-3);
   --pad-control-x: 10px;
   --pad-control-x-sm: 8px;
   --pad-control-x-lg: 12px;
   --pad-card: 12px;
   --font-size-ui: 12.5px;
   --font-size-body: 13px;
-  --row-h: 32px;
+  --row-h: var(--h-3);
 }
 
 /* Browsers without linear() easing fall back to ease-out. */

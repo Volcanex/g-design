@@ -8,15 +8,15 @@
 <script defer src="../assets/g-ui.js"></script>
 <style>
   body { padding: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-5); }
-  section { display: flex; flex-direction: column; gap: 10px; }
-  .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  section { display: flex; flex-direction: column; gap: var(--sp-3); }
+  .row { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; }
   .cap { font-size: 12px; color: var(--text-secondary); }
   .skel-pair { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4); }
   .skel-pair[data-overlay] { grid-template-columns: 1fr; position: relative; max-width: 360px; }
   .skel-pair[data-overlay] > .card:first-child { position: absolute; inset: 0; opacity: 0.5; pointer-events: none; z-index: 1; }
-  .line-item { display: flex; align-items: center; gap: 10px; }
-  .line-item .lines { flex: 1; display: flex; flex-direction: column; gap: 6px; }
-  .tabpanels { font-size: var(--font-size-ui); color: var(--text-secondary); padding: 10px 2px; }
+  .line-item { display: flex; align-items: center; gap: var(--sp-3); }
+  .line-item .lines { flex: 1; display: flex; flex-direction: column; gap: var(--sp-2); }
+  .tabpanels { font-size: var(--font-size-ui); color: var(--text-secondary); padding: var(--sp-3) var(--sp-1); }
 </style>
 </head>
 <body>
@@ -68,7 +68,7 @@
     <div class="row">
       <button class="btn btn-secondary" popovertarget="demo-menu">Actions</button>
       <button class="btn btn-secondary" onclick="document.getElementById('demo-dlg').showModal()">Delete service…</button>
-      <button class="btn btn-secondary" onclick="g.toast({title:'Deployment started',desc:'g-site · edition 42',kind:'ok'})">Toast</button>
+      <button class="btn btn-secondary" onclick="g.toast({title:'Deployment started',desc:'g-site, edition 42',kind:'ok'})">Toast</button>
       <button class="btn btn-tertiary" data-tip="Tooltips share a warm-up: 300ms once, then instant between neighbours">Hover me</button>
       <button class="btn btn-tertiary" data-tip="See, no wait this time">Then me</button>
     </div>

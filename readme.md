@@ -51,10 +51,19 @@ A failing gate fails the build.
   falls back to crossfades.
 - **Density.** `data-density="compact"` on the root remaps control
   heights, paddings and font sizes. Never a per-component prop.
+- **Layout is on a 4px grid.** Spacing (`--sp-*`), line-heights in pixels
+  rather than ratios (`--lh-*`), control and row heights (`--h-*`), page
+  gutters (`--gutter`) and content measures (`--col-*`) all come off it,
+  so two authors reach the same number without a conversation. A slot that
+  is usually empty keeps its size, so its neighbours never move.
+  `packages/g-ui/scripts/rhythm-audit.mjs` measures a rendered page
+  against all of it.
 - **Voice.** Sentence case everywhere; capitalisation is enforced, not
   optional. Verb-first buttons. The same word survives the whole flow, so
-  Publish makes Published. Em dashes are banned; hyphens are discouraged
-  outside technical terms.
+  Publish makes Published. Em dashes are banned, and so is the middle dot:
+  it is a glyph doing a layout job, and the fix is a gap off the spacing
+  scale, a column, a new line, or words. Hyphens are discouraged outside
+  technical terms.
 
 ## Signature interactions
 
@@ -74,7 +83,7 @@ spammed input and interrupted animation, and must stay green.
 
 ```toml
 [tool.gcore]
-design = "g-system@0.1.0"
+design = "g-system@1.1.0"
 ```
 
 Copy `dist/` into the project's static assets. Override the four accent

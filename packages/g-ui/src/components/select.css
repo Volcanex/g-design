@@ -83,12 +83,12 @@
   position: relative;
   display: flex; align-items: center; gap: 8px;
   width: 100%;
-  min-height: 30px;
-  padding: 5px 8px 5px 27px;
+  min-height: var(--h-2);
+  padding: var(--sp-1) var(--sp-2) var(--sp-1) 27px;
   border: none; border-radius: var(--radius-sm);
   background: none;
   color: var(--text-primary);
-  font-family: var(--font-ui); font-size: var(--font-size-ui);
+  font-family: var(--font-ui); font-size: var(--font-size-ui); line-height: var(--lh-2);
   text-align: left;
   cursor: pointer;
   scroll-margin: 4px;
@@ -108,12 +108,13 @@
 }
 .g-option[aria-selected="true"] .gi-check [data-part="tick"] path { stroke-dashoffset: 0; }
 
-.g-option-meta { margin-left: auto; padding-left: 10px; color: var(--text-secondary); font-size: 12px; }
+.g-option-meta { margin-left: auto; padding-left: var(--sp-3); color: var(--text-secondary); font-size: 12px; line-height: var(--lh-2); }
 .g-option-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .g-listbox-empty {
-  padding: 9px 8px;
+  padding: var(--sp-2);
   font-size: var(--font-size-ui);
+  line-height: var(--lh-2);
   color: var(--text-secondary);
 }
 

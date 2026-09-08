@@ -193,8 +193,8 @@
   color: var(--text-primary);
   translate: 0 -2px;
 }
-.g-dropzone-title { font-size: var(--font-size-ui); font-weight: 500; }
-.g-dropzone-hint { font-size: 12px; color: var(--text-secondary); }
+.g-dropzone-title { font-size: var(--font-size-ui); line-height: var(--lh-2); font-weight: 500; }
+.g-dropzone-hint { font-size: 12px; line-height: var(--lh-1); color: var(--text-secondary); }
 
 .g-dropzone-files {
   display: flex;
@@ -229,7 +229,7 @@
   white-space: nowrap;
   text-overflow: ellipsis;
 }
-.g-dropzone-size { font-size: 12px; color: var(--text-secondary); flex: none; }
+.g-dropzone-size { font-size: 12px; line-height: var(--lh-2); color: var(--text-secondary); flex: none; }
 
 /* ---------------------------------------------------------------- adaptation */
 
@@ -257,7 +257,7 @@
 .g-progress-pinned::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 1px; background: var(--border-subtle); }
 .g-progress-pinned .g-progress-fill { position: relative; border-radius: 0; height: 1px; transition: width var(--dur-slow) var(--ease-out), height var(--dur-base) var(--ease-out); }
 .g-progress-pinned[aria-valuenow]:not([aria-valuenow="0"]) .g-progress-fill, .g-progress-pinned[data-indeterminate] .g-progress-fill { height: 3px; }
-/* Readout: percent first, then whatever the job can honestly report. */
-.progress-readout { display: inline-flex; align-items: baseline; gap: 5px; font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary); font-variant-numeric: tabular-nums; white-space: nowrap; }
+/* Readout: percent first, then whatever the job can honestly report. The
+   facts are separated by a gap off the spacing scale, never by a glyph. */
+.progress-readout { display: inline-flex; align-items: baseline; gap: var(--sp-2); font-family: var(--font-mono); font-size: 11px; line-height: var(--lh-1); color: var(--text-secondary); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .progress-readout .pct { font-weight: 500; color: var(--text-primary); }
-.progress-readout .sep { color: var(--text-placeholder); }
