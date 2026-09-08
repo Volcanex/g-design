@@ -44,6 +44,40 @@
       document.documentElement.setAttribute("data-density", "compact");
   } catch {}
 
+  /* ---- plain: markdown source flattened to label text -------------------
+     Authored markdown reaches interface chrome constantly: a note title
+     lifted from a body's first line, a search hit, a table cell, a tooltip.
+     Chrome has no markdown renderer, so the syntax survives as literal
+     asterisks and backticks. `.prose` is the ONLY place markdown is
+     rendered; every other slot flattens first.
+
+     Upstream truncation is the common case ("**A title cut mid-phrase"),
+     which leaves openers with no closer, so unmatched asterisks and
+     backticks are swept after the paired passes. Underscores are not
+     swept: snake_case survives far more often than a stray _emphasis_,
+     so they only pair at word boundaries, the way CommonMark reads them. */
+
+  g.plain = (s) => String(s ?? "")
+    .replace(/```[\s\S]*?```/g, " ")                     /* fenced code */
+    .replace(/!\[([^\]]*)\]\([^)]*\)/g, "$1")            /* image, keep the alt */
+    .replace(/\[\[[^\]|]*\|([^\]]*)\]\]/g, "$1")         /* labelled wikilink */
+    .replace(/\[\[([^\]]*)\]\]/g, "$1")                  /* bare wikilink */
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")             /* link, keep the text */
+    .replace(/^\s{0,3}#{1,6}\s+/gm, "")                  /* heading marker */
+    .replace(/^\s{0,3}>\s?/gm, "")                       /* quote marker */
+    .replace(/^\s{0,3}([-*+]|\d+\.)\s+/gm, "")           /* list marker */
+    .replace(/`+([^`]*)`+/g, "$1")                       /* code span */
+    .replace(/\*\*\*([\s\S]*?)\*\*\*/g, "$1")
+    .replace(/\*\*([\s\S]*?)\*\*/g, "$1")
+    .replace(/\*(?=\S)([\s\S]*?\S)\*/g, "$1")
+    .replace(/(^|\W)___([\s\S]*?)___(?!\w)/g, "$1$2")
+    .replace(/(^|\W)__([\s\S]*?)__(?!\w)/g, "$1$2")
+    .replace(/(^|\W)_(?=\S)([\s\S]*?\S)_(?!\w)/g, "$1$2")
+    .replace(/~~([\s\S]*?)~~/g, "$1")
+    .replace(/[*`]/g, "")                                /* opener left by a cut */
+    .replace(/\s+/g, " ")
+    .trim();
+
   /* ---- tooltip with delay grouping -------------------------------------
      300ms warm-up before the first tooltip; once one is visible (or was
      within the last 300ms) neighbours show instantly. */

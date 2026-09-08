@@ -36,10 +36,21 @@ g-system, in strict order:
 Hard rules that travel with the assets: sentence case everywhere (a
 leading capital, then lowercase; no title case, no ALL CAPS), em dashes
 banned, greys only through the alias tokens, verb-first buttons, dark is
-the default. The reference is `apps/docs` (every component has a card);
-the full contract is the `g-design` skill in genv.
+the default, and **markdown renders only inside `.prose`** (everywhere
+else is plain text, flattened with `g.plain()`). The reference is
+`apps/docs` (every component has a card); the full contract is the
+`g-design` skill in genv.
 
 ## Gotchas
+
+- `.prose` is the only markdown-rendering surface. Titles and summaries
+  are routinely lifted from the first line of an authored body, so raw
+  `**`, backticks and `[[wikilinks]]` arrive at table cells, badges and
+  page headings, where they render as literal characters. `g.plain()`
+  flattens a markdown string to one line of label text; call it at the
+  boundary rather than trusting the source. It also sweeps the unmatched
+  opener a truncated title leaves behind, which is the case that actually
+  ships (see the Prose guideline card).
 
 - `dist/`, `apps/docs/assets/`, `apps/docs/react/` and `apps/docs/r/` are
   **generated**. Edit sources under `packages/` and run
