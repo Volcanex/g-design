@@ -156,11 +156,19 @@
     const trigger = document.querySelector(`[popovertarget="${menu.id}"]`);
     menu.addEventListener("toggle", (e) => {
       if (e.newState !== "open" || !trigger) return;
+      menu.style.maxHeight = "";
       const r = trigger.getBoundingClientRect();
-      const below = r.bottom + 4 + menu.offsetHeight < innerHeight;
+      const fitsBelow = r.bottom + 4 + menu.offsetHeight < innerHeight;
+      const fitsAbove = r.top - 4 - menu.offsetHeight > 0;
+      /* A menu too tall for either side of the trigger stays below it and
+         scrolls in whatever room is actually there, rather than flipping
+         above and landing off the top of the screen: fitsAbove is false in
+         that case too, so flipping never helped. */
+      const below = fitsBelow || !fitsAbove;
       menu.style.setProperty("--_origin", below ? "top" : "bottom");
       menu.style.left = Math.min(r.left, innerWidth - menu.offsetWidth - 8) + "px";
       menu.style.top = (below ? r.bottom + 4 : r.top - menu.offsetHeight - 4) + "px";
+      if (below && !fitsBelow) menu.style.maxHeight = innerHeight - r.bottom - 12 + "px";
       highlight(menu, null);
     });
     menu.addEventListener("keydown", (e) => {

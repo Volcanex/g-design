@@ -425,6 +425,9 @@ dialog.dlg[open]::backdrop { opacity: 1; }
   background: var(--overlay-bg);
   color: var(--text-primary);
   box-shadow: var(--overlay-shadow);
+  /* Unconstrained until g-ui.js sets an inline max-height, which it only does
+     when the menu fits neither below nor above the trigger. */
+  overflow-y: auto;
   opacity: 0;
   scale: 0.97;
   transform-origin: var(--_origin, top);
