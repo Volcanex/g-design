@@ -1,0 +1,102 @@
+/* g-pane-stack: an inspector column of titled sections. Each .g-pane is a
+   title button plus a body; the title's aria-expanded is the state and the
+   body's hidden attribute follows it (pane.js). A .g-splitter between the
+   column and its neighbour resizes it by pointer. Built for editors and
+   inspectors: panes never float, never overlap, and the column scrolls
+   when the window is short. */
+
+.g-pane-stack {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--surface-2);
+  font-family: var(--font-ui);
+  font-size: var(--font-size-ui);
+}
+
+.g-pane {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+  min-height: 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+/* the one pane that takes the slack (a layers list, a log) */
+.g-pane[data-fill] { flex: 1 1 auto; }
+.g-pane[data-fill] > .g-pane-body { flex: 1 1 auto; overflow: auto; }
+
+.g-pane-title {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  width: 100%;
+  height: var(--h-3);
+  padding: 0 var(--sp-2);
+  border: none;
+  background: var(--surface-2);
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: var(--font-size-ui);
+  font-weight: 500;
+  text-align: left;
+  cursor: default;
+  user-select: none;
+}
+.g-pane-title:hover { background: var(--fill-hover); }
+.g-pane-title:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: -2px; }
+.g-pane-title::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 5px;
+  height: 5px;
+  margin: 0 3px 0 1px;
+  border-right: 1.5px solid var(--text-secondary);
+  border-bottom: 1.5px solid var(--text-secondary);
+  rotate: -45deg;
+  transition: rotate var(--dur-fast) var(--ease-out);
+}
+.g-pane-title[aria-expanded="true"]::before { rotate: 45deg; margin-top: -3px; }
+.g-pane-title .kbd { margin-left: auto; }
+.g-pane-title .badge { margin-left: auto; }
+.g-pane-title .kbd + .badge, .g-pane-title .badge + .kbd { margin-left: 0; }
+
+.g-pane-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: var(--sp-1) var(--sp-3) var(--sp-3);
+}
+/* a body that is a list (a .g-tree) wants no side padding */
+.g-pane-body[data-flush] { padding: 0 0 var(--sp-1); }
+
+.g-splitter {
+  flex: 0 0 5px;
+  position: relative;
+  cursor: col-resize;
+  touch-action: none;
+  user-select: none;
+}
+.g-splitter::after {
+  content: "";
+  position: absolute;
+  inset: 0 2px;
+  border-radius: 1px;
+  background: transparent;
+  transition: background var(--dur-fast) var(--ease-out);
+}
+/* at rest the splitter is the hairline between the two regions */
+.g-splitter::before {
+  content: "";
+  position: absolute;
+  inset: 0 2px;
+  background: var(--border-subtle);
+}
+.g-splitter:hover::after,
+.g-splitter[data-active]::after { background: var(--border-hover); }
+.g-splitter[data-axis="row"] { cursor: row-resize; }
+.g-splitter[data-axis="row"]::after { inset: 2px 0; }

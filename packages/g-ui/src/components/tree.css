@@ -1,0 +1,130 @@
+/* g-tree: a flat list of rows that reads as a tree. Depth is a CSS variable
+   on the row (--depth), so the consumer keeps whatever flat, reorderable
+   model it already has (a layers panel, a file list) and the tree never
+   needs nested markup. Drop targets and drag state are attributes the
+   consumer sets from its own pointer logic; tree.js only adds keyboard
+   movement and the caret event. */
+
+.g-tree {
+  --g-tree-indent: 14px;
+  display: flex;
+  flex-direction: column;
+  padding: 2px 0;
+  font-family: var(--font-ui);
+  font-size: var(--font-size-ui);
+}
+
+.g-tree-row {
+  --_inset: calc(var(--sp-2) + var(--depth, 0) * var(--g-tree-indent));
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  height: var(--h-2);
+  padding: 0 var(--sp-2) 0 var(--_inset);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  cursor: default;
+  user-select: none;
+  outline: none;
+}
+.g-tree-row:hover { background: var(--fill-hover); }
+.g-tree-row[aria-selected="true"] { background: var(--fill-active); }
+.g-tree-row:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: -2px; }
+.g-tree-row[data-muted] .g-tree-label,
+.g-tree-row[data-muted] .g-tree-icon { color: var(--text-placeholder); }
+.g-tree-row[data-dragging] { opacity: 0.5; }
+
+/* Drop feedback: a line above the row for "insert before", an inset ring
+   for "drop into" (a group). Both keyed off the same --_inset so the line
+   starts where the row's own content does. */
+.g-tree-row[data-drop="before"]::before {
+  content: "";
+  position: absolute;
+  left: var(--_inset);
+  right: var(--sp-2);
+  top: -1px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--accent-fill);
+}
+.g-tree-row[data-drop="into"] { outline: 2px solid var(--accent-edge); outline-offset: -2px; }
+
+.g-tree-caret {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.g-tree-caret::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  margin-left: -2px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  rotate: -45deg;
+  transition: rotate var(--dur-fast) var(--ease-out);
+}
+.g-tree-row[aria-expanded="true"] > .g-tree-caret::before { rotate: 45deg; margin-left: 0; margin-top: -2px; }
+/* a leaf keeps the caret's width so labels line up within a depth */
+.g-tree-row:not([aria-expanded]) > .g-tree-caret { visibility: hidden; }
+
+.g-tree-icon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  color: var(--text-secondary);
+}
+.g-tree-icon svg { width: 100%; height: 100%; }
+
+.g-tree-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* an in-place rename: the label slot swapped for an input of the same height */
+.g-tree-row .g-tree-edit {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: calc(var(--h-2) - 6px);
+  padding: 0 var(--sp-1);
+  border: 1px solid var(--border-hover);
+  border-radius: var(--radius-sm);
+  background: var(--surface-1);
+  color: var(--text-primary);
+  font: inherit;
+}
+
+.g-tree-actions {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--text-secondary);
+}
+.g-tree-actions .btn-icon { width: 22px; height: 22px; }
+.g-tree-actions .btn-icon svg { width: 14px; height: 14px; }
+
+.g-tree-grip {
+  flex: 0 0 auto;
+  display: inline-flex;
+  width: 14px;
+  height: 16px;
+  color: var(--text-placeholder);
+  cursor: grab;
+  touch-action: none;
+}
+.g-tree-grip svg { width: 100%; height: 100%; }
+.g-tree-grip:active { cursor: grabbing; }

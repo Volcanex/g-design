@@ -1,0 +1,69 @@
+/* g-swatch: a button that shows one colour. The colour is data, not design,
+   so it arrives as an inline custom property (style="--swatch: oklch(...)").
+   Alpha shows over a checkerboard drawn from the alpha fills, so it reads
+   the same on both themes. The picker that changes the colour is the
+   consumer's (a .menu popover, a dialog); the swatch is the part every
+   consumer shares. */
+
+.g-swatch {
+  --swatch: transparent;
+  position: relative;
+  display: inline-block;
+  flex: 0 0 auto;
+  width: var(--h-2);
+  height: var(--h-2);
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background-color: var(--surface-2);
+  background-image: conic-gradient(var(--fill-active) 25%, transparent 0 50%, var(--fill-active) 0 75%, transparent 0);
+  background-size: 8px 8px;
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+.g-swatch::after { content: ""; position: absolute; inset: 0; background: var(--swatch); }
+.g-swatch:hover { border-color: var(--border-hover); }
+.g-swatch:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+.g-swatch[aria-pressed="true"],
+.g-swatch[aria-expanded="true"] { border-color: var(--accent-edge); box-shadow: 0 0 0 1px var(--accent-edge); }
+.g-swatch:disabled { opacity: 0.45; cursor: default; }
+
+.g-swatch-sm { width: 18px; height: 18px; border-radius: 3px; }
+.g-swatch-lg { width: var(--h-4); height: var(--h-4); border-radius: var(--radius); }
+
+/* Primary over secondary, paint-program style. The swap sits in the free
+   corner; the consumer wires its click. */
+.g-swatch-pair {
+  position: relative;
+  display: inline-block;
+  width: 46px;
+  height: 46px;
+}
+.g-swatch-pair > .g-swatch { position: absolute; width: 30px; height: 30px; }
+.g-swatch-pair > .g-swatch:first-child { top: 0; left: 0; z-index: 1; }
+.g-swatch-pair > .g-swatch:nth-child(2) { right: 0; bottom: 0; }
+.g-swatch-pair > .g-swatch-swap {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.g-swatch-pair > .g-swatch-swap svg { width: 14px; height: 14px; }
+.g-swatch-pair > .g-swatch-swap:hover { color: var(--text-primary); background: var(--fill-hover); }
+.g-swatch-pair > .g-swatch-swap:focus-visible { outline: 2px solid var(--focus-ring); }
+
+.g-swatch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(18px, 1fr));
+  gap: 3px;
+}
+.g-swatch-grid > .g-swatch { width: auto; height: auto; aspect-ratio: 1; border-radius: 3px; }

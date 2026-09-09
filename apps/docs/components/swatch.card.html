@@ -1,0 +1,87 @@
+<!-- @dsCard group="Components" name="Swatch" subtitle="A button that shows a colour, the primary and secondary pair, a grid of recent ones, and a segmented control to switch between them." viewport="760x460" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Swatch</title>
+<link rel="stylesheet" href="../assets/g.css">
+<script defer src="../assets/g-ui.js"></script>
+<style>
+  body { padding: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-4); }
+  .cap { font-size: 12px; color: var(--text-secondary); line-height: 1.5; max-width: 640px; }
+  .frame { border: 1px solid var(--border-subtle); border-radius: var(--radius-card); overflow: hidden; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-5); align-items: start; }
+  section { display: flex; flex-direction: column; gap: var(--sp-3); }
+  .row { display: flex; align-items: center; gap: var(--sp-3); }
+  h3 { margin: 0; font-size: var(--font-size-ui); font-weight: 500; }
+</style>
+</head>
+<body>
+  <div class="cols">
+    <section>
+      <h3>Sizes and states</h3>
+      <div class="row">
+        <button class="g-swatch g-swatch-sm" style="--swatch: oklch(0.62 0.19 25)" aria-label="Red"></button>
+        <button class="g-swatch" style="--swatch: oklch(0.7 0.18 145)" aria-label="Green"></button>
+        <button class="g-swatch g-swatch-lg" style="--swatch: oklch(0.6 0.2 260)" aria-label="Blue"></button>
+        <button class="g-swatch" style="--swatch: oklch(0.6 0.2 260 / 0.35)" aria-label="Blue at 35%"></button>
+        <button class="g-swatch" style="--swatch: transparent" aria-label="Transparent"></button>
+        <button class="g-swatch" style="--swatch: oklch(0.85 0.16 95)" aria-pressed="true" aria-label="Yellow, chosen"></button>
+        <button class="g-swatch" style="--swatch: oklch(0.72 0.17 60)" disabled aria-label="Orange, disabled"></button>
+      </div>
+      <span class="cap">The colour is an inline custom property, because it is content. Alpha shows over a checkerboard; a pressed or expanded swatch takes the accent edge.</span>
+      <h3>Primary over secondary</h3>
+      <div class="row">
+        <div class="g-swatch-pair" id="pair">
+          <button class="g-swatch" style="--swatch: oklch(0.62 0.19 25)" aria-label="Primary colour"></button>
+          <button class="g-swatch" style="--swatch: oklch(0.95 0 0)" aria-label="Secondary colour"></button>
+          <button class="g-swatch-swap" aria-label="Swap colours" data-tip="Swap (X)"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M224,48V152a16,16,0,0,1-16,16H99.31l10.35,10.34a8,8,0,0,1-11.32,11.32l-24-24a8,8,0,0,1,0-11.32l24-24a8,8,0,0,1,11.32,11.32L99.31,152H208V48H96v8a8,8,0,0,1-16,0V48A16,16,0,0,1,96,32H208A16,16,0,0,1,224,48ZM168,192a8,8,0,0,0-8,8v8H48V104H156.69l-10.35,10.34a8,8,0,0,0,11.32,11.32l24-24a8,8,0,0,0,0-11.32l-24-24a8,8,0,0,0-11.32,11.32L156.69,88H48a16,16,0,0,0-16,16V208a16,16,0,0,0,16,16H160a16,16,0,0,0,16-16v-8A8,8,0,0,0,168,192Z"/></svg></button>
+        </div>
+        <div class="g-segmented" role="radiogroup" aria-label="Editing">
+          <label><input type="radio" name="edit" value="primary" checked><span>Primary</span></label>
+          <label><input type="radio" name="edit" value="secondary"><span>Secondary</span></label>
+        </div>
+      </div>
+      <span class="cap">The pair is paint-program layout: primary in front. The swap button is the consumer's to wire; here it exchanges the two.</span>
+    </section>
+    <section>
+      <h3>Recent colours</h3>
+      <div class="g-swatch-grid" style="width: 200px">
+        <button class="g-swatch" style="--swatch: oklch(0.62 0.19 25)" aria-label="Recent 1"></button>
+        <button class="g-swatch" style="--swatch: oklch(0.72 0.17 60)" aria-label="Recent 2"></button>
+        <button class="g-swatch" style="--swatch: oklch(0.85 0.16 95)" aria-label="Recent 3"></button>
+        <button class="g-swatch" style="--swatch: oklch(0.7 0.18 145)" aria-label="Recent 4"></button>
+        <button class="g-swatch" style="--swatch: oklch(0.68 0.15 200)" aria-label="Recent 5"></button>
+        <button class="g-swatch" style="--swatch: oklch(0.6 0.2 260)" aria-label="Recent 6"></button>
+        <button class="g-swatch" style="--swatch: oklch(0.58 0.22 305)" aria-label="Recent 7"></button>
+        <button class="g-swatch" style="--swatch: oklch(0.75 0.14 340)" aria-label="Recent 8"></button>
+        <button class="g-swatch" style="--swatch: oklch(0.3 0 0)" aria-label="Recent 9"></button>
+        <button class="g-swatch" style="--swatch: oklch(0.6 0 0)" aria-label="Recent 10"></button>
+        <button class="g-swatch" style="--swatch: oklch(0.9 0 0)" aria-label="Recent 11"></button>
+        <button class="g-swatch" style="--swatch: oklch(0.6 0.2 260 / 0.4)" aria-label="Recent 12"></button>
+      </div>
+      <h3>Segmented</h3>
+      <div class="g-segmented" role="radiogroup" aria-label="Fit">
+        <label><input type="radio" name="fit" value="contain" checked><span>Contain</span></label>
+        <label><input type="radio" name="fit" value="cover"><span>Cover</span></label>
+        <label><input type="radio" name="fit" value="stretch"><span>Stretch</span></label>
+      </div>
+      <div class="g-segmented g-segmented-sm" data-block style="width: 200px" role="radiogroup" aria-label="Units">
+        <label><input type="radio" name="units" value="px" checked><span>px</span></label>
+        <label><input type="radio" name="units" value="pct"><span>%</span></label>
+        <label><input type="radio" name="units" value="em" disabled><span>em</span></label>
+      </div>
+      <span class="cap">Native radios carry the state, so a form reads it and Tab plus arrows work with no script. data-block stretches the control to its container.</span>
+    </section>
+  </div>
+  <script>
+    const pair = document.getElementById('pair');
+    pair.querySelector('.g-swatch-swap').addEventListener('click', () => {
+      const [a, b] = pair.querySelectorAll('.g-swatch');
+      const t = a.style.getPropertyValue('--swatch');
+      a.style.setProperty('--swatch', b.style.getPropertyValue('--swatch'));
+      b.style.setProperty('--swatch', t);
+    });
+  </script>
+</body>
+</html>

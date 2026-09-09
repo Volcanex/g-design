@@ -103,6 +103,18 @@ consumer that runs it.
 - MPA view transitions are on by default (`@view-transition` in g-ui.css)
   with a two-page demo at `guidelines/vt/`. Cross-document transitions
   need same-origin real navigation; the pane iframe still shows them.
+- Editor chrome ships as fragments (2026-09): `menubar` (`.g-menubar` of
+  `.g-menubar-item[popovertarget]` over the ordinary `.menu`, plus
+  `.menu-heading`), `pane` (`.g-pane-stack` > `.g-pane` with a
+  `.g-pane-title[aria-expanded]` and `.g-pane-body`; `.g-splitter` resizes
+  a neighbour and reports `g-splitter:resize`), `tree` (flat `.g-tree-row`s
+  with `--depth`, `data-drop="before|into"`, `g-tree:toggle`), `swatch`
+  (`.g-swatch` with the colour in `--swatch`, `.g-swatch-pair`,
+  `.g-swatch-grid`) and `segmented` (native radios, CSS only). Consumers
+  that render these from a template (lit-html and friends) must call
+  `g.init(root)` after the first render; every fragment guards with a
+  `data-*-init` attribute, but core `initMenu` does not, so render a
+  `.menu` once and keep the element.
 - The app shell is `.g-shell`: persistent chrome, off-canvas sidebar
   sheet under 720px behind `.g-scrim`, toggled by `.g-nav-toggle`
   (gi-list morphs to an x). Do NOT put a box-shadow on the open sheet: a
