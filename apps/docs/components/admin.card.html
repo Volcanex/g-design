@@ -1,0 +1,90 @@
+<!-- @dsCard group="Components" name="Admin overlay" subtitle="The g-admin bar, annotate mode and the edit inspector, running against a mocked ticket api." viewport="1000x700" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Admin overlay</title>
+<meta name="g-admin-base" content="/mock/gadmin">
+<meta name="g-admin-project" content="Docs demo">
+<link rel="stylesheet" href="../assets/g.css">
+<script>
+  /* The overlay only loads for an armed browser that a server confirmed is an
+     admin, so this card has to be both. Arming is one localStorage key; the
+     admin api is mocked in front of fetch, which also lets the demo show a
+     ticket count and accept a POST without a backend.
+
+     The key is cleared on the way out. Another card on this origin that kept
+     it would fire one verify request at a path that does not exist, get a 404
+     and stay invisible, which is the failure mode by design. */
+  try { localStorage.setItem("g-admin", "1"); } catch {}
+  addEventListener("pagehide", () => { try { localStorage.removeItem("g-admin"); } catch {} });
+
+  const BASE = "/mock/gadmin";
+  const tickets = [
+    { id: 1, status: "open", kind: "visual", severity: "minor", note: "The card heading sits too close to its list." },
+    { id: 2, status: "open", kind: "edit", severity: "polish", note: "Row gap should be one step wider." },
+  ];
+  const real = window.fetch.bind(window);
+  window.fetch = (input, init) => {
+    const url = typeof input === "string" ? input : input.url;
+    const path = url.replace(location.origin, "");
+    if (!path.startsWith(BASE)) return real(input, init);
+    const reply = (body, status = 200) => Promise.resolve(
+      new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } }));
+    if (path === BASE + "/verify") return reply({ admin: true });
+    if (path.startsWith(BASE + "/tickets?")) return reply(tickets.filter((t) => t.status === "open"));
+    if (path === BASE + "/tickets" && init?.method === "POST") {
+      const ticket = { id: tickets.length + 1, status: "open", ...JSON.parse(init.body) };
+      tickets.push(ticket);
+      window.__lastTicket = ticket;
+      return reply(ticket, 201);
+    }
+    return reply({ error: "no such route" }, 404);
+  };
+</script>
+<script defer src="../assets/g-ui.js"></script>
+<style>
+  /* The bar is fixed and changes no host layout, so a page that wants its
+     first 28px back gives them back itself. */
+  body { padding: calc(var(--h-2) + var(--sp-5)) var(--sp-5) var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-4); }
+  .cap { font-size: 12px; color: var(--text-secondary); line-height: 1.5; max-width: 640px; }
+  .demo { display: flex; gap: var(--sp-4); align-items: flex-start; }
+  .demo .card { flex: 1 1 0; display: flex; flex-direction: column; gap: var(--sp-3); }
+  .demo .card ul { margin: 0; padding-left: var(--sp-4); color: var(--text-secondary); font-size: 13px; }
+  .demo .card li { line-height: var(--lh-2); }
+  .toolbar { display: flex; align-items: center; gap: var(--sp-2); }
+</style>
+</head>
+<body>
+  <p class="cap">
+    Arm a browser once with <span class="mono">?gadmin=1</span> and every page that ships g-ui.js grows this bar,
+    for that browser and that admin session only. Annotate mode pins elements and draws over them.
+    Edit mode selects one and edits its spacing, alignment and type live, snapped to the spacing scale
+    the host page declares. Nothing writes to source: both save a ticket, and an agent bakes it afterwards.
+  </p>
+
+  <div class="demo">
+    <section class="card">
+      <h2>Weekly digest</h2>
+      <p style="color: var(--text-secondary); font-size: 13px;">Three things moved this week.</p>
+      <ul>
+        <li>Tokens regenerated from the upstream scale</li>
+        <li>Pane splitter reports its size on release</li>
+        <li>Rhythm audit runs in the e2e suite</li>
+      </ul>
+      <div class="toolbar">
+        <button class="btn btn-sm btn-primary" type="button">Publish digest</button>
+        <button class="btn btn-sm btn-tertiary" type="button">Save draft</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Off the scale</h2>
+      <p id="odd" style="padding: 13px; color: var(--text-secondary); font-size: 13px;">
+        This paragraph is padded 13px, which is on nothing. Select it in edit mode and the padding rows
+        flag it as off scale until a step puts it back on.
+      </p>
+    </section>
+  </div>
+</body>
+</html>
