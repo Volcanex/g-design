@@ -12,7 +12,7 @@ const run = (cmd, cwd = root) => execSync(cmd, { cwd, stdio: "inherit" });
 run("node packages/g-tokens/scripts/build-tokens.mjs");
 run("node packages/g-icons/scripts/build-icons.mjs");
 run("node scripts/check-contrast.mjs");
-run('npx stylelint "packages/g-ui/src/*.css" "apps/docs/**/*.card.html" "apps/docs/ui_kits/**/*.html"');
+run('npx stylelint "packages/g-ui/src/*.css" "packages/g-ui/src/admin/*.css" "apps/docs/**/*.card.html" "apps/docs/ui_kits/**/*.html"');
 
 // 2. Self-contained asset sets: dist/ (one-link-tag path) and the docs app.
 const tokens = readFileSync(join(root, "packages/g-tokens/dist/tokens.css"), "utf8");
@@ -36,6 +36,23 @@ for (const f of readdirSync(join(root, "packages/g-tokens/fonts"))) {
   run(`pyftsubset "packages/g-tokens/fonts/${f}" --output-file="packages/g-tokens/dist/fonts/${f}" --flavor=woff2 --unicodes="${UNICODES}" --layout-features+=cv05,cv11,tnum 2>/dev/null`);
 }
 
+// The g-admin overlay is a SEPARATE pair of files, never concatenated into
+// the public bundle: only its activation stub (components/admin-stub.js) ships
+// in g-ui.js. Its CSS carries the whole design system re-scoped from :root to
+// :host, because it renders inside a shadow root on pages that may never have
+// loaded g.css, and generating the token layer rather than restating it is
+// what keeps the overlay's greys from drifting off the scale.
+const adminDir = join(root, "packages/g-ui/src/admin");
+const adminSrc = (ext) => readdirSync(adminDir).filter((f) => f.endsWith(ext)).sort()
+  .map((f) => readFileSync(join(adminDir, f), "utf8")).join("\n");
+const scopeToHost = (css) => css
+  .replace(/\[data-theme="(\w+)"\]/g, ':host([data-theme="$1"])')
+  .replace(/\[data-density="compact"\]/g, ':host([data-density="compact"])')
+  .replace(/(^|[\s,{])\[data-theme\]/g, "$1:host([data-theme])")
+  .replace(/:root/g, ":host");
+const adminCss = `${scopeToHost(tokens)}\n${ui}\n${frags(".css")}\n${adminSrc(".css")}`;
+const adminJs = adminSrc(".js");
+
 for (const out of [join(root, "dist"), join(root, "apps/docs/assets")]) {
   mkdirSync(join(out, "fonts"), { recursive: true });
   cpSync(subsetDir, join(out, "fonts"), { recursive: true });
@@ -43,6 +60,8 @@ for (const out of [join(root, "dist"), join(root, "apps/docs/assets")]) {
   // icons first so g.icon() exists before the behaviour layer injects
   writeFileSync(join(out, "g-ui.js"), `${iconsJs}\n${uiJs}\n${frags(".js")}`);
   writeFileSync(join(out, "tokens.css"), tokens);
+  writeFileSync(join(out, "g-admin.css"), adminCss);
+  writeFileSync(join(out, "g-admin.js"), adminJs);
 }
 
 // 3. Tailwind v4 proof: same tokens through @theme inline, no config file.
@@ -119,5 +138,8 @@ const budget = (name, actual, limit) => {
 };
 budget("g.css gzip", gcssGz, 18 * 1024);
 budget("fonts total", fontsTotal, 200 * 1024);
+// The public bundle carries the g-admin activation stub and nothing else of
+// the overlay. This budget is what stops the rest of it leaking in.
+budget("g-ui.js gzip", gzipSync(readFileSync(join(root, "dist/g-ui.js"))).length, 23 * 1024);
 
 console.log("built dist/, apps/docs/assets/, apps/docs/react/, apps/docs/r/");

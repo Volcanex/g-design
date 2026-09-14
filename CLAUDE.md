@@ -92,6 +92,13 @@ consumer that runs it.
   state CSS lives in g-ui.css. State rules must target
   `[data-part="..."] path`, NOT `path[pathLength]` tails: attribute-flip
   invalidation misses the latter in Chromium and the draw never fires.
+- The g-admin overlay (`packages/g-ui/src/admin/`, its own CLAUDE.md) is the
+  one thing that does NOT ride in the bundle. `dist/g-admin.js|css` are
+  separate files, vendored beside `g-ui.js` and fetched only for a verified
+  admin; only a ~0.6KB activation stub ships in `g-ui.js`, gated by a
+  `g-ui.js gzip` budget in the build. Its CSS is the whole design system with
+  every selector re-scoped from `:root` to `:host`, because it renders in a
+  shadow root on pages that may never have loaded g.css.
 - Component fragments: `packages/g-ui/src/components/*.css|js` are
   concatenated into the built assets; JS fragments register through
   `g.use((root) => ...)` so they re-init on every g.swap. Guard elements

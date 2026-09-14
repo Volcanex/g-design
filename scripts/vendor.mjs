@@ -26,9 +26,12 @@ const stamp = `/* g-system@${version}, vendored, do not edit. Update: node scrip
 
 const out = resolve(target);
 mkdirSync(out, { recursive: true });
-for (const f of ["g.css", "g-ui.js"]) {
+// g-admin.js and g-admin.css are the admin overlay. They ride along because
+// the stub inside g-ui.js resolves them from this directory, and they are
+// separate files precisely so a visitor never downloads them.
+for (const f of ["g.css", "g-ui.js", "g-admin.css", "g-admin.js"]) {
   writeFileSync(join(out, f), stamp + readFileSync(join(dist, f), "utf8"));
 }
 cpSync(join(dist, "fonts"), join(out, "fonts"), { recursive: true });
-console.log(`g-system@${version} -> ${out} (g.css, g-ui.js, fonts/)`);
+console.log(`g-system@${version} -> ${out} (g.css, g-ui.js, g-admin.css, g-admin.js, fonts/)`);
 console.log('Link with: <link rel="stylesheet" href=".../g.css"> and <script defer src=".../g-ui.js"></script>');
