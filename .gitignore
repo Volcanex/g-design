@@ -1,1 +1,5 @@
 node_modules/
+.venv-gadmin/
+__pycache__/
+*.pyc
+
