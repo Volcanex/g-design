@@ -113,6 +113,27 @@
 .ga-margin { position: absolute; background: color-mix(in srgb, var(--warn-text) 16%, transparent); pointer-events: none; }
 .ga-pad { position: absolute; background: color-mix(in srgb, var(--chart-2) 26%, transparent); pointer-events: none; }
 
+/* An applied edit flashes what it changed. A 4px step is a real change that
+   can look like nothing happened, and "nothing happened" is indistinguishable
+   from a broken tool, which is exactly how it was read in live use. */
+/* Each one starts loud and settles into the value it already had: a keyframe
+   block with only a `from` takes the element's own style as its `to`, so the
+   flash can never leave anything behind. Twice --dur-slow, because the thing
+   it has to beat is a glance at a busy page. */
+@keyframes ga-flash-margin { from { background: color-mix(in srgb, var(--warn-text) 55%, transparent); } }
+@keyframes ga-flash-pad { from { background: color-mix(in srgb, var(--chart-2) 70%, transparent); } }
+@keyframes ga-flash-edge { from { background: color-mix(in srgb, var(--accent-fill) 45%, transparent); } }
+@keyframes ga-flash-value {
+  from { border-color: var(--accent-edge); background: color-mix(in srgb, var(--accent-fill) 35%, transparent); }
+}
+.ga-margin.ga-flash { animation: ga-flash-margin calc(var(--dur-slow) * 2) var(--ease-out); }
+.ga-pad.ga-flash { animation: ga-flash-pad calc(var(--dur-slow) * 2) var(--ease-out); }
+.ga-out.ga-flash { animation: ga-flash-edge calc(var(--dur-slow) * 2) var(--ease-out); }
+.ga-val.ga-flash { animation: ga-flash-value calc(var(--dur-slow) * 2) var(--ease-out); }
+@media (prefers-reduced-motion: reduce) {
+  .ga-flash { animation: none; }
+}
+
 .ga-tag {
   position: absolute;
   left: 0;
@@ -239,6 +260,7 @@
   box-shadow: var(--overlay-shadow);
 }
 .ga-side-head {
+  flex: none;
   display: flex;
   flex-direction: column;
   gap: var(--sp-1);
@@ -283,8 +305,20 @@
 .ga-crumbs .ga-crumb:hover { background: var(--fill-hover); color: var(--text-primary); }
 .ga-crumbs .ga-crumb[aria-current] { background: var(--fill-active); color: var(--text-primary); }
 .ga-crumbs .ga-crumb:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 1px; }
-.ga-side-body { flex: 1 1 auto; overflow: auto; }
+/* min-height: 0 is the whole fix for a panel that would not scroll: a flex
+   child's default minimum is its content, so without it the body grows past
+   the sidebar instead of scrolling inside it, and on a short viewport the
+   lower panes are simply unreachable. overscroll-behavior keeps a wheel that
+   reaches the end of this list from carrying on into the page underneath,
+   which moves every box the overlay has drawn. */
+.ga-side-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
 .ga-side-foot {
+  flex: none;
   display: flex;
   align-items: center;
   gap: var(--sp-2);
@@ -302,7 +336,7 @@
 .ga-row > .ga-key { flex: 0 0 48px; color: var(--text-secondary); font-size: 12px; }
 .ga-row > .g-segmented { flex: 1 1 auto; }
 
-.ga-step { display: flex; align-items: center; gap: 2px; }
+.ga-step { display: flex; align-items: center; gap: 2px; flex: 1 1 auto; min-width: 0; }
 .ga-step .btn { flex: none; }
 .ga-step .ga-val {
   width: 48px;
@@ -318,7 +352,18 @@
   text-align: center;
 }
 .ga-step .ga-val:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 1px; }
-.ga-step .ga-token { flex: 0 0 auto; width: 60px; font-size: 11px; white-space: nowrap; color: var(--text-placeholder); }
+/* The token name is the widest thing a project can change about this row, so
+   the strip takes what the row has left rather than a fixed 60px, and a name
+   too long even for that ellipses with the full text on its title. */
+.ga-step .ga-token {
+  flex: 1 1 60px;
+  min-width: 0;
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-placeholder);
+}
 
 /* Off the scale is allowed and never silent: the escape hatch says so in
    place, so a raw value cannot be mistaken for a snapped one. */

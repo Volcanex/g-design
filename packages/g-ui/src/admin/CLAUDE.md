@@ -84,6 +84,36 @@ finding a problem one click at a time is too slow.
   to the end. Clicking a crumb selects it and drops the walk trail, the same
   as a fresh click on the page.
 
+## Why an edit is written twice
+
+First live use reported that margin and padding edits "did not update". They
+did: every one of them applied and persisted. What was missing was any sign of
+it, on a page where a 4px step is invisible and the element being edited was
+placed by a layout engine that put it back. Three answers, all in edit mode:
+
+- **Applying flashes what changed.** The box layer is redrawn immediately
+  rather than on the next scheduled frame, the strips and the outline come
+  back with a flash class, and the value chip flashes too. The scheduled
+  redraw is deliberately not used for this: it would repaint the flash away on
+  the very next frame.
+- **The margin pane says when a margin will not behave.** An inline box
+  ignores vertical margin, a positioned element is placed by something that
+  will place it again on its next render, and a flex or grid item is spaced by
+  its container as well. Silence there is indistinguishable from a broken
+  tool.
+- **Every edit is written inline and mirrored into one `<style
+  data-g-admin-pending>` in the head**, one rule per pending edit, `!important`
+  because what it is competing with after a re-render is the framework's own
+  inline style. The inline write is what shows instantly; the rule is what
+  survives an app page rebuilding the node underneath it. Revert removes the
+  tag with the last rule in it.
+- **The selection is re-resolved by selector on every read and every write.**
+  A detached node reports no computed style at all, so a stepper holding one
+  shows 0 for everything and then steps from 0, which is the edit landing
+  somewhere nobody asked for. A reference still in the document is trusted as
+  it stands: the selector was unique when captured, and a re-render can make
+  it ambiguous.
+
 ## Gotchas
 
 - **The box layer belongs to one mode at a time.** Locking the scrollbar away
@@ -97,7 +127,19 @@ finding a problem one click at a time is too slow.
 - **Leaving a mode reverts pending edits.** They are unsaved DOM mutations, and
   leaving them behind makes the page lie about itself. Saving reverts them too:
   the ticket is the record, and `{base}/overrides.css` is the layer for a
-  project that wants unbaked edits to survive a reload.
+  project that wants unbaked edits to survive a reload. The pending stylesheet
+  survives a re-render, not a reload; that distinction is the whole reason
+  `overrides.css` still exists.
+- **Revert puts back the page's own inline value, not nothing.** Writing a
+  longhand expands any shorthand the page declared inline, so an element the
+  page styled `padding: 13px` and we edited on its top side would revert to a
+  top padding of zero if revert only removed the longhand. What the style
+  attribute said about that one property is captured at first touch, read
+  through CSSOM so a shorthand is already expanded, and written back.
+- **A stepper field takes any text, and `parseFloat` says NaN to most of it.**
+  A non-finite commit is dropped rather than recorded: it would otherwise put
+  `NaNpx` into the record a baking agent reads, and into the pending
+  stylesheet.
 - **"Off" is not a fourth mode, it is leaving**: the overlay is removed and the
   browser disarmed. The off radio also listens for `click`, because it is the
   resting state and `change` never fires for a radio that is already checked.
@@ -124,6 +166,13 @@ finding a problem one click at a time is too slow.
   token name, so a value of 0 reads as on-scale and unnamed rather than off the
   scale. Anything that is genuinely off the scale is flagged in place, never
   corrected.
+- **The inspector has to be told to scroll.** `.ga-side-body` carries
+  `min-height: 0`, because a flex child's default minimum is its own content:
+  without it the body grows past the sidebar instead of scrolling inside it,
+  and on a short viewport the lower panes and the save button are simply
+  unreachable. It also carries `overscroll-behavior: contain`, so a wheel that
+  reaches the end of the pane list does not carry on into the page underneath
+  and move every box the overlay has drawn.
 - The spacing and line-height scales are read from the **host page's** `:root`
   at the moment a control renders, so a project that re-tuned its steps snaps
   to its own. A page with no `--sp-*` falls back to 4/8/12/16/24/32/48/64.

@@ -17,10 +17,12 @@
    tickets; a baking agent applies them afterwards, guided by the note.
 
    Everything renders inside one shadow root so host styles and overlay styles
-   cannot bleed either way. The host page is touched in exactly two reversible
-   ways, both undone on exit: annotate mode locks scrolling (viewport-relative
-   boxes would otherwise point at the wrong thing the moment the page moved),
-   and edit mode writes inline styles on the selected element. */
+   cannot bleed either way. The host page is touched in exactly three
+   reversible ways, all undone on exit: annotate mode locks scrolling
+   (viewport-relative boxes would otherwise point at the wrong thing the moment
+   the page moved), edit mode writes inline styles on the selected element, and
+   it mirrors those edits into one stylesheet in the head so they survive a
+   page that re-renders itself. */
 (() => {
   if (window.__gAdmin) return;
   window.__gAdmin = true;
@@ -696,6 +698,7 @@
   /* ----------------------------------------------------------------- edit */
 
   let selected = null;
+  let selectedSelector = ""; /* the durable name for it, for when the node is replaced */
   const pending = new Map(); /* `${selector}|${prop}` -> edit record */
   const touched = new Map(); /* selector -> element */
   const editOutline = el("div", "ga-out");
@@ -703,7 +706,7 @@
   editOutline.append(editTag);
   const shades = { top: [], right: [], bottom: [], left: [] };
 
-  function shadeBox(kind, rect, sides) {
+  function shadeBox(kind, rect, sides, flash) {
     /* Four strips rather than one box with a hole: a strip is a rectangle, and
        four of them describe a margin or padding ring exactly. */
     const strips = [
@@ -714,7 +717,7 @@
     ];
     for (const s of strips) {
       if (s.w <= 0 || s.h <= 0) continue;
-      const node = el("div", kind);
+      const node = el("div", flash ? kind + " ga-flash" : kind);
       node.style.left = s.x + "px";
       node.style.top = s.y + "px";
       node.style.width = s.w + "px";
@@ -725,19 +728,34 @@
 
   const px = (v) => Math.round(parseFloat(v) || 0);
 
-  function drawEditBoxes(node) {
+  /* Restarting an animation on an element that is already on screen takes all
+     three steps: the class leaves, the layout is read, the class comes back. */
+  function flash(node) {
+    if (!node) return;
+    node.classList.remove("ga-flash");
+    void node.offsetWidth;
+    node.classList.add("ga-flash");
+  }
+
+  function drawEditBoxes(node, flashing) {
+    if (node === selected) {
+      const fresh = live(selected, selectedSelector);
+      if (fresh) { selected = fresh; node = fresh; }
+    }
     boxes.replaceChildren();
     if (!node || !node.isConnected) return;
     const rect = rectOf(node);
     const cs = getComputedStyle(node);
     const margin = { top: px(cs.marginTop), right: px(cs.marginRight), bottom: px(cs.marginBottom), left: px(cs.marginLeft) };
     const padding = { top: px(cs.paddingTop), right: px(cs.paddingRight), bottom: px(cs.paddingBottom), left: px(cs.paddingLeft) };
-    shadeBox("ga-margin", rect, margin);
+    shadeBox("ga-margin", rect, margin, flashing);
     shadeBox("ga-pad", { x: rect.x + padding.left, y: rect.y + padding.top, w: Math.max(0, rect.w - padding.left - padding.right), h: Math.max(0, rect.h - padding.top - padding.bottom) },
-      { top: padding.top, right: padding.right, bottom: padding.bottom, left: padding.left });
+      { top: padding.top, right: padding.right, bottom: padding.bottom, left: padding.left }, flashing);
     place(editOutline, rect);
     editTag.textContent = selectorFor(node).split(" > ").pop();
     boxes.append(editOutline);
+    if (flashing) flash(editOutline);
+    else editOutline.classList.remove("ga-flash");
     if (node === selected) {
       sideDims.textContent = `${rect.w} by ${rect.h}`;
     }
@@ -782,8 +800,9 @@
 
   function select(node) {
     selected = node;
+    selectedSelector = selectorFor(node);
     hovered = null;
-    sideSel.textContent = selectorFor(node);
+    sideSel.textContent = selectedSelector;
     side.hidden = false;
     renderCrumbs();
     drawEditBoxes(node);
@@ -811,18 +830,20 @@
   }
 
   function walkUp() {
-    const parent = selected?.parentElement;
+    const from = currentTarget();
+    const parent = from?.parentElement;
     if (!walkable(parent)) { say("Nothing outside this one to select."); return; }
-    cameFrom.set(parent, selected);
+    cameFrom.set(parent, from);
     walkTo(parent);
   }
 
   function walkDown() {
-    if (!selected) return;
-    const back = cameFrom.get(selected);
-    const next = back && back.isConnected && back.parentElement === selected
+    const from = currentTarget();
+    if (!from) return;
+    const back = cameFrom.get(from);
+    const next = back && back.isConnected && back.parentElement === from
       ? back
-      : [...selected.children].find((child) => {
+      : [...from.children].find((child) => {
         if (child === host || XRAY_SKIP.has(child.tagName)) return false;
         const r = child.getBoundingClientRect();
         return r.width >= 1 && r.height >= 1;
@@ -882,32 +903,102 @@
     return true;
   }
 
+  /* The node in hand goes stale on an app page. A framework that re-renders
+     replaces the element with an identical one, and the old reference is then
+     a detached node: writing to it writes to nothing anybody can see, which is
+     what "the edit did not apply" looks like from the outside. The selector is
+     the durable name for the target, so a reference that has left the document
+     is resolved again through it. A reference that is still in the document is
+     trusted as it stands: the selector was unique when it was captured, and a
+     re-render can make it ambiguous. */
+  function live(node, selector) {
+    if (node?.isConnected) return node;
+    try {
+      const found = selector && document.querySelector(selector);
+      if (found) return found;
+    } catch { /* a selector the page can no longer parse */ }
+    return null;
+  }
+
+  /* Every read of the selection goes through here, not just every write. A
+     detached node reports no computed style at all, so a control that read one
+     would show 0 for everything and then step from 0 the next time it was
+     clicked, which is the edit landing somewhere nobody asked for. */
+  function currentTarget() {
+    if (!selected) return null;
+    const fresh = live(selected, selectedSelector);
+    if (fresh) selected = fresh;
+    return selected;
+  }
+
+  /* Pending edits are written twice: inline on the element, which is what
+     shows instantly, and as rules in one stylesheet in the document head,
+     which is what survives. A re-render takes the inline style with the node
+     it replaces; a rule outlives the node because it is addressed by name.
+     The rules are !important because after a re-render the thing they are
+     competing with is the framework's own inline style. */
+  let pendingSheet = null;
+  function syncPendingSheet() {
+    const rules = [...pending.values()]
+      .map((r) => `${r.selector} { ${r.prop}: ${r.to} !important; }`).join("\n");
+    if (!rules) {
+      pendingSheet?.remove();
+      pendingSheet = null;
+      return;
+    }
+    if (!pendingSheet) {
+      pendingSheet = document.createElement("style");
+      pendingSheet.setAttribute("data-g-admin-pending", "");
+      document.head.append(pendingSheet);
+    }
+    pendingSheet.textContent = rules;
+  }
+
   /* An edit is recorded against the selector, because that is what a baking
      agent will look for. `from` is the computed value before we touched it,
      captured once: a second nudge must not record the first nudge as the
      original. */
   function applyEdit(node, prop, value, stops) {
     const selector = selectorFor(node);
+    const target = live(node, selector);
+    if (!target) { say("That element has left the page. Select it again."); return; }
+    if (target !== node && node === selected) { selected = target; selectedSelector = selector; }
     const key = `${selector}|${prop}`;
     if (!pending.has(key)) {
-      const from = getComputedStyle(node).getPropertyValue(prop);
-      pending.set(key, { selector, prop, from, to: from, token_from: stops ? tokenAt(stops, px(from)) : null, token_to: null });
-      touched.set(selector, node);
+      const from = getComputedStyle(target).getPropertyValue(prop);
+      /* What the page's own style attribute said about this one property,
+         before we wrote over it. Writing a longhand expands any shorthand the
+         page declared inline, so removing the longhand on revert would drop
+         the shorthand's value to nothing. This is read through CSSOM, which
+         has already expanded `padding: 13px` into its four sides. */
+      const inlineBefore = target.style.getPropertyValue(prop);
+      pending.set(key, { selector, prop, from, to: from, token_from: stops ? tokenAt(stops, px(from)) : null, token_to: null, inlineBefore });
     }
+    touched.set(selector, target);
     const record = pending.get(key);
     record.to = value;
     record.token_to = stops ? tokenAt(stops, px(value)) : null;
-    node.style.setProperty(prop, value);
+    target.style.setProperty(prop, value);
+    syncPendingSheet();
     renderPending();
-    scheduleRedrawBoxes();
+    /* Immediate, not on the next idle frame: the edit and the box that shows
+       it have to move together, or a 4px step on a dark page reads as nothing
+       having happened at all. The scheduled redraw is deliberately not used
+       here, because it would repaint the flash away on the very next frame. */
+    drawEditBoxes(selected, true);
+    refreshControls();
   }
 
   function revertAll() {
     for (const record of pending.values()) {
-      touched.get(record.selector)?.style.removeProperty(record.prop);
+      const node = live(touched.get(record.selector), record.selector);
+      if (!node) continue;
+      node.style.removeProperty(record.prop);
+      if (record.inlineBefore) node.style.setProperty(record.prop, record.inlineBefore);
     }
     pending.clear();
     touched.clear();
+    syncPendingSheet();
     renderPending();
     scheduleRedrawBoxes();
   }
@@ -953,15 +1044,24 @@
     row.append(step);
 
     const commit = (next) => {
-      if (!selected) return;
-      applyEdit(selected, prop, Math.max(0, Math.round(next)) + "px", getStops());
+      const target = currentTarget();
+      /* A field takes any text, and parseFloat says NaN to most of it. Letting
+         that through would put "NaNpx" in the record a baking agent reads. */
+      if (!target || !Number.isFinite(next)) { render(); return; }
+      applyEdit(target, prop, Math.max(0, Math.round(next)) + "px", getStops());
       render();
+      /* A step from 0 to 4px is a real change that looks like nothing on a
+         busy page, so the number says it changed even when the page cannot. */
+      flash(value);
     };
     down.addEventListener("click", () => commit(stepAlong(getStops(), current(), -1)));
     up.addEventListener("click", () => commit(stepAlong(getStops(), current(), 1)));
     value.addEventListener("change", () => commit(parseFloat(value.value)));
 
-    const current = () => (selected ? px(getComputedStyle(selected).getPropertyValue(prop)) : 0);
+    const current = () => {
+      const target = currentTarget();
+      return target ? px(getComputedStyle(target).getPropertyValue(prop)) : 0;
+    };
     function render() {
       /* Scrolling re-reads every control, which must not overwrite a number
          somebody is halfway through typing. */
@@ -970,6 +1070,9 @@
       value.value = String(now);
       const stop = stopAt(getStops(), now);
       token.textContent = stop ? (stop.token || "").replace("--", "") : "off scale";
+      /* The strip is one line in a 320px panel and a project can name its
+         steps anything, so the full name is always one hover away. */
+      token.title = token.textContent;
       step.toggleAttribute("data-off", !stop);
     }
     return { row, render, nudge: (delta) => commit(current() + delta), step: (dir) => commit(stepAlong(getStops(), current(), dir)) };
@@ -991,13 +1094,17 @@
       lab.append(input, el("span", null, text));
       seg.append(lab);
       inputs[value] = input;
-      input.addEventListener("change", () => { if (input.checked && selected) applyEdit(selected, prop, value, null); });
+      input.addEventListener("change", () => {
+        const target = input.checked && currentTarget();
+        if (target) applyEdit(target, prop, value, null);
+      });
     }
     row.append(seg);
     return {
       row,
       render() {
-        const now = selected ? getComputedStyle(selected).getPropertyValue(prop).trim() : "";
+        const target = currentTarget();
+        const now = target ? getComputedStyle(target).getPropertyValue(prop).trim() : "";
         for (const [value, input] of Object.entries(inputs)) input.checked = value === now;
       },
       setDisabled(off) {
@@ -1022,6 +1129,28 @@
     paddingBody.append(paddings[side_].row);
   }
 
+  /* Margin is the control that most often does nothing, and silence there is
+     indistinguishable from the tool being broken. Three cases, said in place:
+     an inline box ignores vertical margin outright, a positioned element is
+     placed by something that will place it again, and an item in a flex or
+     grid container is spaced by the container as well. */
+  const marginHint = el("span", "hint");
+  marginHint.hidden = true;
+  marginBody.append(marginHint);
+
+  function marginCaveat() {
+    const target = currentTarget();
+    if (!target) return "";
+    const cs = getComputedStyle(target);
+    if (cs.display === "inline") return "This is an inline box. Top and bottom margins have no effect on it.";
+    if (cs.position === "absolute" || cs.position === "fixed") {
+      return "This element is positioned, not flowed. A margin shifts it from its inset, and a layout that sets that inset again on its next render puts it back.";
+    }
+    const parentDisplay = target.parentElement ? getComputedStyle(target.parentElement).display : "";
+    if (/flex|grid/.test(parentDisplay)) return "This is a flex or grid item. Its margin adds to the container's gap rather than replacing it.";
+    return "";
+  }
+
   const textAlign = toggles("Text", "text-align", [["left", "Left"], ["center", "Centre"], ["right", "Right"]]);
   const justify = toggles("Justify", "justify-content", [["flex-start", "Start"], ["center", "Centre"], ["flex-end", "End"], ["space-between", "Between"]]);
   const alignItems = toggles("Align", "align-items", [["flex-start", "Start"], ["center", "Centre"], ["flex-end", "End"], ["stretch", "Stretch"]]);
@@ -1041,10 +1170,13 @@
   function refreshControls() {
     if (!selected) return;
     for (const s of [...Object.values(margins), ...Object.values(paddings), fontSize, lineHeight]) s.render();
+    const caveat = marginCaveat();
+    marginHint.textContent = caveat;
+    marginHint.hidden = !caveat;
     textAlign.render();
     justify.render();
     alignItems.render();
-    const display = getComputedStyle(selected).display;
+    const display = getComputedStyle(currentTarget()).display;
     const flexish = /flex|grid/.test(display);
     justify.setDisabled(!flexish);
     alignItems.setDisabled(!flexish);
@@ -1092,7 +1224,9 @@
     openComposer({
       kind: "edit",
       summary: `${records.length} ${records.length === 1 ? "edit" : "edits"} on ${touched.size} ${touched.size === 1 ? "element" : "elements"}`,
-      elements: [...touched.values()].map(snapshot),
+      /* The HTML in a ticket has to be the element as it stands now, not as a
+         reference that a re-render left behind. */
+      elements: [...touched.entries()].map(([selector, node]) => snapshot(live(node, selector) || node)),
       edits: records.map(({ selector, prop, from, to, token_from, token_to }) => ({ selector, prop, from, to, token_from, token_to })),
       drawing: null,
     });
