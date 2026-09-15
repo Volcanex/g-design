@@ -23,8 +23,11 @@ annotate.js/annotations.py). Baseline's stays untouched for now.
 
 - A ~1KB stub ships inside `g-ui.js`. It does nothing unless
   `localStorage["g-admin"]` is set; visiting any page with `?gadmin=1`
-  sets it, the bar's "off" control clears it. Public visitors never
-  generate probe traffic.
+  sets it, and cmd+shift+K (ctrl+shift+K off-Mac) toggles it from the
+  keyboard — arming, probing and injecting in one gesture, or tearing
+  the overlay down if it is up. The bar's "off" control clears it too.
+  Public visitors never generate probe traffic (the hotkey listener is
+  inert until pressed and still ends at the verify gate).
 - When armed, the stub fetches `{base}/verify`. On 200 it injects
   `g-admin.js` + `g-admin.css` (separate vendored files, never inside
   the public bundle) from the same static dir as `g-ui.js`.
