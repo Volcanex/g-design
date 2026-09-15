@@ -95,7 +95,8 @@ consumer that runs it.
 - The g-admin overlay (`packages/g-ui/src/admin/`, its own CLAUDE.md) is the
   one thing that does NOT ride in the bundle. `dist/g-admin.js|css` are
   separate files, vendored beside `g-ui.js` and fetched only for a verified
-  admin; only a ~0.6KB activation stub ships in `g-ui.js`, gated by a
+  admin; only a ~0.9KB activation stub ships in `g-ui.js` (it also carries the
+  cmd+shift+K toggle, which has to work before the overlay exists), gated by a
   `g-ui.js gzip` budget in the build. Its CSS is the whole design system with
   every selector re-scoped from `:root` to `:host`, because it renders in a
   shadow root on pages that may never have loaded g.css.
