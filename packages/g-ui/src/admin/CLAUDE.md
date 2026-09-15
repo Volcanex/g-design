@@ -1,7 +1,7 @@
 # g-admin (client)
 
-The admin-only overlay: a bar, an annotate mode and a devtools-like edit mode,
-for any g project. **Nothing here writes to source.** Every saved annotation or
+The admin-only overlay: a bar, an annotate mode, a devtools-like edit mode and
+an x-ray lens over either of them, for any g project. **Nothing here writes to source.** Every saved annotation or
 edit becomes a ticket; an agent bakes tickets into source afterwards, guided by
 the note. The binding contract (endpoints, ticket schema, baking) is
 `agents/g-admin-contract.md` at the repo root until the server half lands and it
@@ -47,6 +47,43 @@ bar shows the hostname.
   and `data-density` from `documentElement` onto the host element, because the
   token blocks are scoped to `:host`.
 
+## X-ray and layer walking
+
+Selection answers "what is this one". These two answer "what is all of it" and
+"what is around it", which is what first live use on poker said was missing:
+finding a problem one click at a time is too slow.
+
+- **X-ray is a lens, not a fourth mode.** It is a switch in the bar, on
+  alongside annotate or edit, and it survives a change between them. Switched
+  on from rest it enters edit mode, because "off" is the overlay gone and
+  there is no stage to paint on; edit is also where a box found by looking
+  becomes a box you can change.
+- **One canvas, one pass.** `.ga-xray` is a full-viewport canvas under the
+  drawing and the box layer. Every visible box is drawn into it in a single
+  walk: margin and padding as four-strip rings in the same two tints the
+  hover shading uses, an outline whose alpha and weight fade with nesting
+  depth, and a warning line on any edge off the 4px grid. Per-element DOM
+  decorations would put hundreds of nodes into the host page's layout, and
+  the overlay's whole promise is that it changes no layout.
+- **Repaint is rAF-throttled** and driven by scroll, resize, the theme
+  observer and a MutationObserver on the body. The observer is connected only
+  while the lens is on, and mutations inside the overlay's own host element
+  are ignored, which is the whole test for "ours" because everything of ours
+  is in there.
+- **The walk is capped** at `XRAY_MAX` boxes and only paints what intersects
+  the viewport, but it descends through elements that do not: a section
+  scrolled halfway off screen still holds children on it.
+- **Layer walking is an edit-mode feature**, because the selection and the
+  inspector are. `[` and `]` walk the ancestry, and alt with the arrows does
+  the same; the arrows alone keep nudging the selected element by its margin.
+  Alt-click, or a second click within a few pixels of the last one, takes the
+  next element down `document.elementsFromPoint()`, which is the only way to
+  reach an element that another element covers. Esc unwinds the walk one step
+  at a time before it deselects, so the way out is the way you came in.
+- The breadcrumb in the inspector head is the ancestry, oldest first, scrolled
+  to the end. Clicking a crumb selects it and drops the walk trail, the same
+  as a fresh click on the page.
+
 ## Gotchas
 
 - **The box layer belongs to one mode at a time.** Locking the scrollbar away
@@ -64,6 +101,25 @@ bar shows the hostname.
 - **"Off" is not a fourth mode, it is leaving**: the overlay is removed and the
   browser disarmed. The off radio also listens for `click`, because it is the
   resting state and `change` never fires for a radio that is already checked.
+- **Painted pixels do not restyle themselves.** Every other part of the
+  overlay follows a theme change because its colours are tokens on `:host`.
+  The x-ray sheet is pixels, and a canvas cannot resolve a custom property, so
+  the colours are read off the host at paint time and the sheet has to be
+  repainted when the theme moves. The MutationObserver that mirrors the theme
+  is the only one watching `documentElement`, so that repaint hangs off it;
+  the body observer never sees the attribute.
+- **Off the grid is measured from the container, not from the page.** Same
+  rule as `packages/g-ui/scripts/rhythm-audit.mjs`, and deliberately the same
+  *number*: the page-origin measure inherits every border above a box, so on
+  a bordered design it flags most of the screen and says nothing. It also
+  skips what the layout placed rather than the author: absolutely positioned
+  boxes, inline boxes, and anything centred or end-aligned in a flex or grid
+  parent.
+- **The inspector covers the right 320px of the viewport**, and the stage
+  underneath it never sees the click. An element under there is reachable by
+  walking to it, not by aiming at it, which is why the docs card puts the
+  overlapped stack in the left column. The legend moves out from under the
+  inspector with a sibling rule, which is why it is appended last.
 - **Zero is on the grid.** The spacing scale lookup returns the stop, not the
   token name, so a value of 0 reads as on-scale and unnamed rather than off the
   scale. Anything that is genuinely off the scale is flagged in place, never

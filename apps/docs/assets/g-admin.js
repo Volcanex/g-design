@@ -36,6 +36,11 @@
   const FONT_SIZES = [11, 12, 13, 14, 15, 16, 18, 20, 22, 24, 28, 32, 40, 48];
   const FALLBACK_SP = [4, 8, 12, 16, 24, 32, 48, 64];
   const FALLBACK_LH = [16, 20, 24, 28, 32];
+  const XRAY_MAX = 1200; /* boxes painted in one pass before the walk gives up */
+  const XRAY_SKIP = new Set(["SCRIPT", "STYLE", "NOSCRIPT", "TEMPLATE", "LINK", "META", "BR"]);
+  const GRID = 4;
+  const GRID_TOL = 0.05;
+  const CLICK_SLOP = 4; /* px between two clicks that still count as the same point */
 
   const meta = (name) => document.querySelector(`meta[name="${name}"]`)?.content || "";
   const base = (meta("g-admin-base") || "/api/gadmin").replace(/\/+$/, "");
@@ -169,7 +174,12 @@
       else host.setAttribute(attr, v);
     }
   }
-  new MutationObserver(mirrorTheme).observe(document.documentElement, {
+  /* The x-ray sheet is painted pixels, not styled nodes, so a theme change
+     repaints the page around it and would leave it in the colours of the
+     theme before. It watches the body for changes; the theme is on the root,
+     and this is the only observer that sees it. The initial mirrorTheme call
+     stays out of here: the x-ray state is declared further down the file. */
+  new MutationObserver(() => { mirrorTheme(); scheduleXray(); }).observe(document.documentElement, {
     attributes: true, attributeFilter: ["data-theme", "data-density"],
   });
   mirrorTheme();
@@ -199,6 +209,14 @@
        never fires for the one control that has to work from rest. */
     if (value === "off") input.addEventListener("click", () => setMode("off"));
   }
+  /* X-ray is not a fourth mode: it is a lens over whichever mode is on, so it
+     is a switch beside the modes rather than another radio in them. */
+  const xrayLabel = el("label", "choice ga-xray-toggle");
+  const xraySwitch = el("input");
+  xraySwitch.type = "checkbox";
+  xraySwitch.className = "switch";
+  xrayLabel.append(xraySwitch, el("span", null, "X-ray"));
+
   const countLink = el("a", "ga-count");
   countLink.href = COMMAND + "/tickets";
   countLink.target = "_blank";
@@ -211,7 +229,7 @@
   commandLink.href = COMMAND;
   commandLink.target = "_blank";
   commandLink.rel = "noreferrer";
-  bar.append(who, modes, el("span", "ga-spacer"), countLink, commandLink);
+  bar.append(who, modes, xrayLabel, el("span", "ga-spacer"), countLink, commandLink);
 
   const hint = el("div", "ga-hint");
   hint.hidden = true;
@@ -237,16 +255,22 @@
 
   const stage = el("div", "ga-stage");
   stage.hidden = true;
+  /* The x-ray sheet is under the drawing and the boxes: it is the blueprint
+     the other two layers annotate, and hundreds of boxes are one canvas
+     rather than hundreds of nodes, which is what keeps layout out of it. */
+  const xrayCanvas = el("canvas", "ga-xray");
+  xrayCanvas.setAttribute("aria-hidden", "true");
+  xrayCanvas.hidden = true;
   const canvas = el("canvas", "ga-canvas");
   canvas.setAttribute("aria-hidden", "true");
   const boxes = el("div", "ga-boxes");
   const hit = el("div", "ga-hit");
-  stage.append(canvas, boxes, hit);
+  stage.append(xrayCanvas, canvas, boxes, hit);
 
-  function sizeCanvas() {
+  function sizeCanvas(node = canvas) {
     const dpr = window.devicePixelRatio || 1;
-    canvas.width = Math.round(window.innerWidth * dpr);
-    canvas.height = Math.round(window.innerHeight * dpr);
+    node.width = Math.round(window.innerWidth * dpr);
+    node.height = Math.round(window.innerHeight * dpr);
   }
 
   function place(node, rect, inset = 2) {
@@ -256,16 +280,15 @@
     node.style.height = rect.h + inset * 2 + "px";
   }
 
-  /* The topmost element that belongs to the page: everything of ours lives in
-     the shadow root, so skipping it is one containment check. */
-  function elementUnder(x, y) {
-    for (const node of document.elementsFromPoint(x, y) || []) {
-      if (node === host || shadow.contains(node)) continue;
-      if (node === document.body || node === document.documentElement) continue;
-      return node;
-    }
-    return null;
+  /* Everything under a point that belongs to the page, topmost first:
+     everything of ours lives in the shadow root, so skipping it is one
+     containment check. The whole stack rather than the top of it, because a
+     covered element is reachable only by naming the ones covering it. */
+  function stackUnder(x, y) {
+    return (document.elementsFromPoint(x, y) || []).filter((node) =>
+      node !== host && !shadow.contains(node) && node !== document.body && node !== document.documentElement);
   }
+  const elementUnder = (x, y) => stackUnder(x, y)[0] || null;
 
   let scrollLock = null;
   function lockScroll(on) {
@@ -280,6 +303,193 @@
       scrollLock = null;
     }
   }
+
+  /* ---------------------------------------------------------------- x-ray */
+
+  /* Selection answers "what is this one". X-ray answers "what is all of it":
+     every visible box painted at once, margin and padding in the two tints
+     the box-model shading already uses, so a page reads as a blueprint and
+     the thing that is wrong can be found by looking rather than by clicking.
+
+     One canvas, one pass. Per-element decorations would put hundreds of nodes
+     into the host page's layout, and the overlay's whole promise is that it
+     changes no layout. */
+
+  const legend = el("div", "ga-legend");
+  legend.hidden = true;
+  const legendCount = el("span", "ga-legend-count num");
+  for (const [cls, label] of [["ga-sw-margin", "Margin"], ["ga-sw-pad", "Padding"], ["ga-sw-off", "Off grid"], ["ga-sw-depth", "Depth"]]) {
+    const item = el("span", "ga-legend-item");
+    item.append(el("i", "ga-sw " + cls), el("span", null, label));
+    legend.append(item);
+  }
+  legend.append(legendCount);
+
+  let xrayOn = false;
+
+  /* Flat list of what the viewport can show, with the depth each box sits at.
+     An element outside the viewport can still hold one inside it, so the walk
+     descends through everything and only the painting is clipped. */
+  function xrayScan() {
+    const out = [];
+    if (!document.body) return out;
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const contentTop = (r, cs) => r.top + px(cs.borderTopWidth) + px(cs.paddingTop);
+    const walk = (node, depth, parentCs, origin) => {
+      for (const child of node.children) {
+        if (out.length >= XRAY_MAX) return;
+        if (child === host || XRAY_SKIP.has(child.tagName)) continue;
+        if (child.classList.contains("sr-only") || child.hasAttribute("data-audit-skip")) continue;
+        const cs = getComputedStyle(child);
+        if (cs.display === "none" || cs.visibility === "hidden" || parseFloat(cs.opacity) === 0) continue;
+        const r = child.getBoundingClientRect();
+        if (r.width >= 1 && r.height >= 1 && r.bottom > 0 && r.top < vh && r.right > 0 && r.left < vw) {
+          out.push({ el: child, r, cs, depth, parentCs, origin });
+        }
+        /* Icons are glyphs, not layout: the svg box is painted, its geometry
+           inside is not. Same call the rhythm audit makes. */
+        if (!(child instanceof SVGElement)) walk(child, depth + 1, cs, contentTop(r, cs));
+      }
+    };
+    const bodyCs = getComputedStyle(document.body);
+    walk(document.body, 0, bodyCs, contentTop(document.body.getBoundingClientRect(), bodyCs));
+    return out;
+  }
+
+  /* Off the 4px grid, by the same rules as scripts/rhythm-audit.mjs, and the
+     same number: measured from the container's content box, not from the top
+     of the page. The page number inherits every border above it, so on a
+     bordered design it flags most of the screen and says nothing; the local
+     number is the one somebody can act on. An element the layout centres or
+     takes out of flow is not placed by its author, so it is never flagged. */
+  const offGrid = (v) => {
+    const r = Math.abs(v) % GRID;
+    return Math.min(r, GRID - r) > GRID_TOL;
+  };
+  function placedByAuthor(item) {
+    const { cs, parentCs } = item;
+    if (cs.position === "absolute" || cs.position === "fixed") return false;
+    if (cs.display === "inline") return false;
+    if (!parentCs || !/flex|grid/.test(parentCs.display)) return true;
+    const align = cs.alignSelf === "auto" ? parentCs.alignItems : cs.alignSelf;
+    return !(align === "center" || align === "baseline" || align === "flex-end" || align === "end");
+  }
+
+  const strips = (x, y, w, h, s) => [
+    [x - s.left, y - s.top, w + s.left + s.right, s.top],
+    [x - s.left, y + h, w + s.left + s.right, s.bottom],
+    [x - s.left, y, s.left, h],
+    [x + w, y, s.right, h],
+  ];
+
+  function paintXray() {
+    const ctx = xrayCanvas.getContext("2d");
+    if (!ctx) return;
+    const dpr = window.devicePixelRatio || 1;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, xrayCanvas.width, xrayCanvas.height);
+    if (!xrayOn) return;
+    ctx.scale(dpr, dpr);
+
+    /* A canvas cannot resolve a custom property, so every colour is read off
+       the overlay root, which carries the token layer whether or not the host
+       page does. The alphas match the two shading rules in g-admin.css. */
+    const cs = getComputedStyle(host);
+    const token = (name, fallback) => cs.getPropertyValue(name).trim() || fallback;
+    const ink = token("--accent-edge", token("--text-primary", "#fff"));
+    const marginInk = token("--warn-text", "#ffca16");
+    const padInk = token("--chart-2", "#6e56cf");
+    const offInk = token("--danger-text", "#ff9592");
+
+    const items = xrayScan();
+    let off = 0;
+    for (const item of items) {
+      const { r, cs: ecs, depth } = item;
+      const margin = { top: px(ecs.marginTop), right: px(ecs.marginRight), bottom: px(ecs.marginBottom), left: px(ecs.marginLeft) };
+      const padding = { top: px(ecs.paddingTop), right: px(ecs.paddingRight), bottom: px(ecs.paddingBottom), left: px(ecs.paddingLeft) };
+
+      ctx.globalAlpha = 0.14;
+      ctx.fillStyle = marginInk;
+      for (const [x, y, w, h] of strips(r.x, r.y, r.width, r.height, margin)) {
+        if (w > 0 && h > 0) ctx.fillRect(x, y, w, h);
+      }
+      ctx.globalAlpha = 0.22;
+      ctx.fillStyle = padInk;
+      const inner = { x: r.x + padding.left, y: r.y + padding.top, w: Math.max(0, r.width - padding.left - padding.right), h: Math.max(0, r.height - padding.top - padding.bottom) };
+      for (const [x, y, w, h] of strips(inner.x, inner.y, inner.w, inner.h, padding)) {
+        if (w > 0 && h > 0) ctx.fillRect(x, y, w, h);
+      }
+
+      /* Depth reads as weight: the outer boxes are the frame of the page and
+         hold the eye, the inner ones recede rather than compete. */
+      ctx.globalAlpha = Math.max(0.12, 0.62 - depth * 0.06);
+      ctx.lineWidth = depth < 2 ? 1.5 : 1;
+      ctx.strokeStyle = ink;
+      ctx.strokeRect(Math.round(r.x) + 0.5, Math.round(r.y) + 0.5, Math.max(1, Math.round(r.width) - 1), Math.max(1, Math.round(r.height) - 1));
+
+      if (!placedByAuthor(item)) continue;
+      ctx.globalAlpha = 0.9;
+      ctx.strokeStyle = offInk;
+      ctx.lineWidth = 2;
+      for (const edge of [r.top, r.bottom]) {
+        if (!offGrid(edge - item.origin)) continue;
+        off++;
+        ctx.beginPath();
+        ctx.moveTo(r.left, Math.round(edge) + 0.5);
+        ctx.lineTo(r.right, Math.round(edge) + 0.5);
+        ctx.stroke();
+      }
+    }
+    ctx.globalAlpha = 1;
+    const boxWord = items.length === 1 ? "box" : "boxes";
+    legendCount.textContent = off
+      ? `${items.length} ${boxWord}, ${off} off grid`
+      : `${items.length} ${boxWord}`;
+  }
+
+  let xrayFrame = 0;
+  function scheduleXray() {
+    if (!xrayOn || xrayFrame) return;
+    xrayFrame = requestAnimationFrame(() => { xrayFrame = 0; paintXray(); });
+  }
+
+  /* The page redrawing itself is the one repaint trigger that is not ours, and
+     the overlay's own nodes are inside the host element, which is how they are
+     told apart without a second observer. */
+  const xrayWatch = new MutationObserver((records) => {
+    for (const record of records) {
+      if (record.target === host || host.contains(record.target)) continue;
+      scheduleXray();
+      return;
+    }
+  });
+  function watchXray(on) {
+    if (on) xrayWatch.observe(document.body, { childList: true, subtree: true, attributes: true, characterData: true });
+    else xrayWatch.disconnect();
+  }
+
+  function setXray(on) {
+    xrayOn = on;
+    xraySwitch.checked = on;
+    xrayCanvas.hidden = !on;
+    legend.hidden = !on;
+    if (!on) {
+      watchXray(false);
+      paintXray();
+      return;
+    }
+    /* Off is not a mode, it is the overlay gone, so there is no stage to paint
+       on. Edit mode is where a box found by looking becomes a box you can
+       change, which is the reason to be looking. */
+    if (mode === "off") setMode("edit");
+    else {
+      sizeCanvas(xrayCanvas);
+      watchXray(true);
+      paintXray();
+    }
+    say("X-ray on. Square brackets walk the layers, alt-click reaches what is underneath.", true);
+  }
+  xraySwitch.addEventListener("change", () => setXray(xraySwitch.checked));
 
   /* ------------------------------------------------------------- composer */
 
@@ -361,7 +571,9 @@
   const sideHead = el("div", "ga-side-head");
   const sideSel = el("div", "ga-sel");
   const sideDims = el("div", "ga-dims");
-  sideHead.append(sideSel, sideDims);
+  const crumbs = el("nav", "ga-crumbs");
+  crumbs.setAttribute("aria-label", "Ancestry");
+  sideHead.append(sideSel, sideDims, crumbs);
   const sideBody = el("div", "ga-side-body");
   const paneStack = el("div", "g-pane-stack");
   sideBody.append(paneStack);
@@ -387,7 +599,9 @@
   }
 
   const wrap = el("div", "ga");
-  wrap.append(bar, stage, hint, panel, side);
+  /* The legend is last so a CSS sibling rule can move it out from under the
+     inspector; its z-index, not its position here, is what keeps it on top. */
+  wrap.append(bar, stage, hint, panel, side, legend);
   shadow.append(wrap);
 
   /* ------------------------------------------------------------- annotate */
@@ -550,10 +764,20 @@
     drawEditBoxes(node);
   }
 
+  /* Clicking takes the topmost element, which is the one thing a click can
+     mean. Clicking the same point again, or holding alt, takes the next one
+     down the stack instead: that is the only way to reach an element another
+     element covers, and covered is where the layout problems live. */
   function editPointerUp(e) {
-    const node = elementUnder(e.clientX, e.clientY);
-    if (!node) return;
-    select(node);
+    const stack = stackUnder(e.clientX, e.clientY);
+    if (!stack.length) return;
+    const repeat = lastPoint && Math.abs(lastPoint.x - e.clientX) <= CLICK_SLOP && Math.abs(lastPoint.y - e.clientY) <= CLICK_SLOP;
+    const at = selected ? stack.indexOf(selected) : -1;
+    const next = (e.altKey || repeat) && at !== -1 ? stack[(at + 1) % stack.length] : stack[0];
+    lastPoint = { x: e.clientX, y: e.clientY };
+    trail = [];
+    select(next);
+    if (next !== stack[0]) say(`Selected the element under it, ${stack.indexOf(next) + 1} of ${stack.length} at this point.`);
   }
 
   function select(node) {
@@ -561,8 +785,101 @@
     hovered = null;
     sideSel.textContent = selectorFor(node);
     side.hidden = false;
+    renderCrumbs();
     drawEditBoxes(node);
     refreshControls();
+  }
+
+  /* ------------------------------------------------------------ layer walk */
+
+  /* The ancestry is a stack, so move through it like one. Up is the container
+     the thing sits in, down is back where you came from, and both keep the
+     sidebar pointed at whatever the walk landed on, so a box found by looking
+     is a box you can edit without hunting for a click that hits it. */
+
+  let lastPoint = null;
+  let trail = []; /* selections the walk stepped through, for Esc to unwind */
+  const cameFrom = new WeakMap(); /* container -> the child the walk came up from */
+
+  const walkable = (node) => node && node.nodeType === 1 && node !== host
+    && node !== document.body && node !== document.documentElement;
+
+  function walkTo(node) {
+    if (!node || node === selected) return;
+    if (selected) trail.push(selected);
+    select(node);
+  }
+
+  function walkUp() {
+    const parent = selected?.parentElement;
+    if (!walkable(parent)) { say("Nothing outside this one to select."); return; }
+    cameFrom.set(parent, selected);
+    walkTo(parent);
+  }
+
+  function walkDown() {
+    if (!selected) return;
+    const back = cameFrom.get(selected);
+    const next = back && back.isConnected && back.parentElement === selected
+      ? back
+      : [...selected.children].find((child) => {
+        if (child === host || XRAY_SKIP.has(child.tagName)) return false;
+        const r = child.getBoundingClientRect();
+        return r.width >= 1 && r.height >= 1;
+      });
+    if (!next) { say("Nothing inside this one to select."); return; }
+    walkTo(next);
+  }
+
+  const crumbLabel = (node) => {
+    const tag = node.tagName.toLowerCase();
+    if (node.id) return tag + "#" + node.id;
+    const cls = [...node.classList][0];
+    return cls ? tag + "." + cls : tag;
+  };
+
+  function renderCrumbs() {
+    crumbs.replaceChildren();
+    if (!selected) return;
+    const chain = [];
+    for (let node = selected; walkable(node); node = node.parentElement) chain.unshift(node);
+    chain.forEach((node, i) => {
+      if (i) crumbs.append(el("span", "ga-crumb-sep", ">"));
+      const crumb = el("button", "ga-crumb", crumbLabel(node));
+      crumb.type = "button";
+      if (node === selected) crumb.setAttribute("aria-current", "true");
+      crumb.addEventListener("click", () => { trail = []; select(node); });
+      crumbs.append(crumb);
+    });
+    /* The end of the chain is the interesting end, and scrollIntoView inside a
+       shadow root will scroll the host page to get there. */
+    crumbs.scrollLeft = crumbs.scrollWidth;
+  }
+
+  /* Focus in a field means the page or the sidebar is taking the key, and the
+     walk must not take it as well. Both roots are asked: the host page keeps
+     its own focus while the overlay is up. */
+  function typingNow() {
+    for (const node of [shadow.activeElement, document.activeElement]) {
+      if (!node || node === host) continue;
+      if (/^(INPUT|TEXTAREA|SELECT)$/.test(node.tagName) || node.isContentEditable) return true;
+    }
+    return false;
+  }
+
+  /* Square brackets walk, and alt with the arrows walks too. The arrows on
+     their own already nudge the selected element by its margin, and a key
+     that does two things depending on what you last touched is worse than
+     two keys. */
+  function walkKeys(e) {
+    if (mode !== "edit" || !selected || typingNow()) return false;
+    const up = e.key === "[" || (e.altKey && e.key === "ArrowUp");
+    const down = e.key === "]" || (e.altKey && e.key === "ArrowDown");
+    if (!up && !down) return false;
+    e.preventDefault();
+    if (up) walkUp();
+    else walkDown();
+    return true;
   }
 
   /* An edit is recorded against the selector, because that is what a baking
@@ -738,9 +1055,7 @@
      one step of the spacing scale with shift. The sidebar's own fields keep
      their keys. */
   function editKeys(e) {
-    if (mode !== "edit" || !selected) return;
-    const target = shadow.activeElement;
-    if (target && /INPUT|TEXTAREA|SELECT/.test(target.tagName)) return;
+    if (mode !== "edit" || !selected || typingNow()) return;
     const axis = { ArrowUp: [margins.top, -1], ArrowDown: [margins.top, 1], ArrowLeft: [margins.left, -1], ArrowRight: [margins.left, 1] }[e.key];
     if (!axis) return;
     e.preventDefault();
@@ -851,6 +1166,14 @@
     panel.hidden = true;
     side.hidden = true;
     hint.hidden = true;
+    /* The x-ray switch survives a mode change, its painting does not: there is
+       no stage to paint on between leaving one mode and entering the next. */
+    watchXray(false);
+    xrayCanvas.hidden = true;
+    legend.hidden = true;
+    crumbs.replaceChildren();
+    trail = [];
+    lastPoint = null;
     strokes.length = 0;
     picked = [];
     drawing = null;
@@ -865,6 +1188,13 @@
   function enter(next) {
     mode = next;
     modeInputs[next].checked = true;
+    if (xrayOn) {
+      xrayCanvas.hidden = false;
+      legend.hidden = false;
+      sizeCanvas(xrayCanvas);
+      watchXray(true);
+      paintXray();
+    }
     if (next === "annotate") {
       lockScroll(true);
       sizeCanvas();
@@ -899,6 +1229,8 @@
     leave();
     if (next !== "off") { enter(next); return; }
     mode = "off";
+    xrayOn = false;
+    xraySwitch.checked = false;
     try { localStorage.removeItem(KEY); } catch { /* nothing to clear */ }
     host.remove();
     window.removeEventListener("keydown", onKey);
@@ -911,18 +1243,30 @@
     if (e.key === "Escape" && mode !== "off") {
       e.preventDefault();
       if (composing) { closeComposer(); return; }
-      if (mode === "edit" && selected) { selected = null; side.hidden = true; boxes.replaceChildren(); return; }
+      /* Esc unwinds the walk one step before it unwinds anything else: having
+         drilled in, the way out is the way you came. */
+      if (mode === "edit" && trail.length) { select(trail.pop()); return; }
+      if (mode === "edit" && selected) {
+        selected = null;
+        side.hidden = true;
+        crumbs.replaceChildren();
+        boxes.replaceChildren();
+        return;
+      }
       setMode("off");
       return;
     }
+    if (walkKeys(e)) return;
     editKeys(e);
   }
   function onResize() {
     if (mode === "annotate") { sizeCanvas(); redraw(); renderPicked(); }
+    if (xrayOn) { sizeCanvas(xrayCanvas); scheduleXray(); }
     scheduleRedrawBoxes();
   }
   function onScroll() {
     if (mode === "edit") scheduleRedrawBoxes();
+    scheduleXray();
   }
   window.addEventListener("keydown", onKey);
   window.addEventListener("resize", onResize);
