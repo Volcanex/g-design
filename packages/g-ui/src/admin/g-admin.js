@@ -1037,7 +1037,7 @@
     const stack = stackUnder(e.clientX, e.clientY);
     if (!stack.length) return;
     if (textOn) { startText(stack); return; }
-    if (e.shiftKey && selected) { addToSelection(stack[0]); return; }
+    if ((e.shiftKey || e.metaKey || e.ctrlKey) && selected) { addToSelection(stack[0]); return; }
     const repeat = lastPoint && Math.abs(lastPoint.x - e.clientX) <= CLICK_SLOP && Math.abs(lastPoint.y - e.clientY) <= CLICK_SLOP;
     const at = selected ? stack.indexOf(selected) : -1;
     const next = (e.altKey || repeat) && at !== -1 ? stack[(at + 1) % stack.length] : stack[0];
