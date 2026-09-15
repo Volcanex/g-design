@@ -143,6 +143,12 @@ placed by a layout engine that put it back. Three answers, all in edit mode:
 - **"Off" is not a fourth mode, it is leaving**: the overlay is removed and the
   browser disarmed. The off radio also listens for `click`, because it is the
   resting state and `change` never fires for a radio that is already checked.
+  Anything else that tears the overlay down, the stub's toggle hotkey included,
+  must call `window.__gAdminOff()` rather than removing the element: pending
+  edits live in inline styles and in a stylesheet in the head, and dropping the
+  element leaves both applied with nothing on screen left to say so.
+  `window.__gAdmin` is the stub's "already loaded" flag; this is its
+  counterpart.
 - **Painted pixels do not restyle themselves.** Every other part of the
   overlay follows a theme change because its colours are tokens on `:host`.
   The x-ray sheet is pixels, and a canvas cannot resolve a custom property, so

@@ -1408,6 +1408,13 @@
 
   /* --------------------------------------------------------------- mount */
 
+  /* The way out, for anything that did not come through the bar. Whatever
+     tears the overlay down has to come through here rather than removing the
+     element: the pending edits are inline styles and a stylesheet in the head,
+     and dropping the element leaves both applied with nothing left on screen
+     to say so. The stub owns `window.__gAdmin`; this is its counterpart. */
+  window.__gAdminOff = () => setMode("off");
+
   function mount() {
     document.body.append(host);
     /* The shipped pane behaviour lives in g-ui.js and only ever walks the root
