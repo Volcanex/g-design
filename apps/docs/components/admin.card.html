@@ -1,4 +1,4 @@
-<!-- @dsCard group="Components" name="Admin overlay" subtitle="The g-admin bar, annotate mode and the edit inspector, running against a mocked ticket api." viewport="1000x920" -->
+<!-- @dsCard group="Components" name="Admin overlay" subtitle="The g-admin bar, annotate mode and the edit inspector, running against a mocked ticket api." viewport="1000x1180" -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -73,6 +73,24 @@
     background: var(--surface-2); border: 1px solid var(--accent-edge);
     font-size: 12px; color: var(--text-secondary);
   }
+
+  /* Three tiles with two different gaps between them: 24px is one step of
+     the scale, 13px is on nothing. Measure names the first and flags the
+     second. */
+  /* The inspector owns the right 320px whenever something is selected, and a
+     click that lands there never reaches the page. Anything this card asks
+     you to click twice in a row lives inside this width. */
+  .demo-narrow { max-width: 640px; }
+  .gaps { display: flex; align-items: flex-start; }
+  .tile {
+    width: 72px; height: 56px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);
+    background: var(--well-bg);
+    font-size: 12px; color: var(--text-secondary);
+  }
+  #tile-b { margin-left: 24px; }
+  #tile-c { margin-left: 13px; }
 </style>
 </head>
 <body>
@@ -96,6 +114,15 @@
     behave: an inline box, a positioned element, an item spaced by its flex or grid container. Edits are
     written inline and mirrored into one stylesheet in the head, so they survive an app page that rebuilds
     the element underneath them. Revert takes both away.
+  </p>
+  <p class="cap">
+    With something selected, hovering anything else measures the distance between the two and names the
+    spacing stop each gap is nearest, in the warning tint where it is on none. <span class="kbd">shift</span>
+    click adds to the selection and the controls then write to every element in it.
+    <span class="kbd">delete</span> hides one, as a pending <span class="mono">display: none</span> that
+    reverts and tickets like any other edit. The text tool, <span class="kbd">t</span> or the switch in the
+    bar, edits a line of copy in place and saves it as a content ticket.
+    <span class="kbd">shift</span> <span class="kbd">/</span> lists every key.
   </p>
 
   <div class="demo">
@@ -135,8 +162,7 @@
       </div>
     </section>
 
-    <section class="card nest" id="nest">
-      <h2>Nested layout</h2>
+    <section class="card nest" id="nest">      <h2>Nested layout</h2>
       <div class="nest-row">
         <div class="nest-cell">
           <p>Card, row, cell, paragraph.</p>
@@ -147,6 +173,26 @@
           <button class="btn btn-sm btn-tertiary" type="button">Walk from here</button>
         </div>
       </div>
+    </section>
+  </div>
+
+  <div class="demo demo-narrow">
+    <section class="card" id="measure-card">
+      <h2>Measure the gaps</h2>
+      <p style="color: var(--text-secondary); font-size: 13px; margin: 0;">
+        Select one tile, then hover another.
+      </p>
+      <div class="gaps">
+        <div class="tile" id="tile-a">A</div>
+        <div class="tile" id="tile-b">B</div>
+        <div class="tile" id="tile-c">C</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Editable copy</h2>
+      <p id="copy-one" style="color: var(--text-secondary); font-size: 13px; margin: 0;">Turn the text tool on, click this line and type.</p>
+      <p id="copy-two" style="color: var(--text-secondary); font-size: 13px; margin: 0;">A text edit is a pending edit: revert takes it away, save turns it into a content ticket.</p>
     </section>
   </div>
 </body>
