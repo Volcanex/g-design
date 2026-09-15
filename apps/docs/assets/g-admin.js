@@ -1632,7 +1632,7 @@
     for (const record of records) {
       const row = el("div", "ga-edit");
       row.append(el("span", "ga-prop", record.prop));
-      row.append(el("span", "ga-to", record.token_to || record.to));
+      row.append(el("span", "ga-to", record.token_to ? record.token_to.replace("--", "") : record.to));
       pendingList.append(row);
     }
   }
