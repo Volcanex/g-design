@@ -1,11 +1,16 @@
 # g-admin (client)
 
-The admin-only overlay: a bar, an annotate mode, a devtools-like edit mode and
-an x-ray lens over either of them, for any g project. **Nothing here writes to source.** Every saved annotation or
-edit becomes a ticket; an agent bakes tickets into source afterwards, guided by
-the note. The binding contract (endpoints, ticket schema, baking) is
-`agents/g-admin-contract.md` at the repo root until the server half lands and it
-graduates into this file.
+The admin-only overlay: a bar, an annotate mode, a devtools-like edit mode, and
+an x-ray lens and a text tool over them, for any g project. **Nothing here
+writes to source.** Every saved annotation or edit becomes a ticket; an agent
+bakes tickets into source afterwards, guided by the note. The binding contract
+(endpoints, ticket schema, baking) is `agents/g-admin-contract.md` at the repo
+root until the server half lands and it graduates into this file.
+
+The reference for what this is trying to be is VisBug. The two things it does
+that VisBug does not are the whole point of it: every change lands as a ticket
+rather than in the page, and every value snaps to the host page's own token
+scales.
 
 ## Where the pieces are
 
@@ -86,6 +91,76 @@ finding a problem one click at a time is too slow.
 - The breadcrumb in the inspector head is the ancestry, oldest first, scrolled
   to the end. Clicking a crumb selects it and drops the walk trail, the same
   as a fresh click on the page.
+
+## Measuring
+
+Selection answers "what is this one", x-ray answers "what is all of it", and
+measuring answers "how far apart are these two", which is the question a
+spacing decision actually turns on and the one thing devtools will not answer.
+
+- **Hovering means two different things.** With nothing selected it shades the
+  hovered element's own box model, as it always did. With something selected
+  it measures the selection against whatever the pointer is over, and the
+  shading gives way to the measurement, because two box models on screen at
+  once is not a reading anybody can take.
+- **Two geometries, because they are two questions.** Boxes that face each
+  other across a gap get the gap. Boxes that overlap, which is the common case
+  of an element inside its container, get the four edge offsets, which is the
+  padding question asked from outside. The line runs through the part the two
+  boxes share, or through the selection's own middle when they share nothing.
+- **A distance of zero is not drawn.** Two edges that touch are already
+  legible, and a zero-length line with a chip on it is not.
+- **A stop is only named when the gap is near it.** Within a quarter of the
+  stop's own value, floor of 2px: 13 reads as a near miss on sp-3, and 109 gets
+  the number alone rather than claiming to be sp-8. Anything not exactly on a
+  stop takes the warning tint either way, which is the same signal the steppers
+  give.
+
+## Text, hide, multi-select
+
+Three features that all had to become pending edits or not exist. The rule is
+in `applyEdit`: if it cannot be expressed as a record that reverts and saves,
+it does not go in.
+
+- **Text is the one edit with no CSS property behind it.** It is recorded as
+  `{prop: "text", from, to}`, which the contract already allows, and written to
+  the node rather than to its style. Two things follow. It cannot be mirrored
+  into the pending stylesheet, so a text edit is the one edit a re-render takes
+  with the node it replaces. And the tool only takes an element whose whole
+  content is text, because that is the only shape a from and a to can describe
+  without throwing away the page's markup.
+- **The text tool is edit mode's, not a fourth mode.** It needs the selection,
+  the pending list and the save button, and a fourth radio would have to borrow
+  all three. Same shape as the x-ray lens: a switch in the bar, `t` from the
+  keyboard, and switching it on from rest enters edit mode.
+- **Hide is `display: none` through the ordinary path.** It reverts, it shows
+  in the pending list, and the ticket carries it as a declaration a baking
+  agent can act on. Removing the node would be none of those things.
+- **Multi-select keeps a primary.** The first click stays the one the head, the
+  crumbs, the box model and every number in the sidebar point at; shift adds
+  the rest. The controls write the primary's value to all of them, so a stepper
+  means "make them all this" rather than "move each of them by that much",
+  which is the only reading that matches a stepper showing one number.
+- **The multi-select ticket falls out for free.** `pending` is keyed
+  `selector|prop` and `touched` is keyed by selector, so one control writing to
+  three elements already produces three records and three elements without the
+  save path knowing anything about it.
+
+## Keys
+
+`?` (shift and slash, read both ways because layouts disagree) opens a sheet
+listing every binding. It is built from the shipped pane stack, so the list
+lives in one array, `HELP`, and the sheet renders it.
+
+- **The single letters work from rest**, because `a` and `e` are how a mode
+  starts. They do not work while a field has focus, while a line of text is
+  open, or while the composer is up: every one of them leaves the mode, and
+  leaving reverts the edits the composer is about to save.
+- **`m` and `p` focus the pane, not its first field.** A field would make the
+  next letter a typed character, and `m` then `p` is the whole point of having
+  both. Tab from the pane title reaches the controls.
+- **Modifiers are left alone.** cmd, ctrl and alt combinations belong to the
+  browser and to the walk.
 
 ## Why an edit is written twice
 
@@ -169,8 +244,34 @@ placed by a layout engine that put it back. Three answers, all in edit mode:
 - **The inspector covers the right 320px of the viewport**, and the stage
   underneath it never sees the click. An element under there is reachable by
   walking to it, not by aiming at it, which is why the docs card puts the
-  overlapped stack in the left column. The legend moves out from under the
-  inspector with a sibling rule, which is why it is appended last.
+  overlapped stack in the left column and caps the row that has to be clicked
+  twice in a row at 640px. It is also why the first click of a demo works and
+  the second does not: the first one opens the inspector over the second
+  target. The legend moves out from under the inspector with a sibling rule,
+  which is why it is appended last.
+- **The stage is the layer that has to stand down for a caret, not the hit
+  layer.** `.ga-hit` never declares `pointer-events` and the property is
+  inherited, so switching off the one node that covers the viewport switches
+  off both, where switching off the hit layer alone leaves the stage eating
+  every click. While it is down the page is back in reach of its own handlers,
+  so `textOutside` swallows the whole closing gesture, pointerdown, mousedown
+  and click: closing on the pointerdown puts the stage back before the click is
+  dispatched, and a link whose mousedown the page saw would navigate out from
+  under an unsaved edit.
+- **Authored HTML is indented, so a paragraph's raw text carries newlines.**
+  They render as one space and would make a ticket unreadable, so a text record
+  keeps the collapsed form on both sides. The exact original is held separately
+  for the duration of the edit, which is what esc puts back.
+- **A hidden element has no box.** Nothing is drawn for it and the head says
+  "Hidden": a collapsed outline at the top left corner of the screen would be a
+  lie about where the element is.
+- **The stepper takes a unit.** `font-weight: 400px` is not a declaration, so
+  the weight stepper passes an empty one. Anything else added to the type pane
+  has to decide the same question.
+- **The family picker offers tokens and nothing else.** It scans the host
+  page's `:root` for `--font-*`, falling back to the three g names, and writes
+  `var(--font-mono)` rather than a font name, so the value in the ticket is one
+  the design system has. A page that resolves none has no row.
 - **The hotkey lives in the stub, not here.** cmd+shift+K (ctrl+shift+K off a
   Mac) has to work on a page where the overlay has never loaded, so the
   listener has to be the part that always ships. Pressed cold it arms, probes
