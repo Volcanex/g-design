@@ -115,6 +115,34 @@ spacing decision actually turns on and the one thing devtools will not answer.
   the number alone rather than claiming to be sp-8. Anything not exactly on a
   stop takes the warning tint either way, which is the same signal the steppers
   give.
+- **The chip on a gap is a jump, not a label.** A number is only worth having
+  if you can reach the declaration that produced it, so clicking one selects
+  the element that owns the gap, opens the pane its property lives in and
+  flashes the row. The precedence is the order the browser resolves them in.
+  Between a child and its container's edge: the container's padding on that
+  side, else the child's margin on that side, else the container's own
+  alignment where it is flex or grid. Between two siblings: the container's
+  `gap` where there is one, else the facing margin, taking the first in
+  document order unless its margin is zero and the other's is not, because an
+  answer naming a margin of zero is not a diagnosis. Two boxes that overlap
+  without one containing the other are almost always a positioned box on its
+  inset, which is what it says.
+- **Where the answer is not the only one, the hint names the other.** "or
+  div.tile's margin-right" is the difference between a diagnosis and a guess,
+  and a container's padding with a child's margin on top of it is one gap with
+  two owners.
+- **The container's own `gap` has no row in the inspector**, so that case
+  flashes the whole Alignment pane rather than pointing at justify or align,
+  which would be false precision about which control moves it.
+- **The reading holds while the pointer is on a chip.** Reaching a chip means
+  crossing the gap, and what lies under a gap is not what was being measured;
+  without that the chip walks away from the pointer on the way to it.
+- **The chips are hit-tested, not clicked.** `.ga-hit` covers the viewport and
+  sits above the box layer, which is what keeps every box decoration free of
+  pointer-events, so the chip rects are tested against the point in the stage's
+  own handlers instead. The owner is stored as a thunk beside each chip:
+  working it out costs several computed-style reads, and the pointer redraws
+  this on every frame it moves.
 
 ## Text, hide, multi-select
 
@@ -137,10 +165,24 @@ it does not go in.
   in the pending list, and the ticket carries it as a declaration a baking
   agent can act on. Removing the node would be none of those things.
 - **Multi-select keeps a primary.** The first click stays the one the head, the
-  crumbs, the box model and every number in the sidebar point at; shift adds
-  the rest. The controls write the primary's value to all of them, so a stepper
-  means "make them all this" rather than "move each of them by that much",
-  which is the only reading that matches a stepper showing one number.
+  crumbs, the box model and every number in the sidebar point at; shift, cmd or
+  ctrl adds the rest. The controls write the primary's value to all of them, so
+  a stepper means "make them all this" rather than "move each of them by that
+  much", which is the only reading that matches a stepper showing one number.
+- **A multi-selection says what its elements have in common**, because that is
+  the thing worth knowing about a set: the tag every one of them shares plus
+  the classes all of them carry, or the tags it is mixed from. Three boxes that
+  are all `button.btn.btn-secondary` are one class waiting to be changed, and
+  three of three different tags are three separate edits that happen to be
+  selected together. Where they share a tag and at least one class the head
+  offers to take everything else like it on the page, up to `MAX_ELEMENTS`,
+  saying so when that cap bites: a selection that stopped at eight in silence
+  would be a ticket quietly missing half its subject.
+- **The signature travels into the ticket summary**, which is free text the
+  contract already allows, so a baking agent reads "6 edits on 3 elements, all
+  button.btn" as one class-level change rather than three coincidences. It is
+  claimed only where it is true of every element the edits touched: a shape
+  covering three of four elements is worse than no shape at all.
 - **The multi-select ticket falls out for free.** `pending` is keyed
   `selector|prop` and `touched` is keyed by selector, so one control writing to
   three elements already produces three records and three elements without the

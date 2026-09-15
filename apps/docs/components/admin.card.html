@@ -1,4 +1,4 @@
-<!-- @dsCard group="Components" name="Admin overlay" subtitle="The g-admin bar, annotate mode and the edit inspector, running against a mocked ticket api." viewport="1000x1180" -->
+<!-- @dsCard group="Components" name="Admin overlay" subtitle="The g-admin bar, annotate mode and the edit inspector, running against a mocked ticket api." viewport="1000x1520" -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -91,6 +91,19 @@
   }
   #tile-b { margin-left: 24px; }
   #tile-c { margin-left: 13px; }
+
+  /* Three ways of producing the same looking gap, so clicking one has a
+     different owner each time: the container's own gap, a container's
+     padding, and a sibling's margin (the tiles above). */
+  #owned { display: flex; gap: var(--sp-4); }
+  #padded {
+    display: flex;
+    padding: var(--sp-5);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+  }
+
+  .alike { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
 </style>
 </head>
 <body>
@@ -123,6 +136,19 @@
     reverts and tickets like any other edit. The text tool, <span class="kbd">t</span> or the switch in the
     bar, edits a line of copy in place and saves it as a content ticket.
     <span class="kbd">shift</span> <span class="kbd">/</span> lists every key.
+  </p>
+  <p class="cap">
+    A multi-selection says what its elements have in common, the shared tag and every class all of them
+    carry, or the tags it is mixed from. Where they share a tag and a class it offers to select everything
+    else like it on the page, up to the eight a ticket carries, and says so when that cap bites. The shape
+    goes into the ticket summary too, so a baking agent reads six edits on three elements as one change to
+    a class rather than three coincidences.
+  </p>
+  <p class="cap">
+    Every measured gap is clickable. The chip jumps the selection to whatever owns that gap, the container's
+    padding, the container's own gap, or a sibling's margin, opens the pane the property lives in and
+    flashes the row, and says in one line what it decided. Where two declarations are both adding to the
+    gap it names the one it did not pick.
   </p>
 
   <div class="demo">
@@ -186,6 +212,40 @@
         <div class="tile" id="tile-a">A</div>
         <div class="tile" id="tile-b">B</div>
         <div class="tile" id="tile-c">C</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>What owns this gap</h2>
+      <p style="color: var(--text-secondary); font-size: 13px; margin: 0;">
+        Select one box, hover the next, then click the number.
+      </p>
+      <div id="owned">
+        <div class="tile">One</div>
+        <div class="tile">Two</div>
+      </div>
+      <div id="padded">
+        <div class="tile">Inside</div>
+      </div>
+    </section>
+  </div>
+
+  <div class="demo demo-narrow">
+    <section class="card">
+      <h2>Alike on the page</h2>
+      <p style="color: var(--text-secondary); font-size: 13px; margin: 0;">
+        Select one, cmd-click a second, then take the rest in one go.
+      </p>
+      <div class="alike">
+        <button class="btn btn-sm btn-secondary" type="button">Monday</button>
+        <button class="btn btn-sm btn-secondary" type="button">Tuesday</button>
+        <button class="btn btn-sm btn-secondary" type="button">Wednesday</button>
+        <button class="btn btn-sm btn-secondary" type="button">Thursday</button>
+        <button class="btn btn-sm btn-secondary" type="button">Friday</button>
+        <button class="btn btn-sm btn-secondary" type="button">Saturday</button>
+        <button class="btn btn-sm btn-secondary" type="button">Sunday</button>
+        <button class="btn btn-sm btn-secondary" type="button">Weekdays</button>
+        <button class="btn btn-sm btn-secondary" type="button">Weekend</button>
       </div>
     </section>
 
