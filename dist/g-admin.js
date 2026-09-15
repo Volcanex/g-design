@@ -175,6 +175,23 @@
       if (v == null) host.removeAttribute(attr);
       else host.setAttribute(attr, v);
     }
+    mirrorAccent();
+  }
+
+  /* A project that rebranded g-system did it by overriding the accent slot on
+     its :root, and nothing else. The overlay carries the same token layer
+     re-scoped to :host, where an inline custom property on the host element
+     wins, so copying those five across is the whole of wearing the host's
+     brand: primary buttons and the switch come out in it, greys and spacing
+     stay g-system. A page that never rebranded resolves none of them and gets
+     stock g. Read alongside the theme rather than once at boot, because a
+     rebrand is allowed to name a different accent per theme. */
+  function mirrorAccent() {
+    const cs = getComputedStyle(document.documentElement);
+    for (const token of ["--accent", "--accent-fill", "--accent-fill-hover", "--accent-fg", "--accent-edge"]) {
+      const value = cs.getPropertyValue(token).trim();
+      if (value) host.style.setProperty(token, value);
+    }
   }
   /* The x-ray sheet is painted pixels, not styled nodes, so a theme change
      repaints the page around it and would leave it in the colours of the

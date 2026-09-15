@@ -11,9 +11,12 @@ graduates into this file.
 
 - `packages/g-ui/src/components/admin-stub.js` is the **only** part in the
   public bundle. It is concatenated into `g-ui.js` like any other fragment and
-  costs about 0.6KB gzipped. It does nothing unless `localStorage["g-admin"]`
-  is set (`?gadmin=1` sets it), and even then it only injects the overlay if
-  `{base}/verify` answers 200.
+  costs about 0.9KB gzipped. It does nothing unless `localStorage["g-admin"]`
+  is set (`?gadmin=1` sets it, cmd+shift+K toggles it, the bar's "off" clears
+  it), and even then it only injects the overlay if `{base}/verify` answers
+  200. **It is not minified by the build**, so a comment in there costs real
+  bytes against the 23KB gate; the reasoning that does not have to be read at
+  the keyboard belongs in this file instead.
 - `packages/g-ui/src/admin/g-admin.js|css` build to `dist/g-admin.js|css`,
   **separate files, never concatenated into g-ui.js or g.css**. `vendor.mjs`
   copies them beside `g-ui.js`, which is how the stub finds them: it resolves
@@ -168,6 +171,22 @@ placed by a layout engine that put it back. Three answers, all in edit mode:
   walking to it, not by aiming at it, which is why the docs card puts the
   overlapped stack in the left column. The legend moves out from under the
   inspector with a sibling rule, which is why it is appended last.
+- **The hotkey lives in the stub, not here.** cmd+shift+K (ctrl+shift+K off a
+  Mac) has to work on a page where the overlay has never loaded, so the
+  listener has to be the part that always ships. Pressed cold it arms, probes
+  and injects; pressed with the overlay up it calls `window.__gAdminOff()`.
+  It ignores the key when focus is in a field, and it reads focus through one
+  shadow root, because a document whose overlay has focus reports only the
+  host element.
+- **The overlay wears the host page's accent.** At boot, and again whenever
+  the theme changes, the five accent tokens are read off the host page's
+  `:root` and set as inline custom properties on the `<g-admin>` element. The
+  token layer in g-admin.css is scoped to `:host`, where an inline property
+  wins, so a project that rebranded g-system gets an overlay in its own accent
+  and everything else stays g-system. A page that resolves none of them is
+  left alone. The theme observer does the re-read because a rebrand is allowed
+  to name a different accent per theme, and a value frozen at boot would be
+  the wrong one after a theme switch.
 - **Zero is on the grid.** The spacing scale lookup returns the stop, not the
   token name, so a value of 0 reads as on-scale and unnamed rather than off the
   scale. Anything that is genuinely off the scale is flagged in place, never
