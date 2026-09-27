@@ -26,6 +26,9 @@
     <div class="test"><span class="name">Toast flood</span><span>10 toasts in 400ms; stack stays capped and ordered</span><span class="badge badge-plain" id="t-toast">Waiting</span></div>
     <div class="test"><span class="name">Copy spam</span><span>12 rapid clicks resolve to one clean copied state</span><span class="badge badge-plain" id="t-copy">Waiting</span></div>
     <div class="test"><span class="name">Interrupted hold</span><span>5 pressed-then-released holds; nothing left mid-sweep</span><span class="badge badge-plain" id="t-hold">Waiting</span></div>
+    <div class="test"><span class="name">Library thrash</span><span>600 items: 30 searches, 20 page flips, 9 stars and 12 category swaps in a burst</span><span class="badge badge-plain" id="t-lib">Waiting</span></div>
+    <div class="test"><span class="name">Interrupt sheet</span><span>A full-height sheet opened and closed 6 times mid-slide</span><span class="badge badge-plain" id="t-sheet">Waiting</span></div>
+    <div class="test"><span class="name">Menu at the edge</span><span>A context menu opened in each corner stays on screen, one at a time</span><span class="badge badge-plain" id="t-ctx">Waiting</span></div>
     <div class="test"><span class="name">Theme thrash</span><span>Theme flipped 8 times in a burst</span><span class="badge badge-plain" id="t-theme">Waiting</span></div>
   </div>
   <div class="subjects">
@@ -35,6 +38,9 @@
   </div>
   <p class="cap">Every test asserts real end-state, not just the absence of exceptions: one uncaught error anywhere fails the run. Fast scrolling, spammed input and interrupted gestures are the checklist; nothing here queues an animation.</p>
 
+  <div id="s-lib" style="height: 160px; border: 1px solid var(--border-subtle); border-radius: var(--radius-card); overflow: hidden"></div>
+  <dialog class="dlg g-sheet" id="r-sheet"><div class="g-sheet-head"><div class="g-sheet-title"><h2>Sheet</h2></div></div><div class="g-sheet-body"></div></dialog>
+  <div class="menu" popover id="r-menu" role="menu"><button class="menu-item" role="menuitem">First</button><button class="menu-item" role="menuitem">Second</button></div>
   <dialog class="dlg" id="r-dlg"><div class="dlg-body"><span class="dlg-title">Interruption target</span><span class="dlg-desc">Opened and closed faster than its own transition.</span></div></dialog>
 
 <script>
@@ -76,6 +82,38 @@ async function gauntlet() {
   }
   await sleep(200);
   set("t-hold", errors === 0 && !hold.hasAttribute("data-holding"));
+
+  const items = Array.from({ length: 600 }, (_, i) => ({ id: "p" + i, label: `Part ${i} ${i % 3 ? "iron" : "timber"}`, category: `Set ${i % 4}/Group ${i % 7}` }));
+  const lib = g.library(document.getElementById("s-lib"), { items, pageSize: 50, noun: ["part", "parts"] });
+  const input = lib.el.querySelector("input");
+  for (let i = 0; i < 30; i++) { input.value = "timber".slice(0, (i % 6) + 1); input.dispatchEvent(new Event("input")); await sleep(5); }
+  for (let i = 0; i < 20; i++) { lib.page(i % 5); await sleep(5); }
+  const firstOnPage = () => lib.el.querySelector(".g-tile-main");
+  for (let i = 0; i < 9; i++) { firstOnPage().dispatchEvent(new KeyboardEvent("keydown", { key: "f", bubbles: true })); await sleep(5); }
+  const starred = firstOnPage().dataset.id;
+  for (let i = 0; i < 12; i++) { lib.category(["all", "favourites", "recent", "Set 1", "Set 2/Group 3"][i % 5]); await sleep(5); }
+  lib.category("all");
+  const timbers = items.filter((it) => it.label.includes("timber")).length;
+  const pagesShown = lib.el.querySelectorAll('.g-library-foot [data-page]:not([data-page="prev"]):not([data-page="next"])').length;
+  set("t-lib", errors === 0 && lib.state.query === "timber" && lib.el.querySelector(".g-library-count").textContent === `${timbers} parts found`
+    && lib.state.favourites.length === 1 && lib.state.favourites[0] === starred && lib.el.querySelectorAll(".g-tile").length === 50 && pagesShown >= 3);
+
+  const sheet = document.getElementById("r-sheet");
+  for (let i = 0; i < 6; i++) { sheet.showModal(); await sleep(60); sheet.close(); await sleep(60); }
+  await sleep(300);
+  set("t-sheet", errors === 0 && !sheet.open);
+
+  const menu = document.getElementById("r-menu");
+  let onScreen = true;
+  for (const [x, y] of [[0, 0], [innerWidth - 1, 0], [innerWidth - 1, innerHeight - 1], [0, innerHeight - 1]]) {
+    g.contextMenu(menu, x, y);
+    await sleep(30);
+    const r = menu.getBoundingClientRect();
+    onScreen = onScreen && r.left >= 0 && r.top >= 0 && r.right <= innerWidth && r.bottom <= innerHeight;
+  }
+  const openMenus = document.querySelectorAll(".menu:popover-open").length;
+  menu.hidePopover();
+  set("t-ctx", errors === 0 && onScreen && openMenus === 1);
 
   for (let i = 0; i < 8; i++) { g.theme(i % 2 ? "dark" : "light"); await sleep(40); }
   g.theme("dark");

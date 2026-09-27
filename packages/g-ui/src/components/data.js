@@ -73,8 +73,23 @@
     menu.style.setProperty("--_origin", "top left");
     menu.style.left = Math.max(8, Math.min(x, innerWidth - w - 8)) + "px";
     menu.style.top = Math.max(8, Math.min(y, innerHeight - h - 8)) + "px";
-    menu.querySelector(".menu-item:not(:disabled)")?.focus({ preventScroll: true });
+    /* focus and highlight agree, so the first arrow press moves off it */
+    menu.querySelectorAll("[data-highlighted]").forEach((i) => i.removeAttribute("data-highlighted"));
+    const first = menu.querySelector(".menu-item:not(:disabled)");
+    first?.setAttribute("data-highlighted", "");
+    first?.focus({ preventScroll: true });
   }
+
+  /* g.contextMenu(menu, x, y): the same open, for a consumer that decides
+     what was hit itself (a canvas, a map, a 3D scene) and fills the menu
+     before showing it. Call it from a contextmenu handler, after
+     preventDefault; the pointerup hand-off above applies unchanged. The
+     menu must have been through g.init once (render it, keep it). */
+  g.contextMenu = (menu, x, y) => {
+    const open = () => showMenuAt(menu, x, y);
+    if (pointerDown) pendingOpen = open;
+    else open();
+  };
 
   function initContextMenu(target) {
     if (!once(target, "data-ctx-init")) return;
@@ -82,9 +97,7 @@
     if (!menu) return;
     target.addEventListener("contextmenu", (e) => {
       e.preventDefault();
-      const open = () => showMenuAt(menu, e.clientX, e.clientY);
-      if (pointerDown) pendingOpen = open;
-      else open();
+      g.contextMenu(menu, e.clientX, e.clientY);
     });
   }
 

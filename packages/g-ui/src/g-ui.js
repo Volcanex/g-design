@@ -140,6 +140,18 @@
       ind.style.translate = tab.offsetLeft + "px 0";
       if (focus) tab.focus();
     }
+    /* Tabs that start hidden (in a closed dialog or sheet) measure zero, so
+       the indicator is placed again whenever the strip changes size, without
+       a transition when it had no size to move from. */
+    new ResizeObserver(() => {
+      const cur = tabs.querySelector('.tab[aria-selected="true"]');
+      if (!cur || !cur.offsetWidth) return;
+      const snap = !ind.offsetWidth;
+      if (snap) ind.style.transition = "none";
+      ind.style.width = cur.offsetWidth + "px";
+      ind.style.translate = cur.offsetLeft + "px 0";
+      if (snap) { void ind.offsetWidth; ind.style.transition = ""; }
+    }).observe(tabs);
     items.forEach((t) => t.addEventListener("click", () => select(t)));
     tabs.addEventListener("keydown", (e) => {
       const i = items.indexOf(document.activeElement);

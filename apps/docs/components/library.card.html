@@ -1,0 +1,64 @@
+<!-- @dsCard group="Components" name="Library" subtitle="A searchable, paged grid of things to pick, beside a category tree with recent and favourites." viewport="960x640" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Library</title>
+<link rel="stylesheet" href="../assets/g.css">
+<script defer src="../assets/g-ui.js"></script>
+<style>
+  body { padding: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-4); }
+  .cap { font-size: 12px; color: var(--text-secondary); line-height: var(--lh-1); max-width: 720px; margin: 0; }
+  .frame { height: 440px; border: 1px solid var(--border-subtle); border-radius: var(--radius-card); overflow: hidden; background: var(--bg-panel); }
+  .row { display: flex; align-items: center; gap: var(--sp-3); }
+  #picked { font-size: 12px; line-height: var(--lh-1); color: var(--text-secondary); }
+</style>
+</head>
+<body>
+  <div class="row">
+    <span class="label">Street parts</span>
+    <span id="picked" aria-live="polite">Nothing picked yet</span>
+  </div>
+  <div class="frame"><div id="lib"></div></div>
+  <p class="cap">Data in, events out: the consumer passes items with a label, a meta line and a slash-path category, and listens for g-library:pick. Tiles are text: a label and a meta line, with no placeholder art. Type to filter, Enter picks the first result, arrows walk the grid, F stars a tile. Past the page size the set pages with the shipped pagination.</p>
+<script>
+  /* a demo set a little past two pages of 60: every object in the finishes it comes in */
+  const OBJECTS = [
+    ["Street/Furniture", "Bench", ["cast iron", "timber slat", "recycled plastic", "granite"]],
+    ["Street/Furniture", "Litter bin", ["steel", "cast iron", "timber clad"]],
+    ["Street/Furniture", "Bollard", ["cast iron", "steel", "granite", "timber", "concrete", "retractable"]],
+    ["Street/Furniture", "Planter", ["timber", "corten steel", "concrete"]],
+    ["Street/Furniture", "Cycle stand", ["steel", "stainless"]],
+    ["Street/Lighting", "Lamppost", ["heritage", "LED column", "wall bracket", "sodium, 1970s"]],
+    ["Street/Lighting", "Bollard light", ["steel", "stainless"]],
+    ["Street/Signs", "Road sign", ["give way", "no entry", "20 zone", "one way", "bus lane", "school"]],
+    ["Street/Signs", "Street name plate", ["enamel", "aluminium", "cast iron"]],
+    ["Services/Utilities", "Telegraph pole", ["timber", "timber with lamp"]],
+    ["Services/Utilities", "Cabinet", ["BT green", "electricity", "traffic signal"]],
+    ["Services/Utilities", "Manhole cover", ["round", "square", "double"]],
+    ["Services/Transport", "Bus shelter", ["one bay", "two bay", "three bay"]],
+    ["Services/Transport", "Bus stop flag", ["pole", "shelter mounted"]],
+  ];
+  const SIZES = ["small", "standard", "large", "long"];
+  const items = [];
+  for (const [cat, obj, finishes] of OBJECTS)
+    for (const f of finishes)
+      for (const s of SIZES.slice(0, finishes.length > 3 ? 2 : 3))
+        items.push({
+          id: `${obj}-${f}-${s}`.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+          label: `${obj}, ${f}`,
+          meta: s === "standard" ? "Standard size" : `${s[0].toUpperCase()}${s.slice(1)}`,
+          category: cat,
+        });
+  addEventListener("DOMContentLoaded", () => {
+    const lib = g.library(document.getElementById("lib"), {
+      items, noun: ["part", "parts"], pageSize: 60, favourites: [items[2].id, items[9].id], recent: [items[0].id],
+    });
+    lib.el.addEventListener("g-library:pick", (e) => {
+      lib.current(e.detail.item.id);
+      document.getElementById("picked").textContent = `Picked ${e.detail.item.label}`;
+    });
+  });
+</script>
+</body>
+</html>

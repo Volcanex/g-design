@@ -1,0 +1,229 @@
+/* g-library: a searchable grid of things to pick (props, parts, tools,
+   assets) beside a category tree with recent and favourites, paged past a
+   page size. library.js renders the parts; this file styles them.
+
+   Tiles are text only: a label and a meta line. There is no thumbnail slot
+   until there are real renders to put in it, because a wall of placeholder
+   art reads worse than a clean list of names. */
+
+.g-library {
+  --g-tile-min: 176px;
+  --g-library-side: 208px;
+  display: grid;
+  grid-template-columns: var(--g-library-side) minmax(0, 1fr);
+  min-height: 0;
+  height: 100%;
+  font-family: var(--font-ui);
+  font-size: var(--font-size-ui);
+  line-height: var(--lh-2);
+}
+
+.g-library-side {
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--sp-2);
+  border-right: 1px solid var(--border-subtle);
+}
+.g-library-side .g-tree { padding: 0; }
+.g-library-n {
+  flex: 0 0 auto;
+  margin-left: auto;
+  font-size: 12px;
+  line-height: var(--lh-1);
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+/* the hairline is painted 4px down an 8px strip, so everything around it
+   stays on the grid */
+.g-library-rule {
+  height: var(--sp-2);
+  margin: 0 var(--sp-2);
+  background: linear-gradient(var(--border-subtle), var(--border-subtle)) 0 var(--sp-1) / 100% 1px no-repeat;
+}
+
+.g-library-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+.g-library-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-3) calc(var(--sp-3) - 1px);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.g-library-search { position: relative; display: block; flex: 1 1 auto; min-width: 0; }
+.g-library-search .input { padding-left: calc(var(--pad-control-x) + 20px); }
+.g-library-search .input::-webkit-search-cancel-button { display: none; }
+/* magnifying-glass, the Phosphor glyph, as a mask like the select caret */
+.g-library-search::before {
+  content: "";
+  position: absolute;
+  left: var(--pad-control-x);
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  translate: 0 -50%;
+  background: var(--text-placeholder);
+  pointer-events: none;
+  mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"/></svg>') center / contain no-repeat;
+}
+.g-library-count {
+  flex: 0 0 auto;
+  font-size: 12px;
+  line-height: var(--lh-1);
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.g-library-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--sp-3);
+}
+.g-library-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--g-tile-min), 1fr));
+  gap: var(--sp-2);
+  align-content: start;
+}
+.g-library-grid:empty { display: none; }
+.g-library .empty .btn { margin-top: var(--sp-1); }
+
+.g-library-foot {
+  justify-content: center;
+  padding: calc(var(--sp-2) - 1px) var(--sp-3) var(--sp-2);
+  border-top: 1px solid var(--border-subtle);
+}
+.g-library-foot[hidden] { display: none; }
+
+/* ---------------------------------------------------------------- tile */
+
+.g-tile { position: relative; min-width: 0; }
+.g-tile-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  width: 100%;
+  /* the border comes out of the padding, so a text tile is 52px */
+  padding: calc(var(--sp-2) - 1px) calc(var(--sp-3) - 1px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+.g-tile-main:hover { background: var(--fill-hover); border-color: var(--border); }
+.g-tile-main:active { background: var(--fill-active); }
+.g-tile-main:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+.g-tile-main[aria-current="true"] { border-color: var(--accent-edge); background: var(--fill-active); }
+.g-tile-main:disabled { cursor: default; color: var(--text-placeholder); background: transparent; }
+.g-tile-main:disabled .g-tile-meta { color: var(--text-placeholder); }
+
+.g-tile-text { display: flex; flex-direction: column; min-width: 0; }
+/* the right padding keeps a long label clear of the favourite star */
+.g-tile-label,
+.g-tile-meta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-right: var(--sp-5);
+}
+.g-tile-label { font-weight: 500; line-height: var(--lh-2); }
+.g-tile-meta { font-size: 12px; line-height: var(--lh-1); color: var(--text-secondary); }
+.g-tile-meta.mono { font-family: var(--font-mono); font-size: 11px; }
+
+.g-tile-fav {
+  position: absolute;
+  top: var(--sp-2);
+  right: var(--sp-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--h-1);
+  height: var(--h-1);
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  opacity: 0;
+}
+.g-tile-fav svg { width: 14px; height: 14px; }
+/* one filled star, outlined while off: the stroke on the 256 grid matches
+   the regular Phosphor weight */
+.g-tile-fav .g-star { fill: none; stroke: currentColor; stroke-width: 16; stroke-linejoin: round; overflow: visible; }
+.g-tile-fav[aria-pressed="true"] .g-star { fill: currentColor; }
+.g-tile-fav:hover { background: var(--fill-hover); color: var(--text-primary); }
+.g-tile-fav:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 0; }
+.g-tile:hover .g-tile-fav,
+.g-tile:focus-within .g-tile-fav,
+.g-tile-fav[aria-pressed="true"] { opacity: 1; }
+.g-tile-fav[aria-pressed="true"] { color: var(--text-primary); }
+
+@media (max-width: 720px) {
+  .g-library { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+  .g-library-side { max-height: calc(var(--h-2) * 4 + var(--sp-4)); border-right: none; border-bottom: 1px solid var(--border-subtle); }
+  .g-library { --g-tile-min: 144px; }
+}
+
+/* ---------------------------------------------------------------- sheet */
+
+/* A dialog.dlg variant docked to an edge at full height: the same surface,
+   border and backdrop, sliding in on the sheet duration and spring rather
+   than scaling up. No drop shadow: the backdrop separates it, and a shadow
+   on a full-height layer trips the software-raster wash the app shell hit. */
+dialog.dlg.g-sheet {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: min(var(--g-sheet-w, 960px), calc(100vw - var(--sp-7)));
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  border-width: 0 1px 0 0;
+  border-radius: 0;
+  box-shadow: none;
+  scale: 1;
+  translate: -100% 0;
+  transition:
+    opacity var(--dur-sheet) var(--spring-sheet),
+    translate var(--dur-sheet) var(--spring-sheet),
+    overlay var(--dur-sheet) allow-discrete,
+    display var(--dur-sheet) allow-discrete;
+}
+dialog.dlg.g-sheet[data-side="right"] { inset: 0 0 0 auto; border-width: 0 0 0 1px; translate: 100% 0; }
+dialog.dlg.g-sheet[open] { display: flex; flex-direction: column; translate: 0 0; scale: 1; }
+@starting-style {
+  dialog.dlg.g-sheet[open] { translate: -100% 0; scale: 1; }
+  dialog.dlg.g-sheet[data-side="right"][open] { translate: 100% 0; }
+}
+
+.g-sheet-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: calc(var(--sp-3) - 1px) var(--sp-3) 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.g-sheet-head .tabs { border-bottom: none; margin: 0 calc(var(--sp-3) * -1); padding: 0 var(--sp-2); }
+.g-sheet-title {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: var(--h-3);
+}
+.g-sheet-title h2 { flex: 1 1 auto; margin: 0; font-size: 15px; line-height: var(--lh-2); font-weight: 500; }
+.g-sheet-body { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+.g-sheet-body > [role="tabpanel"] { flex: 1 1 auto; min-height: 0; }
+.g-sheet-body > [hidden] { display: none; }

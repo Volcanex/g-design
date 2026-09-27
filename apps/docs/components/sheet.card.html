@@ -1,0 +1,80 @@
+<!-- @dsCard group="Components" name="Sheet" subtitle="A full-height dialog docked to an edge, here holding a tabbed spawn menu of libraries." viewport="960x640" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sheet</title>
+<link rel="stylesheet" href="../assets/g.css">
+<script defer src="../assets/g-ui.js"></script>
+<style>
+  body { padding: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-4); }
+  .cap { font-size: 12px; color: var(--text-secondary); line-height: var(--lh-1); max-width: 640px; margin: 0; }
+  .row { display: flex; align-items: center; gap: var(--sp-3); }
+  #picked { font-size: 12px; line-height: var(--lh-1); color: var(--text-secondary); }
+</style>
+</head>
+<body>
+  <div class="row">
+    <button class="btn btn-secondary" id="open" type="button">Open spawn menu <span class="kbd">Q</span></button>
+    <span id="picked" aria-live="polite"></span>
+  </div>
+  <p class="cap">dialog.dlg.g-sheet: the dialog's surface, border and backdrop, docked full height and sliding in on the sheet duration and spring, with no drop shadow. data-side="right" docks it the other way. Escape or a backdrop click closes it. The tabs are the shipped tabs; each panel is a library.</p>
+
+  <dialog class="dlg g-sheet" id="spawn" aria-labelledby="spawn-title">
+    <div class="g-sheet-head">
+      <div class="g-sheet-title">
+        <h2 id="spawn-title">Spawn</h2>
+        <button class="btn btn-tertiary btn-sm btn-icon" type="button" aria-label="Close" onclick="this.closest('dialog').close()"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></button>
+      </div>
+      <div class="tabs" role="tablist" aria-label="Spawn menu">
+        <button class="tab" role="tab" aria-selected="true" aria-controls="t-props">Props</button>
+        <button class="tab" role="tab" aria-controls="t-ents">Entities</button>
+        <button class="tab" role="tab" aria-controls="t-tools">Tools</button>
+        <button class="tab" role="tab" aria-controls="t-mats">Materials</button>
+      </div>
+    </div>
+    <div class="g-sheet-body">
+      <div role="tabpanel" id="t-props"></div>
+      <div role="tabpanel" id="t-ents" hidden></div>
+      <div role="tabpanel" id="t-tools" hidden></div>
+      <div role="tabpanel" id="t-mats" hidden></div>
+    </div>
+  </dialog>
+<script>
+  const P = (id, label, cat) => ({ id, label, meta: id, metaMono: true, category: cat });
+  const DATA = {
+    "t-props": { noun: ["prop", "props"], items: [
+      P("prop/bench-slat-iron", "Bench", "Newcastle/Street furniture"),
+      P("prop/bin-wheelie-green", "Wheelie bin", "Newcastle/Street furniture"),
+      P("prop/bus-shelter-3bay", "Bus shelter", "Newcastle/Transport"),
+      P("prop/lamppost-8m-led", "Lamppost", "Newcastle/Lighting"),
+      P("prop/telegraph-pole", "Telegraph pole", "Newcastle/Utilities"),
+    ] },
+    "t-ents": { noun: ["entity", "entities"], items: [
+      P("logic/relay", "Relay", "Logic"), P("logic/timer", "Timer", "Logic"), P("logic/counter", "Counter", "Logic"),
+      P("logic/trigger", "Trigger zone", "Logic"), P("logic/speaker", "Speaker", "Sound"),
+    ] },
+    "t-tools": { noun: ["tool", "tools"], items: [
+      { id: "move", label: "Move", meta: "Drag the gizmo to place it" },
+      { id: "weld", label: "Weld", meta: "Pick two things to join them" },
+      { id: "wire", label: "Wire", meta: "When this happens, do that" },
+      { id: "remove", label: "Remove", meta: "Take away what you placed" },
+    ] },
+    "t-mats": { noun: ["material", "materials"], items: [], empty: { title: "No materials to paint with yet", desc: "Surfaces arrive with the texture library. Until then this tab stays empty rather than guessing." } },
+  };
+  addEventListener("DOMContentLoaded", () => {
+    const dlg = document.getElementById("spawn");
+    for (const [id, d] of Object.entries(DATA)) {
+      const lib = g.library(document.getElementById(id), d);
+      lib.el.addEventListener("g-library:pick", (e) => {
+        document.getElementById("picked").textContent = `Picked ${e.detail.item.label}`;
+        dlg.close();
+      });
+    }
+    document.getElementById("open").addEventListener("click", () => dlg.showModal());
+    dlg.showModal();
+    document.querySelector("#t-props input").focus();
+  });
+</script>
+</body>
+</html>

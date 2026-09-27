@@ -123,6 +123,19 @@ consumer that runs it.
   `g.init(root)` after the first render; every fragment guards with a
   `data-*-init` attribute, but core `initMenu` does not, so render a
   `.menu` once and keep the element.
+- Picking chrome ships as fragments (2026-09, 1.3.0, for the Newcastle
+  forge): `library` (`g.library(el, {items, noun, pageSize, storageKey})`,
+  a searchable paged grid of text-first `.g-tile`s beside a `.g-tree` of
+  All, Recent, Favourites and slash-path categories; emits
+  `g-library:pick` and `g-library:favourite`; no thumbnail slot until real
+  renders exist, rather than placeholder art), the sheet
+  (`dialog.dlg.g-sheet`, full height, `data-side="right"` optional, with
+  `.g-sheet-head`, `.g-sheet-title`, `.g-sheet-body`; no shadow, same
+  reason as the shell) and `g.contextMenu(menu, x, y)` in data.js for a
+  surface that does its own hit testing. The library renders its own
+  pagination from `.g-pages` markup stamped `data-pages-init`, so data.js
+  leaves it alone. `.tabs` now re-measure their indicator when the strip
+  resizes, so tabs that start inside a closed dialog show it on open.
 - The app shell is `.g-shell`: persistent chrome, off-canvas sidebar
   sheet under 720px behind `.g-scrim`, toggled by `.g-nav-toggle`
   (gi-list morphs to an x). Do NOT put a box-shadow on the open sheet: a
