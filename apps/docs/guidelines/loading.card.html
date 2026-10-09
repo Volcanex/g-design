@@ -1,0 +1,91 @@
+<!-- @dsCard group="Guidelines" name="Page loading" subtitle="First paint, page change and slow data: one choreography, chrome stays put." viewport="760x560" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Page loading</title>
+<link rel="stylesheet" href="../assets/g.css">
+<script defer src="../assets/g-ui.js"></script>
+<style>
+  body { padding: var(--sp-5); display: grid; grid-template-columns: 1fr 320px; gap: var(--sp-6); align-items: start; }
+  .rules { display: flex; flex-direction: column; gap: var(--sp-2); font-size: var(--font-size-ui); }
+  .rule { display: flex; gap: var(--sp-2); align-items: baseline; }
+  .rule .mono { color: var(--text-placeholder); font-size: 11px; white-space: nowrap; min-width: 102px; flex: none; }
+
+  .mini { border: 1px solid var(--border-subtle); border-radius: var(--radius-card); overflow: hidden; }
+  .mini-top { height: var(--h-3); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: var(--sp-2); padding: 0 var(--sp-3); }
+  .mini-top .dot { width: 16px; height: 16px; border-radius: var(--radius-sm); background: var(--accent-fill); }
+  .mini-top .pill { height: 14px; width: 90px; border-radius: var(--radius-full); background: var(--fill-active); }
+  .mini-body { display: grid; grid-template-columns: 64px 1fr; min-height: 220px; }
+  .mini-nav { border-right: 1px solid var(--border-subtle); padding: var(--sp-2); display: flex; flex-direction: column; gap: 4px; }
+  .mini-nav span { height: 14px; border-radius: var(--radius-sm); background: var(--fill-hover); }
+  .mini-nav span.on { background: var(--fill-active); }
+  .mini-view { padding: var(--sp-3); display: flex; flex-direction: column; gap: 8px; }
+  .mini-view .card { padding: var(--sp-2) var(--sp-3); font-size: 12px; display: flex; align-items: center; gap: 8px; }
+  .controls { display: flex; gap: 8px; margin-top: var(--sp-3); }
+  .cap { font-size: 12px; color: var(--text-secondary); line-height: 1.55; margin-top: var(--sp-3); }
+</style>
+</head>
+<body>
+  <div class="rules">
+    <h3>The rules</h3>
+    <div class="rule"><span class="mono">first paint</span>Content enters once with the stagger: 4px rise, 200ms ease-out, 30ms per sibling. Never scroll-triggered, never replayed.</div>
+    <div class="rule"><span class="mono">chrome</span>The sidebar and top bar persist across navigation. They never re-render, move or blink; only content answers.</div>
+    <div class="rule"><span class="mono">page change</span>Old content sinks out in 100ms (fade, 4px). The next view sweeps in with the same stagger as first load, so navigation and arrival feel like one system.</div>
+    <div class="rule"><span class="mono">interruption</span>Rapid navigation cancels the pending swap; the last destination wins. No queue, ever.</div>
+    <div class="rule"><span class="mono">slow data</span>A skeleton mirrors the final layout exactly, waits 350ms before appearing so quick loads never flash it, and shimmers left to right. Lists and tables get skeletons; compact elements get an inline spinner; under about a second, nothing at all.</div>
+    <div class="rule"><span class="mono">reduced motion</span>Everything above falls back to crossfades. Feedback stays, movement goes.</div>
+    <div class="rule"><span class="mono">api</span><span><span class="mono">g.swap(view, update)</span> is the whole mechanism: mark the container <span class="mono">.view.enter</span> and hand it new content.</span></div>
+    <div class="rule"><span class="mono">real pages</span><span>Full document navigations get the same choreography from CSS alone via <span class="mono">@view-transition</span>, with speculation-rules prerender for instant arrival. <a href="vt/a.html">Try the two-page demo</a>.</span></div>
+  </div>
+  <div>
+    <div class="mini" aria-label="Miniature app frame">
+      <div class="mini-top"><span class="dot"></span><span class="pill"></span></div>
+      <div class="mini-body">
+        <div class="mini-nav"><span class="on" id="mn-a"></span><span id="mn-b"></span><span></span></div>
+        <div class="mini-view view enter" id="mini-view"></div>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="btn btn-secondary btn-sm" onclick="flip()">Change page</button>
+      <button class="btn btn-tertiary btn-sm" onclick="slow()">Slow load</button>
+    </div>
+    <p class="cap">Change page: the frame's chrome holds still while the content swaps. Slow load: skeletons hold the exact layout, then the real rows replace them in place.</p>
+  </div>
+
+  <template id="m-a">
+    <div class="card"><span class="badge badge-ok">Live</span>brain-mcp<span style="flex:1"></span><span class="mono" style="color:var(--text-secondary)">84 ms</span></div>
+    <div class="card"><span class="badge badge-ok">Live</span>gcommand<span style="flex:1"></span><span class="mono" style="color:var(--text-secondary)">121 ms</span></div>
+    <div class="card"><span class="badge badge-warn">Degraded</span>state-api<span style="flex:1"></span><span class="mono" style="color:var(--text-secondary)">402 ms</span></div>
+  </template>
+  <template id="m-b">
+    <div class="card"><span class="avatar" style="width:20px;height:20px;font-size:9px">RA</span><b>Robin</b>&nbsp;deployed edition 42<span style="flex:1"></span><span class="mono" style="color:var(--text-placeholder)">2m</span></div>
+    <div class="card"><span class="avatar" style="width:20px;height:20px;font-size:9px">MH</span><b>Mira</b>&nbsp;updated tokens<span style="flex:1"></span><span class="mono" style="color:var(--text-placeholder)">26m</span></div>
+  </template>
+  <template id="m-skel">
+    <div class="card"><span class="skeleton" style="width:44px;height:16px;border-radius:var(--radius-full)"></span><span class="skeleton skeleton-text" style="width:40%"></span><span style="flex:1"></span><span class="skeleton skeleton-text" style="width:34px"></span></div>
+    <div class="card"><span class="skeleton" style="width:44px;height:16px;border-radius:var(--radius-full)"></span><span class="skeleton skeleton-text" style="width:46%"></span><span style="flex:1"></span><span class="skeleton skeleton-text" style="width:34px"></span></div>
+    <div class="card"><span class="skeleton" style="width:44px;height:16px;border-radius:var(--radius-full)"></span><span class="skeleton skeleton-text" style="width:36%"></span><span style="flex:1"></span><span class="skeleton skeleton-text" style="width:34px"></span></div>
+  </template>
+
+<script>
+let onA = true;
+const view = () => document.getElementById("mini-view");
+function show(tpl) {
+  view().replaceChildren(document.getElementById(tpl).content.cloneNode(true));
+}
+function flip() {
+  onA = !onA;
+  document.getElementById("mn-a").classList.toggle("on", onA);
+  document.getElementById("mn-b").classList.toggle("on", !onA);
+  g.swap(view(), () => show(onA ? "m-a" : "m-b"));
+}
+function slow() {
+  g.swap(view(), () => show("m-skel"));
+  clearTimeout(window._slowT);
+  window._slowT = setTimeout(() => g.swap(view(), () => show(onA ? "m-a" : "m-b")), 1600);
+}
+show("m-a");
+</script>
+</body>
+</html>

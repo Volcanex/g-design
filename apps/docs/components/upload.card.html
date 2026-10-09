@@ -1,0 +1,135 @@
+<!-- @dsCard group="Components" name="Upload" subtitle="A pinned bar for the whole job, a bar and a rate per asset, and the toast that outlives the panel." viewport="760x600" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Upload</title>
+<link rel="stylesheet" href="../assets/g.css">
+<script defer src="../assets/g-ui.js"></script>
+<style>
+  body { padding: var(--sp-5); display: grid; grid-template-columns: 1fr 236px; gap: var(--sp-5); align-items: start; }
+  .panel { border: 1px solid var(--card-border); border-top-color: var(--card-highlight); border-radius: var(--radius-card); background: var(--card-bg); overflow: hidden; }
+  .panel-head { display: flex; align-items: center; gap: var(--sp-3); padding: 12px var(--sp-4); border-bottom: 1px solid var(--border-subtle); }
+  .panel-head .card-title { flex: 1; }
+  .scroller { max-height: 268px; overflow-y: auto; position: relative; }
+  .file { display: grid; grid-template-columns: 1fr 76px 104px 72px; gap: var(--sp-3); align-items: center; padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--border-subtle); font-size: var(--font-size-ui); }
+  .file:last-child { border-bottom: none; }
+  .file .name { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .file .name span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .file svg { width: 15px; height: 15px; flex: none; color: var(--text-placeholder); }
+  .file .size { font-size: 11px; color: var(--text-placeholder); font-variant-numeric: tabular-nums; flex: none; }
+  .file .progress-readout { min-width: 0; }
+  .file .badge { justify-self: end; }
+  .foot { display: flex; align-items: center; gap: var(--sp-3); padding: 12px var(--sp-4); border-top: 1px solid var(--border-subtle); }
+  .foot .mono { font-size: 11px; color: var(--text-secondary); font-variant-numeric: tabular-nums; margin-left: auto; }
+  .aside { display: flex; flex-direction: column; gap: var(--sp-3); font-size: 12px; color: var(--text-secondary); }
+  .aside .card { display: flex; flex-direction: column; gap: var(--sp-2); line-height: 1.55; }
+</style>
+</head>
+<body>
+  <div class="panel">
+    <div class="panel-head">
+      <span class="card-title">Upload assets</span>
+      <span class="badge badge-plain" id="u-state">Ready</span>
+    </div>
+    <div class="scroller">
+      <div class="g-progress g-progress-pinned" id="u-all" data-readout="u-num"></div>
+      <div class="file"><span class="name"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M213.66,82.34l-56-56A8,8,0,0,0,152,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V88A8,8,0,0,0,213.66,82.34ZM160,51.31,188.69,80H160ZM200,216H56V40h88V88a8,8,0,0,0,8,8h48V216Z"/></svg><span>edition-42-hero.png</span><span class="size">2.4 MB</span></span><div class="g-progress" data-file></div><span class="progress-readout" data-readout></span><span class="badge badge-plain" data-badge>Waiting</span></div>
+      <div class="file"><span class="name"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M213.66,82.34l-56-56A8,8,0,0,0,152,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V88A8,8,0,0,0,213.66,82.34ZM160,51.31,188.69,80H160ZM200,216H56V40h88V88a8,8,0,0,0,8,8h48V216Z"/></svg><span>kontrol-palette.svg</span><span class="size">88 KB</span></span><div class="g-progress" data-file></div><span class="progress-readout" data-readout></span><span class="badge badge-plain" data-badge>Waiting</span></div>
+      <div class="file"><span class="name"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M213.66,82.34l-56-56A8,8,0,0,0,152,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V88A8,8,0,0,0,213.66,82.34ZM160,51.31,188.69,80H160ZM200,216H56V40h88V88a8,8,0,0,0,8,8h48V216Z"/></svg><span>spine-walkthrough.mp4</span><span class="size">41 MB</span></span><div class="g-progress" data-file></div><span class="progress-readout" data-readout></span><span class="badge badge-plain" data-badge>Waiting</span></div>
+      <div class="file"><span class="name"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M213.66,82.34l-56-56A8,8,0,0,0,152,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V88A8,8,0,0,0,213.66,82.34ZM160,51.31,188.69,80H160ZM200,216H56V40h88V88a8,8,0,0,0,8,8h48V216Z"/></svg><span>tokens-2026-09.json</span><span class="size">12 KB</span></span><div class="g-progress" data-file></div><span class="progress-readout" data-readout></span><span class="badge badge-plain" data-badge>Waiting</span></div>
+      <div class="file"><span class="name"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M213.66,82.34l-56-56A8,8,0,0,0,152,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V88A8,8,0,0,0,213.66,82.34ZM160,51.31,188.69,80H160ZM200,216H56V40h88V88a8,8,0,0,0,8,8h48V216Z"/></svg><span>probe-report.pdf</span><span class="size">1.1 MB</span></span><div class="g-progress" data-file></div><span class="progress-readout" data-readout></span><span class="badge badge-plain" data-badge>Waiting</span></div>
+      <div class="file"><span class="name"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M213.66,82.34l-56-56A8,8,0,0,0,152,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V88A8,8,0,0,0,213.66,82.34ZM160,51.31,188.69,80H160ZM200,216H56V40h88V88a8,8,0,0,0,8,8h48V216Z"/></svg><span>state-api-schema.graphql</span><span class="size">7 KB</span></span><div class="g-progress" data-file></div><span class="progress-readout" data-readout></span><span class="badge badge-plain" data-badge>Waiting</span></div>
+    </div>
+    <div class="foot">
+      <button class="btn btn-primary btn-sm" id="u-go">Upload six assets</button>
+      <span class="progress-readout" id="u-num"></span>
+    </div>
+  </div>
+  <div class="aside">
+    <div class="card">
+      <span class="card-title">The pinned bar</span>
+      <span>One bar owns the whole job and sticks to the top edge of the panel, so it stays in view however far you scroll the list. It squares off flush with the edge: pinned progress is an edge, not an object.</span>
+    </div>
+    <div class="card">
+      <span class="card-title">Per asset</span>
+      <span>Each row carries its own bar, rate and status, because one stalled file among six is the thing you need to see. A bar says how far; the readout beside it says how fast and how much longer, in mono tabular figures so the numbers never shift the row.</span>
+    </div>
+    <div class="card">
+      <span class="card-title">Leaving the panel</span>
+      <span>Close the panel mid-upload and the work keeps going in a loading toast, which resolves in place. Progress never lives only inside the thing that started it.</span>
+    </div>
+  </div>
+
+<script>
+const rows = [...document.querySelectorAll(".file")];
+const all = document.getElementById("u-all");
+const foot = document.getElementById("u-num");
+const state = document.getElementById("u-state");
+const go = document.getElementById("u-go");
+/* real byte sizes, so the rates and the total are the same arithmetic a real
+   upload would do */
+const SIZES = [2.4e6, 88e3, 41e6, 12e3, 1.1e6, 7e3];
+const TOTAL = SIZES.reduce((a, b) => a + b, 0);
+let running;
+
+const bar = (r) => r.querySelector("[data-file]");
+const badge = (r) => r.querySelector("[data-badge]");
+const readout = (r) => r.querySelector("[data-readout]");
+
+function reset() {
+  rows.forEach((r) => {
+    g.progress(bar(r), 0);
+    readout(r).textContent = "";
+    g.status(badge(r), { label: "Waiting" });
+  });
+  g.progress(all, 0);
+  foot.textContent = "";
+  g.status(state, { label: "Ready" });
+}
+
+function upload() {
+  clearInterval(running);
+  reset();
+  g.status(state, { kind: "info", label: "Uploading" });
+  const toast = g.toast({ title: "Uploading six assets", desc: "0%", kind: "loading", progress: 0 });
+  const p = rows.map(() => 0);
+  let i = 0;
+  const started = performance.now();
+  /* reported often and in small steps, so every fill reads as one movement */
+  running = setInterval(() => {
+    if (i >= rows.length) return;
+    if (p[i] === 0) g.status(badge(rows[i]), { kind: "info", label: "Sending" });
+    p[i] = Math.min(1, p[i] + 0.12);
+
+    const sent = p.reduce((a, v, n) => a + v * SIZES[n], 0);
+    const secs = (performance.now() - started) / 1000;
+    const rate = sent / Math.max(secs, 0.001);
+    const done = sent / TOTAL;
+
+    g.progress(bar(rows[i]), p[i], g.rate(rate));
+    /* the pinned bar reports into the footer readout it points at */
+    g.progress(all, done, [
+      g.bytes(sent) + " of " + g.bytes(TOTAL),
+      g.rate(rate),
+      g.eta((TOTAL - sent) / Math.max(rate, 1)),
+    ]);
+    toast.update({ progress: done, desc: Math.round(done * 100) + "%, " + g.rate(rate) });
+
+    if (p[i] === 1) {
+      g.status(badge(rows[i]), { kind: "ok", label: "Done" });
+      readout(rows[i]).textContent = g.bytes(SIZES[i]);
+      i++;
+      if (i === rows.length) {
+        clearInterval(running);
+        g.status(state, { kind: "ok", label: "Complete" });
+        toast.update({ title: "Six assets uploaded", desc: g.bytes(TOTAL) + " in " + Math.round(secs) + "s", kind: "ok", progress: null });
+      }
+    }
+  }, 90);
+}
+go.addEventListener("click", upload);
+if (window.g?.progress) reset(); else window.addEventListener("DOMContentLoaded", reset);
+</script>
+</body>
+</html>

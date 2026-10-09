@@ -1,0 +1,72 @@
+<!-- @dsCard group="Components" name="Forms" subtitle="Fields, selection controls, validation. Real inputs, styled." viewport="760x540" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Forms</title>
+<link rel="stylesheet" href="../assets/g.css">
+<script defer src="../assets/g-ui.js"></script>
+<style>
+  body { padding: var(--sp-5); display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-6); align-items: start; }
+  form, .col { display: flex; flex-direction: column; gap: var(--sp-4); }
+  .choices { display: flex; flex-direction: column; gap: var(--sp-3); }
+  .switch-row { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); }
+  .switch-row .meta { display: flex; flex-direction: column; gap: var(--sp-1); }
+  .switch-row .meta span:last-child { font-size: 12px; color: var(--text-secondary); }
+</style>
+</head>
+<body>
+  <form onsubmit="return false">
+    <div class="field">
+      <label class="label" for="f-name">Service name</label>
+      <input class="input" id="f-name" placeholder="production-api" autocomplete="off">
+      <span class="hint">Lowercase, hyphens allowed.</span>
+    </div>
+    <div class="field">
+      <label class="label" for="f-region">Region</label>
+      <span class="select-wrap">
+        <select class="select" id="f-region">
+          <option>eu-central, Nuremberg</option>
+          <option>eu-north, Helsinki</option>
+        </select>
+      </span>
+    </div>
+    <div class="field">
+      <label class="label" for="f-domain">Domain</label>
+      <input class="input" id="f-domain" value="api.example" aria-invalid="true" aria-describedby="f-domain-err">
+      <span class="error" id="f-domain-err"><svg viewBox="0 0 256 256" fill="currentColor" width="13" height="13" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-80V80a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,172Z"/></svg>Domain needs a top-level part. Add .com or similar.</span>
+    </div>
+    <div class="field">
+      <label class="label" for="f-notes">Notes <span class="optional">optional</span></label>
+      <textarea class="textarea" id="f-notes" placeholder="Anything the on-call person should know"></textarea>
+    </div>
+  </form>
+  <div class="col">
+    <div class="field">
+      <span class="label">Visibility</span>
+      <div class="choices">
+        <label class="choice"><input type="radio" class="radio" name="vis" checked>Private to the workspace</label>
+        <label class="choice"><input type="radio" class="radio" name="vis">Anyone with the link</label>
+      </div>
+    </div>
+    <hr class="separator">
+    <div class="field">
+      <span class="label">Checks on deploy</span>
+      <div class="choices">
+        <label class="choice"><input type="checkbox" class="checkbox" checked>Run health probe</label>
+        <label class="choice"><input type="checkbox" class="checkbox" checked>Verify AA contrast</label>
+        <label class="choice"><input type="checkbox" class="checkbox">Warm the cache</label>
+      </div>
+    </div>
+    <hr class="separator">
+    <div class="switch-row">
+      <span class="meta"><span class="label">Alerts</span><span>Page the spine when a check fails.</span></span>
+      <input type="checkbox" class="switch" checked aria-label="Alerts">
+    </div>
+    <div class="switch-row">
+      <span class="meta"><span class="label">Auto-deploy</span><span>Ship green builds without asking.</span></span>
+      <input type="checkbox" class="switch" aria-label="Auto-deploy">
+    </div>
+  </div>
+</body>
+</html>

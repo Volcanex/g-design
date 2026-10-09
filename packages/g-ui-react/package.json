@@ -1,0 +1,23 @@
+{
+  "name": "@g-design/ui-react",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "vite build"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.1.1",
+    "vite": "^8.2.2"
+  },
+  "dependencies": {
+    "@base-ui/react": "^1.7.0",
+    "@number-flow/react": "^0.6.2",
+    "cmdk": "^1.1.1",
+    "motion": "^13.2.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "sonner": "^2.0.8",
+    "vaul": "^1.1.2"
+  }
+}

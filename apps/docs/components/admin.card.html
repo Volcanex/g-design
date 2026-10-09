@@ -1,0 +1,259 @@
+<!-- @dsCard group="Components" name="Admin overlay" subtitle="The g-admin bar, annotate mode and the edit inspector, running against a mocked ticket api." viewport="1000x1520" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Admin overlay</title>
+<meta name="g-admin-base" content="/mock/gadmin">
+<meta name="g-admin-project" content="Docs demo">
+<link rel="stylesheet" href="../assets/g.css">
+<script>
+  /* The overlay only loads for an armed browser that a server confirmed is an
+     admin, so this card has to be both. Arming is one localStorage key; the
+     admin api is mocked in front of fetch, which also lets the demo show a
+     ticket count and accept a POST without a backend.
+
+     The key is cleared on the way out. Another card on this origin that kept
+     it would fire one verify request at a path that does not exist, get a 404
+     and stay invisible, which is the failure mode by design. */
+  try { localStorage.setItem("g-admin", "1"); } catch {}
+  addEventListener("pagehide", () => { try { localStorage.removeItem("g-admin"); } catch {} });
+
+  const BASE = "/mock/gadmin";
+  const tickets = [
+    { id: 1, status: "open", kind: "visual", severity: "minor", note: "The card heading sits too close to its list." },
+    { id: 2, status: "open", kind: "edit", severity: "polish", note: "Row gap should be one step wider." },
+  ];
+  const real = window.fetch.bind(window);
+  window.fetch = (input, init) => {
+    const url = typeof input === "string" ? input : input.url;
+    const path = url.replace(location.origin, "");
+    if (!path.startsWith(BASE)) return real(input, init);
+    const reply = (body, status = 200) => Promise.resolve(
+      new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } }));
+    if (path === BASE + "/verify") return reply({ admin: true });
+    if (path.startsWith(BASE + "/tickets?")) return reply(tickets.filter((t) => t.status === "open"));
+    if (path === BASE + "/tickets" && init?.method === "POST") {
+      const ticket = { id: tickets.length + 1, status: "open", ...JSON.parse(init.body) };
+      tickets.push(ticket);
+      window.__lastTicket = ticket;
+      return reply(ticket, 201);
+    }
+    return reply({ error: "no such route" }, 404);
+  };
+</script>
+<script defer src="../assets/g-ui.js"></script>
+<style>
+  /* The bar is fixed and changes no host layout, so a page that wants its
+     first 28px back gives them back itself. */
+  body { padding: calc(var(--h-2) + var(--sp-5)) var(--sp-5) var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-4); }
+  .cap { font-size: 12px; color: var(--text-secondary); line-height: 1.5; max-width: 640px; }
+  .demo { display: flex; gap: var(--sp-4); align-items: flex-start; }
+  .demo .card { flex: 1 1 0; display: flex; flex-direction: column; gap: var(--sp-3); }
+  .demo .card ul { margin: 0; padding-left: var(--sp-4); color: var(--text-secondary); font-size: 13px; }
+  .demo .card li { line-height: var(--lh-2); }
+  .toolbar { display: flex; align-items: center; gap: var(--sp-2); }
+
+  /* Four levels of nesting in one box, so x-ray has depth to draw and the
+     brackets have a chain to walk. */
+  .nest { padding: var(--sp-4); border: 1px solid var(--border-subtle); border-radius: var(--radius); }
+  .nest-row { display: flex; gap: var(--sp-3); }
+  .nest-cell { flex: 1 1 0; padding: var(--sp-3); border-radius: var(--radius-sm); background: var(--well-bg); }
+  .nest-cell p { margin: 0 0 var(--sp-2); font-size: 12px; color: var(--text-secondary); }
+
+  /* Three boxes on top of each other. The top one takes every click, so the
+     two underneath are reachable only by alt-clicking or by walking. */
+  .stack { position: relative; height: 128px; }
+  .stack > div { position: absolute; border-radius: var(--radius-sm); }
+  .stack .under { inset: 0; background: var(--well-bg); border: 1px solid var(--border-subtle); }
+  .stack .middle { inset: 16px 48px 16px 16px; background: var(--surface-1); border: 1px solid var(--border); }
+  .stack .over {
+    inset: 32px 96px 32px 32px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--surface-2); border: 1px solid var(--accent-edge);
+    font-size: 12px; color: var(--text-secondary);
+  }
+
+  /* Three tiles with two different gaps between them: 24px is one step of
+     the scale, 13px is on nothing. Measure names the first and flags the
+     second. */
+  /* The inspector owns the right 320px whenever something is selected, and a
+     click that lands there never reaches the page. Anything this card asks
+     you to click twice in a row lives inside this width. */
+  .demo-narrow { max-width: 640px; }
+  .gaps { display: flex; align-items: flex-start; }
+  .tile {
+    width: 72px; height: 56px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);
+    background: var(--well-bg);
+    font-size: 12px; color: var(--text-secondary);
+  }
+  #tile-b { margin-left: 24px; }
+  #tile-c { margin-left: 13px; }
+
+  /* Three ways of producing the same looking gap, so clicking one has a
+     different owner each time: the container's own gap, a container's
+     padding, and a sibling's margin (the tiles above). */
+  #owned { display: flex; gap: var(--sp-4); }
+  #padded {
+    display: flex;
+    padding: var(--sp-5);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+  }
+
+  .alike { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+</style>
+</head>
+<body>
+  <p class="cap">
+    Arm a browser once with <span class="mono">?gadmin=1</span>, or press <span class="kbd">cmd</span>
+    <span class="kbd">shift</span> <span class="kbd">K</span>, and every page that ships g-ui.js grows this bar,
+    for that browser and that admin session only. The same keys take it away again. Where the host page
+    rebranded g-design, the overlay wears that accent too. Annotate mode pins elements and draws over them.
+    Edit mode selects one and edits its spacing, alignment and type live, snapped to the spacing scale
+    the host page declares. Nothing writes to source: both save a ticket, and an agent bakes it afterwards.
+  </p>
+  <p class="cap">
+    X-ray is a lens over either mode: it paints every visible box at once, margin in one tint and padding
+    in another, outlines fading with nesting depth, and flags any edge off the 4px grid. In edit mode
+    <span class="kbd">[</span> and <span class="kbd">]</span> walk the selection up and down the ancestry,
+    alt-click reaches an element another element covers, and the breadcrumb under the selector says where
+    you are. Esc steps back out one layer at a time.
+  </p>
+  <p class="cap">
+    Every applied edit flashes the box it changed, and the margin pane says so when a margin will not
+    behave: an inline box, a positioned element, an item spaced by its flex or grid container. Edits are
+    written inline and mirrored into one stylesheet in the head, so they survive an app page that rebuilds
+    the element underneath them. Revert takes both away.
+  </p>
+  <p class="cap">
+    With something selected, hovering anything else measures the distance between the two and names the
+    spacing stop each gap is nearest, in the warning tint where it is on none. <span class="kbd">shift</span>
+    click adds to the selection and the controls then write to every element in it.
+    <span class="kbd">delete</span> hides one, as a pending <span class="mono">display: none</span> that
+    reverts and tickets like any other edit. The text tool, <span class="kbd">t</span> or the switch in the
+    bar, edits a line of copy in place and saves it as a content ticket.
+    <span class="kbd">shift</span> <span class="kbd">/</span> lists every key.
+  </p>
+  <p class="cap">
+    A multi-selection says what its elements have in common, the shared tag and every class all of them
+    carry, or the tags it is mixed from. Where they share a tag and a class it offers to select everything
+    else like it on the page, up to the eight a ticket carries, and says so when that cap bites. The shape
+    goes into the ticket summary too, so a baking agent reads six edits on three elements as one change to
+    a class rather than three coincidences.
+  </p>
+  <p class="cap">
+    Every measured gap is clickable. The chip jumps the selection to whatever owns that gap, the container's
+    padding, the container's own gap, or a sibling's margin, opens the pane the property lives in and
+    flashes the row, and says in one line what it decided. Where two declarations are both adding to the
+    gap it names the one it did not pick.
+  </p>
+
+  <div class="demo">
+    <section class="card">
+      <h2>Weekly digest</h2>
+      <p style="color: var(--text-secondary); font-size: 13px;">Three things moved this week.</p>
+      <ul>
+        <li>Tokens regenerated from the upstream scale</li>
+        <li>Pane splitter reports its size on release</li>
+        <li>Rhythm audit runs in the e2e suite</li>
+      </ul>
+      <div class="toolbar">
+        <button class="btn btn-sm btn-primary" type="button">Publish digest</button>
+        <button class="btn btn-sm btn-tertiary" type="button">Save draft</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Off the scale</h2>
+      <p id="odd" style="padding: 13px; color: var(--text-secondary); font-size: 13px;">
+        This paragraph is padded 13px, which is on nothing. Select it in edit mode and the padding rows
+        flag it as off scale until a step puts it back on.
+      </p>
+    </section>
+  </div>
+
+  <!-- The inspector sidebar takes the right 320px of the viewport while
+       something is selected, so the stack that has to stay clickable is the
+       left card here. -->
+  <div class="demo">
+    <section class="card">
+      <h2>Overlapped stack</h2>
+      <div class="stack" id="stack">
+        <div class="under"></div>
+        <div class="middle"></div>
+        <div class="over">Alt-click me twice</div>
+      </div>
+    </section>
+
+    <section class="card nest" id="nest">      <h2>Nested layout</h2>
+      <div class="nest-row">
+        <div class="nest-cell">
+          <p>Card, row, cell, paragraph.</p>
+          <span class="badge badge-plain">Four deep</span>
+        </div>
+        <div class="nest-cell">
+          <p>Select the badge, then walk out to the cell, the row and the card.</p>
+          <button class="btn btn-sm btn-tertiary" type="button">Walk from here</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="demo demo-narrow">
+    <section class="card" id="measure-card">
+      <h2>Measure the gaps</h2>
+      <p style="color: var(--text-secondary); font-size: 13px; margin: 0;">
+        Select one tile, then hover another.
+      </p>
+      <div class="gaps">
+        <div class="tile" id="tile-a">A</div>
+        <div class="tile" id="tile-b">B</div>
+        <div class="tile" id="tile-c">C</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>What owns this gap</h2>
+      <p style="color: var(--text-secondary); font-size: 13px; margin: 0;">
+        Select one box, hover the next, then click the number.
+      </p>
+      <div id="owned">
+        <div class="tile">One</div>
+        <div class="tile">Two</div>
+      </div>
+      <div id="padded">
+        <div class="tile">Inside</div>
+      </div>
+    </section>
+  </div>
+
+  <div class="demo demo-narrow">
+    <section class="card">
+      <h2>Alike on the page</h2>
+      <p style="color: var(--text-secondary); font-size: 13px; margin: 0;">
+        Select one, cmd-click a second, then take the rest in one go.
+      </p>
+      <div class="alike">
+        <button class="btn btn-sm btn-secondary" type="button">Monday</button>
+        <button class="btn btn-sm btn-secondary" type="button">Tuesday</button>
+        <button class="btn btn-sm btn-secondary" type="button">Wednesday</button>
+        <button class="btn btn-sm btn-secondary" type="button">Thursday</button>
+        <button class="btn btn-sm btn-secondary" type="button">Friday</button>
+        <button class="btn btn-sm btn-secondary" type="button">Saturday</button>
+        <button class="btn btn-sm btn-secondary" type="button">Sunday</button>
+        <button class="btn btn-sm btn-secondary" type="button">Weekdays</button>
+        <button class="btn btn-sm btn-secondary" type="button">Weekend</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Editable copy</h2>
+      <p id="copy-one" style="color: var(--text-secondary); font-size: 13px; margin: 0;">Turn the text tool on, click this line and type.</p>
+      <p id="copy-two" style="color: var(--text-secondary); font-size: 13px; margin: 0;">A text edit is a pending edit: revert takes it away, save turns it into a content ticket.</p>
+    </section>
+  </div>
+</body>
+</html>

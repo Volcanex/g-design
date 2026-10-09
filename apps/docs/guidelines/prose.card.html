@@ -1,0 +1,62 @@
+<!-- @dsCard group="Guidelines" name="Prose" subtitle="Long-form rendered content: one class, calm rhythm, and where markdown stops." viewport="760x860" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Prose</title>
+<link rel="stylesheet" href="../assets/g.css">
+<script defer src="../assets/g-ui.js"></script>
+<style>
+  body { padding: var(--sp-6) var(--sp-5); display: flex; justify-content: center; }
+</style>
+</head>
+<body>
+  <article class="prose">
+    <h1>Shipping the edition</h1>
+    <p>Rendered markdown gets the <code>.prose</code> class and nothing else. Width caps at 68 characters, the line height opens up to 1.65, and headings keep the interface scale so documents and dashboards feel like one product.</p>
+    <h2>How publishing works</h2>
+    <p>An edition is a frozen static build. The pipeline compiles every post, stamps the grid, and swaps the symlink; <strong>nothing is rendered at request time</strong>. Rolling back is pointing the symlink at the previous edition.</p>
+    <blockquote>Publish is the same word the whole way through: the Publish button makes a Published toast and a published edition.</blockquote>
+    <ul>
+      <li>Posts are files under <code>pages/</code>, one directory per post</li>
+      <li>Drafts never leave the machine they were written on</li>
+      <li>Images are downscaled at compile time, not upload time</li>
+    </ul>
+    <pre><code>g edition publish
+# builds, verifies, swaps the symlink in one step</code></pre>
+    <h3>Numbers in text</h3>
+    <p>Inline figures such as 1,241,082 requests or a P95 of 118 ms stay in the text face; tabular alignment is for columns, not sentences.</p>
+    <hr>
+    <p>Everything above is default element styling inside one wrapper class. No per-page CSS.</p>
+
+    <h2>Where markdown stops</h2>
+    <p><code>.prose</code> is the only place markdown is rendered. Every other slot in the interface is plain text: a table cell, a badge, a page heading, a tooltip, a menu item, a chart label. Chrome has no markdown renderer, so syntax handed to it survives on screen as literal asterisks and backticks.</p>
+    <p>Authored markdown reaches those slots constantly, because titles and summaries are so often lifted from the first line of a body. Flatten at the boundary with <code>g.plain()</code> rather than trusting the source:</p>
+    <pre><code>td.textContent = g.plain(note.title);</code></pre>
+    <p>It handles the truncated case too, which is the one that actually bites: a title cut to eight words keeps its opening <code>**</code> and never sees the closer.</p>
+
+    <table>
+      <thead><tr><th>Source</th><th>Rendered in a label</th></tr></thead>
+      <tbody data-plain-demo></tbody>
+    </table>
+  </article>
+
+<script>
+  const CASES = [
+    "**Archive links promoted over original URLs in citation",
+    "**Poker betting closure with single `acted` flag mechanism",
+    "See [[designs/g-site|the g-site note]] for detail",
+    "snake_case_name stays intact",
+  ];
+  addEventListener("DOMContentLoaded", () => {
+    document.querySelector("[data-plain-demo]").innerHTML = CASES.map((c) => {
+      const cell = document.createElement("td");
+      cell.textContent = g.plain(c);
+      const raw = document.createElement("td");
+      raw.textContent = c;
+      return `<tr>${raw.outerHTML}${cell.outerHTML}</tr>`;
+    }).join("");
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!-- @dsCard group="Components" name="Buttons" subtitle="Contrast-led hierarchy. Colour means something and always carries an icon." viewport="760x680" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Buttons</title>
+<link rel="stylesheet" href="../assets/g.css">
+<script defer src="../assets/g-ui.js"></script>
+<style>
+  body { padding: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-5); }
+  section { display: flex; flex-direction: column; gap: var(--sp-3); }
+  .row { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; }
+  .cap { font-size: 12px; color: var(--text-secondary); }
+</style>
+</head>
+<body>
+  <section>
+    <span class="label">Hierarchy</span>
+    <div class="row">
+      <button class="btn btn-primary">Save changes</button>
+      <button class="btn btn-secondary">Preview</button>
+      <button class="btn btn-tertiary">Cancel</button>
+    </div>
+    <span class="cap">Primary is the far end of the neutral scale. Every neutral control keeps a visible border; no naked ghosts.</span>
+  </section>
+  <section>
+    <span class="label">Meaning</span>
+    <div class="row">
+      <button class="btn btn-go confirm-btn" data-revert data-label="Approve" data-label-done="Approved"><span class="confirm-label">Approve</span></button>
+      <button class="btn btn-danger hold-btn" data-hold-ms="900"><span>Hold to delete</span></button>
+    </div>
+    <span class="cap">Green commits, red destroys; always solid, never used for emphasis. Approve starts bare and draws its tick when clicked. Delete guards itself two ways, chosen from the pointer: on a mouse it is a held press, where the fill sweeps, the trash wiggles and releasing early rewinds it; on touch, where holding reads as a stuck tap, it is a second tap instead, "Delete" then "Really delete?". Both end in one hold-complete event. A view never holds both a contrast primary and a go.</span>
+  </section>
+  <section>
+    <span class="label">Feedback buttons</span>
+    <div class="row">
+      <button class="btn btn-primary save-btn" data-label="Save changes" data-label-done="Saved"><span class="save-label">Save changes</span></button>
+      <button class="btn btn-secondary send-btn" data-label="Send invite" data-label-done="Sent"><span class="send-label">Send invite</span></button>
+      <button class="btn btn-secondary dl-btn" data-label="Download" data-label-done="Downloaded"><span class="dl-label">Download</span></button>
+      <button class="btn btn-secondary btn-icon spin-btn" aria-label="Refresh" data-tip="Refresh"></button>
+      <button class="btn btn-secondary copy-btn" data-copy="npx g-design add button">
+        <span class="copy-label">Copy</span>
+      </button>
+    </div>
+    <span class="cap">The taxonomy: destructive buttons show their icon before, as a warning; feedback buttons earn theirs after. Save is the primary colour, never green, and its floppy springs in and blinks as it writes. Send carries its plane up front, then the plane flies and a check lands. While a download runs, arrows feed into the tray on a conveyor and it flexes as each lands. Refresh does one spring-timed revolution per click. Every label swap pins the width and resets its timer on re-click.</span>
+  </section>
+  <section>
+    <span class="label">Sizes &amp; shapes</span>
+    <div class="row">
+      <button class="btn btn-secondary btn-sm">Small 28</button>
+      <button class="btn btn-secondary">Base 32</button>
+      <button class="btn btn-secondary btn-lg">Large 38</button>
+      <button class="btn btn-secondary btn-icon" aria-label="Add" aria-expanded="false" data-icon="plus" data-tip="Add, springs to close" onclick="this.setAttribute('aria-expanded', this.getAttribute('aria-expanded')==='false')"></button>
+    </div>
+  </section>
+  <section>
+    <span class="label">States</span>
+    <div class="row">
+      <button class="btn btn-primary" data-loading><span>Deploying</span><span class="spinner"></span></button>
+      <button class="btn btn-secondary" disabled>Disabled</button>
+    </div>
+    <span class="cap">Loading overlays the spinner, so the width never changes and nothing reflows.</span>
+  </section>
+  <section>
+    <span class="label">Spec</span>
+    <span class="cap mono" style="font-size:11px">32px tall, 0 12px padding, radius 6.5, 13px/450/−0.003em, gap 6, icon 15, press scale(0.97), 140ms ease-out</span>
+  </section>
+<script>
+document.addEventListener("hold-complete", (e) => {
+  if (e.target.closest(".hold-btn")) g.toast({ title: "Project deleted", desc: "Guarded by a held press or a second tap, so no accidents", kind: "danger" });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,132 @@
+/* g-select and g-combobox, a listbox popup on the Popover API, wired by
+   select.js. The control wears the .input recipe; the popup wears the .menu
+   recipe. `.g-select` is the custom one; `.select` stays the native element. */
+
+.g-select, .g-combobox { position: relative; display: block; }
+
+/* caret-up-down, the same Phosphor glyph the native .select wears */
+.g-select::after, .g-combobox::after {
+  content: "";
+  position: absolute;
+  right: 9px; top: 50%;
+  width: 14px; height: 14px;
+  translate: 0 -50%;
+  background: var(--text-secondary);
+  pointer-events: none;
+  mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><path d="M181.66,170.34a8,8,0,0,1,0,11.32l-48,48a8,8,0,0,1-11.32,0l-48-48a8,8,0,0,1,11.32-11.32L128,212.69l42.34-42.35A8,8,0,0,1,181.66,170.34Zm-96-84.68L128,43.31l42.34,42.35a8,8,0,0,0,11.32-11.32l-48-48a8,8,0,0,0-11.32,0l-48,48A8,8,0,0,0,85.66,85.66Z"/></svg>') center / contain no-repeat;
+}
+
+.g-select-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: var(--h-control);
+  padding: 0 30px 0 var(--pad-control-x);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: var(--font-size-ui);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color var(--dur-base) var(--ease-out),
+    background var(--dur-base) var(--ease-out);
+}
+.g-select-trigger:hover:not(:disabled) { border-color: var(--border-hover); }
+.g-select-trigger[aria-expanded="true"] { border-color: var(--border-hover); background: var(--fill-hover); }
+.g-select-trigger:disabled { opacity: 0.45; cursor: default; }
+.g-select-trigger:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+
+.g-select-value {
+  display: flex; align-items: center; gap: 8px;
+  flex: 1; min-width: 0;
+  overflow: hidden; white-space: nowrap;
+}
+.g-select-trigger[data-empty] .g-select-value { color: var(--text-placeholder); }
+
+.g-combobox .input { padding-right: 30px; }
+
+/* ---- the popup ---- */
+
+.g-listbox {
+  position: fixed;
+  margin: 0;
+  min-width: 180px;
+  max-height: 264px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 4px;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  background: var(--overlay-bg);
+  color: var(--text-primary);
+  box-shadow: var(--overlay-shadow);
+  opacity: 0;
+  scale: 0.97;
+  transform-origin: var(--_origin, top);
+  transition:
+    opacity var(--dur-base) var(--ease-out),
+    scale var(--dur-base) var(--ease-out),
+    overlay var(--dur-base) allow-discrete,
+    display var(--dur-base) allow-discrete;
+}
+.g-listbox:popover-open { opacity: 1; scale: 1; }
+@starting-style { .g-listbox:popover-open { opacity: 0; scale: 0.97; } }
+/* the list holds focus so it can hear the keys; the highlighted row is the
+   visible focus, so a ring around the whole popup would be a second answer */
+.g-listbox:focus { outline: none; }
+
+.g-option {
+  position: relative;
+  display: flex; align-items: center; gap: 8px;
+  width: 100%;
+  min-height: var(--h-2);
+  padding: var(--sp-1) var(--sp-2) var(--sp-1) 27px;
+  border: none; border-radius: var(--radius-sm);
+  background: none;
+  color: var(--text-primary);
+  font-family: var(--font-ui); font-size: var(--font-size-ui); line-height: var(--lh-2);
+  text-align: left;
+  cursor: pointer;
+  scroll-margin: 4px;
+}
+.g-option:hover, .g-option[data-highlighted] { background: var(--fill-hover); }
+.g-option:active { background: var(--fill-active); }
+.g-option[aria-disabled="true"] { color: var(--text-placeholder); cursor: default; pointer-events: none; }
+.g-option[hidden], .g-listbox-empty[hidden] { display: none; }
+
+/* the check draws itself in when a row becomes the chosen one */
+.g-option .gi-check {
+  position: absolute;
+  left: 7px; top: 50%;
+  width: 13px; height: 13px;
+  translate: 0 -50%;
+  color: var(--text-secondary);
+}
+.g-option[aria-selected="true"] .gi-check [data-part="tick"] path { stroke-dashoffset: 0; }
+
+.g-option-meta { margin-left: auto; padding-left: var(--sp-3); color: var(--text-secondary); font-size: 12px; line-height: var(--lh-2); }
+.g-option-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.g-listbox-empty {
+  padding: var(--sp-2);
+  font-size: var(--font-size-ui);
+  line-height: var(--lh-2);
+  color: var(--text-secondary);
+}
+
+@media (pointer: coarse) {
+  .g-option { min-height: 44px; }
+}
+
+/* the popup keeps its crossfade, loses the scale, like .menu does */
+@media (prefers-reduced-motion: reduce) {
+  .g-listbox {
+    scale: 1 !important;
+    transition-property: opacity, overlay, display !important;
+    transition-duration: var(--dur-base) !important;
+  }
+}

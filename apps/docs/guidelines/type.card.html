@@ -1,0 +1,45 @@
+<!-- @dsCard group="Guidelines" name="Type" subtitle="Inter from State, two UI weights, roles not sizes." viewport="760x480" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Type</title>
+<link rel="stylesheet" href="../assets/g.css">
+<style>
+  body { padding: var(--sp-5); display: grid; grid-template-columns: 1fr 220px; gap: var(--sp-6); }
+  .roles { display: flex; flex-direction: column; gap: var(--sp-4); }
+  .role { display: grid; grid-template-columns: 116px 1fr; gap: var(--sp-4); align-items: baseline; }
+  /* role and spec are two facts, so they get a column and a gap each */
+  .role .meta { display: flex; justify-content: space-between; gap: var(--sp-2); font-size: 11px; line-height: var(--lh-1); color: var(--text-placeholder); font-variant-numeric: tabular-nums; }
+  .aside { display: flex; flex-direction: column; gap: var(--sp-3); font-size: 12px; color: var(--text-secondary); }
+  .aside .card { display: flex; flex-direction: column; gap: var(--sp-2); }
+  .nums { font-variant-numeric: tabular-nums; color: var(--text-primary); }
+</style>
+</head>
+<body>
+  <div class="roles">
+    <div class="role"><span class="meta"><span>Title</span><span>24/500</span></span><h1>Deploy with confidence</h1></div>
+    <div class="role"><span class="meta"><span>Heading</span><span>18/500</span></span><h2>Connected services</h2></div>
+    <div class="role"><span class="meta"><span>Subheading</span><span>15/500</span></span><h3>Production database</h3></div>
+    <div class="role"><span class="meta"><span>Body</span><span>14/400</span></span><p>Every surface reads Inter at two weights. Emphasis comes from colour and weight 500, never from a heavier cut.</p></div>
+    <div class="role"><span class="meta"><span>Label</span><span>13/500</span></span><span class="label">Environment name</span></div>
+    <div class="role"><span class="meta"><span>Caption</span><span>12/400</span></span><span style="font-size:12px;color:var(--text-secondary)">Updated 2 minutes ago</span></div>
+    <div class="role"><span class="meta"><span>Mono</span><span>12.5</span></span><span class="mono">state-api, 402 ms, eu-central</span></div>
+  </div>
+  <div class="aside">
+    <div class="card">
+      <span class="card-title">Weights</span>
+      <span>400 body, 500 emphasis, 450 buttons. Never 600 or above in UI.</span>
+    </div>
+    <div class="card">
+      <span class="card-title">Numerics</span>
+      <span class="nums">1,240,081 → 1,240,112<br>99.98%, 84 ms, £25,000</span>
+      <span>Tabular where columns align, via <span class="mono">.num</span>.</span>
+    </div>
+    <div class="card">
+      <span class="card-title">Features</span>
+      <span>InterVariable with optical sizing, <span class="mono">calt liga cv05 cv11</span>, giving the open l and the single-storey a.</span>
+    </div>
+  </div>
+</body>
+</html>

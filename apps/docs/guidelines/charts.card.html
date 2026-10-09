@@ -1,0 +1,172 @@
+<!-- @dsCard group="Guidelines" name="Charts" subtitle="Five renderers on one palette. No axes furniture, no gridlines; linked charts share focus." viewport="760x620" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Charts</title>
+<link rel="stylesheet" href="../assets/g.css">
+<script defer src="../assets/g-ui.js"></script>
+<style>
+  body { padding: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-3); }
+  .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--sp-3); }
+  .stat { display: flex; flex-direction: column; gap: var(--sp-1); padding: var(--sp-3) var(--sp-4); }
+  .stat .k { font-size: 12px; color: var(--text-secondary); }
+  .stat .v { font-size: 20px; font-weight: 500; letter-spacing: -0.01em; }
+  .stat .g-spark { margin-top: var(--sp-2); }
+
+  .panel { display: flex; flex-direction: column; gap: var(--sp-3); }
+  .panel .head { display: flex; align-items: baseline; gap: 8px; }
+  .panel .sub { font-size: 11px; color: var(--text-placeholder); margin-left: auto; }
+  .row { display: grid; grid-template-columns: 1fr 262px; gap: var(--sp-3); }
+  .plot-line { height: 120px; }
+  .plot-bar { height: 120px; }
+  .plot-donut { height: 120px; }
+  .plot-scatter { height: 200px; }
+  .cap { font-size: 12px; color: var(--text-secondary); line-height: 1.55; }
+</style>
+</head>
+<body>
+  <div class="stats">
+    <div class="card stat">
+      <span class="k">Requests today</span>
+      <span class="v num">318k</span>
+      <div class="g-spark" data-values="41,44,39,52,58,54,61" data-color="1"></div>
+    </div>
+    <div class="card stat">
+      <span class="k">Errors today</span>
+      <span class="v num">204</span>
+      <div class="g-spark" data-values="31,26,29,22,25,18,14" data-color="5"></div>
+    </div>
+    <div class="card stat">
+      <span class="k">Latency p95</span>
+      <span class="v num">140 ms</span>
+      <div class="g-spark" data-values="128,133,131,146,139,144,140" data-color="3"></div>
+    </div>
+  </div>
+
+  <div class="card panel">
+    <div class="head">
+      <span class="card-title">Requests by service</span>
+      <span class="sub">Thousands per day, last 7 days</span>
+    </div>
+    <div class="plot-line" id="requests"></div>
+  </div>
+
+  <div class="row">
+    <div class="card panel">
+      <div class="head">
+        <span class="card-title">Latency p95 by service</span>
+        <span class="sub">ms</span>
+      </div>
+      <div class="plot-bar" id="latency"></div>
+    </div>
+    <div class="card panel">
+      <div class="head"><span class="card-title">Storage</span></div>
+      <div class="plot-donut" id="storage"></div>
+    </div>
+  </div>
+
+  <div class="card panel">
+    <div class="head">
+      <span class="card-title">Score against cost</span>
+      <span class="sub">Scatter with the Pareto frontier, log cost axis</span>
+    </div>
+    <div class="plot-line" id="frontier"></div>
+  </div>
+
+  <div class="card panel" id="price-example">
+    <div class="head">
+      <span class="card-title">Price now</span>
+      <span class="sub">Size is speed, hollow is out of play</span>
+      <button class="btn btn-secondary btn-sm" id="raise-stakes">Raise stakes</button>
+      <button class="btn btn-secondary btn-sm" id="change-prices">Change prices</button>
+    </div>
+    <div class="plot-scatter" id="price-now"></div>
+  </div>
+
+  <div class="card panel">
+    <div class="head">
+      <span class="card-title">Score anatomy</span>
+      <span class="sub">Breakdown on a shared axis, linked to the plot above</span>
+    </div>
+    <div id="anatomy"></div>
+  </div>
+
+  <p class="cap">The six categorical colours live in the token layer as <span class="mono">--chart-1</span> to <span class="mono">--chart-6</span>, contrast-derived per theme so a series keeps its identity in both. A renderer writes them into the markup as var() strings rather than resolving them, which is why a theme switch recolours a chart in place with no re-render.</p>
+
+<script>
+  addEventListener("DOMContentLoaded", () => {
+    g.chart.line(document.getElementById("requests"), {
+      labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+      series: [
+        { label: "api", values: [42, 45, 39, 51, 58, 54, 61] },
+        { label: "web", values: [28, 31, 27, 33, 36, 35, 30] },
+        { label: "worker", values: [12, 11, 14, 13, 16, 15, 14] },
+      ],
+    });
+
+    g.chart.bar(document.getElementById("latency"), {
+      labels: ["gateway", "api", "search", "media", "auth"],
+      values: [82, 140, 210, 96, 64],
+    }, { values: true });
+
+    g.chart.donut(document.getElementById("storage"), [
+      { label: "media", value: 420 },
+      { label: "backups", value: 260 },
+      { label: "logs", value: 120 },
+      { label: "artefacts", value: 60 },
+    ], { legend: "side", center: "860", caption: "GB" });
+
+    g.chart.scatter(document.getElementById("frontier"), {
+      points: [
+        { label: "small", x: 0.07, y: 38, group: "vendor a", color: 1 },
+        { label: "mid", x: 0.21, y: 48, group: "vendor a", color: 1, active: true },
+        { label: "large", x: 0.72, y: 52, group: "vendor a", color: 1 },
+        { label: "fast", x: 0.59, y: 41, group: "vendor b", color: 2 },
+        { label: "deep", x: 1.82, y: 54, group: "vendor b", color: 2 },
+        { label: "max", x: 6, y: 58, group: "vendor b", color: 2 },
+      ],
+    }, { frontier: true, xLog: true, xLabel: "Dollars per task", yLabel: "Score", xFormat: (v) => "$" + v.toFixed(2) });
+
+    let prices = [
+      { id: "small", label: "Small", x: 12, y: 38, r: 1.8, color: 1 },
+      { id: "mid", label: "Mid", x: 18, y: 48, r: 1.4, color: 2 },
+      { id: "large", label: "Large", x: 28, y: 52, r: 1, color: 3 },
+      { id: "deep", label: "Deep", x: 38, y: 54, r: 0.6, color: 4 },
+      { id: "gated", label: "Gated", x: 30, y: 57, r: 0.8, color: 4, hollow: true, tip: "Gated, out of play at these stakes" },
+    ];
+    let stakes = 1;
+    const drawPrices = () => {
+      const best = prices.filter((p) => !p.hollow).reduce((a, b) => stakes * b.y - b.x > stakes * a.y - a.x ? b : a);
+      g.chart.scatter(document.getElementById("price-now"), {
+        points: prices.map((p) => ({ ...p, active: p.id === best.id })),
+      }, {
+        xLabel: "Price", yLabel: "Score", xFormat: (v) => "$" + v.toFixed(0),
+        lines: [{ slope: 1 / stakes, through: best, label: "Best value", active: true }],
+      });
+      g.chart.breakdown(document.getElementById("anatomy"), {
+        keys: [{ key: "gain", label: "Quality gain", color: 1 }, { key: "price", label: "Price", sign: -1, color: 5 }],
+        rows: prices.map((p) => ({
+          id: p.id, label: p.label, active: p.id === best.id, hollow: p.hollow,
+          badge: p.id === best.id ? "Pick" : p.hollow ? "Sits out" : "", badgeKind: p.id === best.id ? "ok" : null,
+          parts: [{ key: "gain", value: stakes * p.y }, { key: "price", value: p.x }],
+          note: p.id === best.id ? "" : `Behind by ${Math.round((stakes * best.y - best.x) - (stakes * p.y - p.x))}`,
+        })),
+      }, { guide: best.id, format: (v) => String(Math.round(v)) });
+    };
+    ["price-now", "anatomy"].forEach((id, i, both) => document.getElementById(id).addEventListener("g-chart:focus", (e) =>
+      g.chart.focus(document.getElementById(both[1 - i]), e.detail.id)));
+    drawPrices();
+    document.getElementById("raise-stakes").addEventListener("click", (e) => {
+      stakes = stakes === 1 ? 2 : 1;
+      e.currentTarget.textContent = stakes === 1 ? "Raise stakes" : "Lower stakes";
+      drawPrices();
+    });
+    document.getElementById("change-prices").addEventListener("click", () => {
+      prices = prices.map((p) => ({ ...p, x: Math.max(4, p.x + (Math.random() - 0.5) * 12) }));
+      drawPrices();
+    });
+  });
+</script>
+</body>
+</html>

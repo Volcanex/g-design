@@ -1,0 +1,14 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "menu",
+  "type": "registry:ui",
+  "title": "Menu",
+  "description": "g-design menu: g tokens over Base UI and friends. Pair with g.css (or tokens.css + the react shim).",
+  "files": [
+    {
+      "path": "components/g/menu.jsx",
+      "content": "import { Menu } from \"@base-ui/react/menu\";\n\nexport function GMenu({ trigger, items }) {\n  return (\n    <Menu.Root>\n      <Menu.Trigger render={trigger} />\n      <Menu.Portal>\n        <Menu.Positioner sideOffset={4} align=\"start\">\n          <Menu.Popup className=\"menu rmenu\">\n            {items.map((it, i) =>\n              it === \"-\" ? (\n                <hr className=\"separator\" key={i} />\n              ) : (\n                <Menu.Item\n                  key={it.label}\n                  className={it.danger ? \"menu-item danger\" : \"menu-item\"}\n                  onClick={it.onClick}\n                >\n                  {it.label}\n                </Menu.Item>\n              )\n            )}\n          </Menu.Popup>\n        </Menu.Positioner>\n      </Menu.Portal>\n    </Menu.Root>\n  );\n}\n",
+      "type": "registry:ui"
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+/* g-design: the single entry point for consumers.
+   Link this one file; it pulls in fonts, tokens, and components.
+   assets/g.css already carries the token layer inline (assets/tokens.css is the
+   generated source it is built from), so importing it twice is unnecessary. */
+@import "assets/g.css";
+@import "assets/tw.css";

@@ -1,0 +1,326 @@
+<!-- @dsCard group="Screens" name="App shell" subtitle="Everything composed. Change pages: the chrome stays put and the content sweeps in." viewport="1280x800" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>App shell</title>
+<link rel="stylesheet" href="../../assets/g.css">
+<script defer src="../../assets/g-ui.js"></script>
+<style>
+  .brand { display: flex; align-items: center; gap: 8px; padding: var(--sp-2) var(--sp-2) var(--sp-4); }
+  .brand .mark {
+    width: 22px; height: 22px; border-radius: var(--radius-sm);
+    background: var(--accent-fill); color: var(--accent-fg);
+    display: grid; place-items: center;
+    font-size: 12px; font-weight: 500;
+  }
+  .brand b { font-size: 13px; font-weight: 500; }
+  .nav-item {
+    display: flex; align-items: center; gap: var(--sp-2);
+    height: var(--h-3); padding: 0 8px;
+    border: none; border-radius: var(--radius-sm);
+    background: none; color: var(--text-secondary);
+    font-family: var(--font-ui); font-size: var(--font-size-ui); font-weight: 450;
+    cursor: pointer; text-align: left;
+    transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+  }
+  .nav-item svg { width: 15px; height: 15px; }
+  .nav-item:hover { background: var(--fill-hover); color: var(--text-primary); }
+  .nav-item[aria-current] { background: var(--fill-active); color: var(--text-primary); font-weight: 500; }
+  .nav-head { padding: var(--sp-4) var(--sp-2) var(--sp-1); font-size: 11px; font-weight: 500; color: var(--text-placeholder); }
+  .side-foot { margin-top: auto; display: flex; align-items: center; gap: 8px; padding: 8px; font-size: 12px; }
+  .side-foot .who { display: flex; flex-direction: column; }
+  .side-foot .who span:last-child { color: var(--text-placeholder); font-size: 11px; }
+
+  main { display: flex; flex-direction: column; overflow: auto; }
+  header {
+    display: flex; align-items: center; gap: var(--sp-3);
+    padding: var(--sp-3) var(--sp-5);
+    border-bottom: 1px solid var(--border-subtle);
+    position: sticky; top: 0; background: var(--surface-1); z-index: 5;
+  }
+  .search { position: relative; width: 260px; }
+  .search svg { position: absolute; left: 9px; top: 50%; translate: 0 -50%; width: 14px; height: 14px; color: var(--text-placeholder); }
+  .search .input { padding-left: 30px; padding-right: 54px; }
+  .search .keys { position: absolute; right: 7px; top: 50%; translate: 0 -50%; display: flex; gap: var(--sp-1); }
+
+  .content { padding: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-4); max-width: 980px; }
+  .page-head { display: flex; align-items: center; gap: var(--sp-3); }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-4); }
+  .stat { display: flex; flex-direction: column; gap: 4px; }
+  .stat .v { font-size: 22px; font-weight: 500; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .stat .k { font-size: 12px; color: var(--text-secondary); }
+  .stat .d { font-size: 12px; color: var(--ok-text); display: flex; align-items: center; gap: 4px; }
+  .stat .d svg { width: 12px; height: 12px; }
+  .stat .d.flat { color: var(--text-placeholder); }
+
+  .panel-head { display: flex; align-items: center; gap: var(--sp-3); padding-bottom: var(--sp-3); }
+  .page-head .badge { white-space: nowrap; }
+  @media (max-width: 720px) {
+    .stats { grid-template-columns: 1fr; }
+    header .btn-tertiary:not(.g-nav-toggle), header .avatar { display: none; }
+    .search { flex: 1; width: auto; }
+    .table th, .table td { white-space: nowrap; }
+  }
+  .feed { display: flex; flex-direction: column; }
+  .feed-item { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-3) 0; border-bottom: 1px solid var(--border-subtle); font-size: var(--font-size-ui); }
+  .feed-item:last-child { border-bottom: none; }
+  .feed-item .when { margin-left: auto; font-size: 12px; color: var(--text-placeholder); font-variant-numeric: tabular-nums; }
+  .alert-row { display: flex; align-items: center; gap: var(--sp-3); }
+  .alert-row .meta { display: flex; flex-direction: column; gap: var(--sp-1); }
+  .alert-row .meta span:last-child { font-size: 12px; color: var(--text-secondary); }
+  .settings-row { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4); }
+  .settings-row .meta { display: flex; flex-direction: column; gap: var(--sp-1); max-width: 420px; }
+  .settings-row .meta span:last-child { font-size: 12px; color: var(--text-secondary); }
+</style>
+</head>
+<body class="g-shell">
+  <aside>
+    <div class="brand"><span class="mark">g</span><b>Console</b></div>
+    <button class="nav-item" data-view="overview" aria-current="page"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M219.31,108.68l-80-80a16,16,0,0,0-22.62,0l-80,80A15.87,15.87,0,0,0,32,120v96a8,8,0,0,0,8,8h64a8,8,0,0,0,8-8V160h32v56a8,8,0,0,0,8,8h64a8,8,0,0,0,8-8V120A15.87,15.87,0,0,0,219.31,108.68ZM208,208H160V152a8,8,0,0,0-8-8H104a8,8,0,0,0-8,8v56H48V120l80-80,80,80Z"/></svg>Overview</button>
+    <button class="nav-item" data-view="services"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M223.68,66.15,135.68,18h0a15.88,15.88,0,0,0-15.36,0l-88,48.17a16,16,0,0,0-8.32,14v95.64a16,16,0,0,0,8.32,14l88,48.17a15.88,15.88,0,0,0,15.36,0l88-48.17a16,16,0,0,0,8.32-14V80.18A16,16,0,0,0,223.68,66.15ZM128,32h0l80.34,44L128,120,47.66,76ZM40,90l80,43.78v85.79L40,175.82Zm96,129.57V133.82L216,90v85.78Z"/></svg>Services</button>
+    <button class="nav-item" data-view="activity"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M240,128a8,8,0,0,1-8,8H204.94l-37.78,75.58A8,8,0,0,1,160,216h-.4a8,8,0,0,1-7.08-5.14L95.35,60.76,63.28,131.31A8,8,0,0,1,56,136H24a8,8,0,0,1,0-16H50.85L88.72,36.69a8,8,0,0,1,14.76.46l57.51,151,31.85-63.71A8,8,0,0,1,200,120h32A8,8,0,0,1,240,128Z"/></svg>Activity</button>
+    <button class="nav-item" data-view="alerts" data-icon="bell">Alerts<span class="badge badge-plain" style="margin-left:auto;height:17px">1</span></button>
+    <div class="nav-head">Workspace</div>
+    <button class="nav-item" data-view="members">Members</button>
+    <button class="nav-item" data-view="billing">Billing</button>
+    <button class="nav-item" data-view="settings">Settings</button>
+    <div class="side-foot"><span class="avatar">RA</span><span class="who"><span>Robin</span><span>g-design</span></span></div>
+  </aside>
+  <main>
+    <header>
+      <button class="btn btn-tertiary btn-sm btn-icon g-nav-toggle" aria-label="Menu" aria-expanded="false" data-icon="list" onclick="toggleNav()"></button>
+      <div class="search">
+        <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"/></svg>
+        <input class="input" placeholder="Search or jump to…" onfocus="this.blur();document.querySelector('.cmdk').showModal();document.querySelector('.cmdk-input').focus()">
+        <span class="keys"><span class="kbd">⌘</span><span class="kbd">K</span></span>
+      </div>
+      <span style="flex:1"></span>
+      <button class="btn btn-tertiary btn-sm" data-tip="Comfortable ↔ compact" onclick="g.density(document.documentElement.hasAttribute('data-density')?'comfortable':'compact')">Density</button>
+      <button class="btn btn-tertiary btn-sm" data-tip="Dark ↔ light" onclick="g.theme(document.documentElement.getAttribute('data-theme')==='light'?'dark':'light')">Theme</button>
+      <button class="btn btn-secondary btn-sm">Feedback</button>
+      <span class="avatar">RA</span>
+    </header>
+    <div class="content view enter" id="view"></div>
+  </main>
+
+  <template id="v-overview">
+    <div class="page-head">
+      <h1 style="font-size:18px">Overview</h1>
+      <span class="badge badge-ok">All systems live</span>
+      <span style="flex:1"></span>
+      <button class="btn btn-secondary">Export</button>
+      <button class="btn btn-primary" onclick="g.toast({title:'Deployment started',desc:'g-site, edition 42',kind:'ok'});window.bumpReq&amp;&amp;bumpReq()"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg>New deployment</button>
+    </div>
+    <div class="stats">
+      <div class="card stat"><span class="k">Requests, last 24h</span><span class="v"><number-flow id="nf-req">1,241,082</number-flow></span><span class="d"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M200,64V168a8,8,0,0,1-16,0V83.31L69.66,197.66a8,8,0,0,1-11.32-11.32L172.69,72H88a8,8,0,0,1,0-16H192A8,8,0,0,1,200,64Z"/></svg>8.2% vs yesterday</span><div class="g-spark" data-values="38,41,40,44,43,47,52" style="height:24px;margin-top:4px"></div></div>
+      <div class="card stat"><span class="k">P95 latency</span><span class="v">118 ms</span><span class="d flat">Flat</span><div class="g-spark" data-values="121,118,124,117,119,118,118" data-color="3" style="height:24px;margin-top:4px"></div></div>
+      <div class="card stat"><span class="k">Error rate</span><span class="v">0.03%</span><span class="d"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M200,64V168a8,8,0,0,1-16,0V83.31L69.66,197.66a8,8,0,0,1-11.32-11.32L172.69,72H88a8,8,0,0,1,0-16H192A8,8,0,0,1,200,64Z"/></svg>Improving</span></div>
+    </div>
+    <div class="card" style="padding: var(--pad-card) var(--pad-card) 4px">
+      <div class="panel-head">
+        <span class="card-title">Services</span>
+        <span style="flex:1"></span>
+        <span style="font-size:12px;color:var(--text-placeholder)">Updated 12s ago</span>
+        <button class="btn btn-tertiary btn-sm" onclick="goto('services')">View all</button>
+      </div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>Service</th><th>Region</th><th>Status</th><th class="r">Uptime</th><th class="r">P95</th></tr></thead>
+          <tbody>
+            <tr><td>brain-mcp</td><td>eu-central</td><td><span class="badge badge-ok">Live</span></td><td class="r">99.98%</td><td class="r">84 ms</td></tr>
+            <tr><td>gcommand</td><td>eu-central</td><td><span class="badge badge-ok">Live</span></td><td class="r">99.94%</td><td class="r">121 ms</td></tr>
+            <tr><td>state-api</td><td>eu-central</td><td><span class="badge badge-warn">Degraded</span></td><td class="r">98.71%</td><td class="r">402 ms</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </template>
+
+  <template id="v-services">
+    <div class="page-head">
+      <h1 style="font-size:18px">Services</h1>
+      <span class="badge badge-plain">6</span>
+      <span style="flex:1"></span>
+      <input class="input" placeholder="Filter services" style="width:200px">
+      <button class="btn btn-secondary btn-icon spin-btn" aria-label="Refresh" data-tip="Refresh"></button>
+      <button class="btn btn-primary"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg>New service</button>
+    </div>
+    <div class="card" style="padding: 4px var(--pad-card)">
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>Service</th><th>Region</th><th>Status</th><th class="r">Uptime</th><th class="r">P95</th></tr></thead>
+          <tbody>
+            <tr><td>brain-mcp</td><td>eu-central</td><td><span class="badge badge-ok">Live</span></td><td class="r">99.98%</td><td class="r">84 ms</td></tr>
+            <tr><td>gcommand</td><td>eu-central</td><td><span class="badge badge-ok">Live</span></td><td class="r">99.94%</td><td class="r">121 ms</td></tr>
+            <tr><td>state-api</td><td>eu-central</td><td><span class="badge badge-warn">Degraded</span></td><td class="r">98.71%</td><td class="r">402 ms</td></tr>
+            <tr><td>g-site</td><td>eu-central</td><td><span class="badge badge-ok">Live</span></td><td class="r">99.99%</td><td class="r">67 ms</td></tr>
+            <tr><td>baselinelabs</td><td>eu-north</td><td><span class="badge badge-ok">Live</span></td><td class="r">99.97%</td><td class="r">143 ms</td></tr>
+            <tr><td>render</td><td>eu-central</td><td><span class="badge badge-ok">Live</span></td><td class="r">99.91%</td><td class="r">210 ms</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </template>
+
+  <template id="v-activity">
+    <div class="page-head"><h1 style="font-size:18px">Activity</h1></div>
+    <div class="card feed">
+      <div class="feed-item"><span class="avatar">RA</span><span><b>Robin</b> deployed edition 42</span><span class="when">2m</span></div>
+      <div class="feed-item"><span class="avatar">MH</span><span><b>Mira</b> updated the palette tokens</span><span class="when">26m</span></div>
+      <div class="feed-item"><span class="avatar">g</span><span><b>Probe</b> flagged state-api as degraded</span><span class="when">1h</span></div>
+      <div class="feed-item"><span class="avatar">RA</span><span><b>Robin</b> invited a new member</span><span class="when">3h</span></div>
+      <div class="feed-item"><span class="avatar">g</span><span><b>Probe</b> confirmed baselinelabs recovery</span><span class="when">5h</span></div>
+    </div>
+  </template>
+
+  <template id="v-alerts">
+    <div class="page-head"><h1 style="font-size:18px">Alerts</h1><span class="badge badge-warn">1 open</span></div>
+    <div class="card alert-row">
+      <span class="badge badge-warn">Degraded</span>
+      <span class="meta"><span>state-api P95 above 400ms for 20 minutes</span><span>Opened 1h ago. The probe rechecks every 5 minutes.</span></span>
+      <span style="flex:1"></span>
+      <button class="btn btn-go confirm-btn" data-label="Acknowledge" data-label-done="Acknowledged"><span class="confirm-label">Acknowledge</span></button>
+    </div>
+    <div class="card alert-row" style="opacity:.6">
+      <span class="badge badge-ok">Resolved</span>
+      <span class="meta"><span>baselinelabs timed out twice</span><span>Recovered on its own after 4 minutes, yesterday.</span></span>
+    </div>
+  </template>
+
+  <template id="v-members">
+    <div class="page-head">
+      <h1 style="font-size:18px">Members</h1>
+      <span style="flex:1"></span>
+      <button class="btn btn-primary" onclick="g.toast({title:'Invite sent',kind:'ok'})"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg>Invite member</button>
+    </div>
+    <div class="card feed">
+      <div class="feed-item"><span class="avatar">RA</span><span><b>Robin Ashby</b></span><span class="badge badge-info">Owner</span><span class="when">robin@example.com</span></div>
+      <div class="feed-item"><span class="avatar">MH</span><span><b>Mira Holt</b></span><span class="badge badge-plain">Editor</span><span class="when">Invited 3h ago</span></div>
+    </div>
+  </template>
+
+  <template id="v-billing">
+    <div class="page-head"><h1 style="font-size:18px">Billing</h1></div>
+    <div class="stats">
+      <div class="card stat"><span class="k">Plan</span><span class="v">Workspace</span><span class="d flat">Renews 1 October</span></div>
+      <div class="card stat"><span class="k">This month</span><span class="v">£19.00</span><span class="d flat">Flat</span></div>
+      <div class="card stat"><span class="k">Seats</span><span class="v">2 of 5</span><span class="d flat">3 free</span></div>
+    </div>
+    <div class="card" style="padding: 4px var(--pad-card)">
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>Invoice</th><th>Date</th><th>Status</th><th class="r">Amount</th></tr></thead>
+          <tbody>
+            <tr><td>INV-0042</td><td>1 September</td><td><span class="badge badge-ok">Paid</span></td><td class="r">£19.00</td></tr>
+            <tr><td>INV-0041</td><td>1 August</td><td><span class="badge badge-ok">Paid</span></td><td class="r">£19.00</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </template>
+
+  <template id="v-settings">
+    <div class="page-head"><h1 style="font-size:18px">Settings</h1></div>
+    <div class="card" style="display:flex;flex-direction:column;gap:var(--sp-4)">
+      <div class="field" style="max-width:320px">
+        <label class="label" for="ws-name">Workspace name</label>
+        <input class="input" id="ws-name" value="g-design">
+      </div>
+      <hr class="separator">
+      <div class="settings-row">
+        <span class="meta"><span class="label">Alerts</span><span>Page the spine when a probe crosses into down or warn.</span></span>
+        <input type="checkbox" class="switch" checked aria-label="Alerts">
+      </div>
+      <div class="settings-row">
+        <span class="meta"><span class="label">Auto-deploy</span><span>Ship green builds without asking.</span></span>
+        <input type="checkbox" class="switch" aria-label="Auto-deploy">
+      </div>
+      <hr class="separator">
+      <div style="display:flex;justify-content:flex-end">
+        <button class="btn btn-primary save-btn" data-label="Save changes" data-label-done="Saved"><span class="save-label">Save changes</span></button>
+      </div>
+    </div>
+    <div class="well settings-row">
+      <span class="meta"><span class="label" style="color:var(--danger-text)">Delete workspace</span><span>Removes every service, deployment and member. Held, not clicked, on purpose.</span></span>
+      <button class="btn btn-danger hold-btn" data-hold-ms="1200"><span>Hold to delete</span></button>
+    </div>
+  </template>
+
+  <div class="menu" popover id="svc-menu" role="menu">
+    <button class="menu-item" role="menuitem">Refresh now</button>
+    <button class="menu-item" role="menuitem">Download CSV</button>
+    <hr class="separator">
+    <button class="menu-item danger" role="menuitem">Pause probes</button>
+  </div>
+
+  <dialog class="dlg cmdk" aria-label="Command menu">
+    <input class="cmdk-input" placeholder="Type a command or search…" aria-label="Search commands">
+    <div class="cmdk-list">
+      <div class="cmdk-group">Go to</div>
+      <button class="menu-item" onclick="goto('overview')">Overview<span class="kbd">G</span><span class="kbd">O</span></button>
+      <button class="menu-item" onclick="goto('services')">Services</button>
+      <button class="menu-item" onclick="goto('activity')">Activity</button>
+      <button class="menu-item" onclick="goto('alerts')">Alerts</button>
+      <button class="menu-item" onclick="goto('settings')">Settings</button>
+      <div class="cmdk-group">Actions</div>
+      <button class="menu-item" onclick="g.toast({title:'Deployment started',desc:'Via the command menu',kind:'ok'})">New deployment</button>
+      <button class="menu-item" onclick="g.theme(document.documentElement.getAttribute('data-theme')==='light'?'dark':'light')">Toggle theme</button>
+      <button class="menu-item" onclick="g.density(document.documentElement.hasAttribute('data-density')?'comfortable':'compact')">Toggle density</button>
+      <div class="cmdk-empty" hidden>No results. Try fewer letters.</div>
+    </div>
+  </dialog>
+
+<script>
+/* Router-lite: the chrome never re-renders. Content leaves in 100ms, the
+   next view staggers in via g.swap. */
+let currentView = null;
+function render(name) {
+  const view = document.getElementById("view");
+  view.replaceChildren(document.getElementById("v-" + name).content.cloneNode(true));
+  document.dispatchEvent(new CustomEvent("g:view", { detail: name }));
+}
+function goto(name, viaSwap = true) {
+  if (name === currentView) return;
+  currentView = name;
+  document.querySelectorAll(".nav-item[data-view]").forEach((b) =>
+    b.toggleAttribute("aria-current", b.getAttribute("data-view") === name));
+  const view = document.getElementById("view");
+  if (viaSwap) g.swap(view, () => render(name));
+  else { render(name); window.g?.init?.(view); }
+  if (name === "alerts") {
+    const b = document.querySelector('[data-view="alerts"]');
+    b.removeAttribute("data-ring"); void b.offsetWidth; b.setAttribute("data-ring", "");
+  }
+  toggleNav(false);
+}
+function toggleNav(force) {
+  const open = force !== undefined ? force : !document.body.hasAttribute("data-nav-open");
+  document.body.toggleAttribute("data-nav-open", open);
+  document.querySelector(".g-nav-toggle")?.setAttribute("aria-expanded", open);
+}
+document.querySelectorAll(".nav-item[data-view]").forEach((b) =>
+  b.addEventListener("click", () => goto(b.getAttribute("data-view"))));
+goto("overview", false);
+document.addEventListener("hold-complete", (e) => {
+  if (e.target.closest(".hold-btn")) g.toast({ title: "Workspace deleted", desc: "This is the demo, so not really", kind: "danger" });
+});
+</script>
+<div class="g-scrim" onclick="toggleNav(false)"></div>
+<script type="importmap">{"imports":{"esm-env":"../../assets/vendor/esm-env.js"}}</script>
+<script type="module">
+/* NumberFlow (vendored): digits roll instead of swapping. The static text
+   in the template is the fallback wherever module scripts cannot load.
+   The element is recreated on each visit to Overview, so sync on g:view. */
+import "../../assets/vendor/number-flow/index.mjs";
+let val = 1241082;
+const sync = () => {
+  const nf = document.getElementById("nf-req");
+  if (nf) customElements.whenDefined(nf.localName).then(() => nf.update(val));
+};
+window.bumpReq = () => { val += Math.floor(900 + Math.random() * 1500); sync(); };
+document.addEventListener("g:view", (e) => { if (e.detail === "overview") sync(); });
+sync();
+</script>
+</body>
+</html>

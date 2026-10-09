@@ -1,0 +1,14 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "switch",
+  "type": "registry:ui",
+  "title": "Switch",
+  "description": "g-design switch: g tokens over Base UI and friends. Pair with g.css (or tokens.css + the react shim).",
+  "files": [
+    {
+      "path": "components/g/switch.jsx",
+      "content": "import { Switch as BaseSwitch } from \"@base-ui/react/switch\";\n\nexport function Switch(props) {\n  return (\n    <BaseSwitch.Root className=\"rswitch\" {...props}>\n      <BaseSwitch.Thumb className=\"rswitch-thumb\" />\n    </BaseSwitch.Root>\n  );\n}\n",
+      "type": "registry:ui"
+    }
+  ]
+}

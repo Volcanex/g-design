@@ -1,0 +1,108 @@
+<!-- @dsCard group="Components" name="Data" subtitle="Breadcrumbs, pagination, and a table that sorts, sticks, selects and answers a right-click." viewport="760x640" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Data</title>
+<link rel="stylesheet" href="../assets/g.css">
+<script defer src="../assets/g-ui.js"></script>
+<style>
+  body { padding: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-4); }
+  section { display: flex; flex-direction: column; gap: var(--sp-3); }
+  .row { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; }
+  .cap { font-size: 12px; color: var(--text-secondary); }
+  .table-card { padding: 4px var(--pad-card); --table-max-h: 216px; }
+</style>
+</head>
+<body>
+  <section>
+    <span class="label">Breadcrumb</span>
+    <nav class="g-crumbs" aria-label="Breadcrumb">
+      <ol>
+        <li><a href="#">Home</a></li>
+        <li><a href="#">Services</a></li>
+        <li><a href="#">eu-central</a></li>
+        <li><span aria-current="page">state-api</span></li>
+      </ol>
+    </nav>
+    <span class="cap">The separator is drawn by CSS, so the copy holds only the names. The current page is text, not a link, and carries aria-current.</span>
+  </section>
+
+  <section>
+    <div class="row">
+      <span class="label">Table</span>
+      <span class="badge badge-plain" id="sel-count">Nothing selected</span>
+      <span style="flex:1"></span>
+      <button class="btn btn-tertiary btn-sm" id="sel-clear" disabled>Clear selection</button>
+    </div>
+    <div class="card table-card">
+      <div class="table-wrap" data-context-menu="row-menu">
+        <table class="table g-sortable g-sticky g-selectable" aria-label="Services">
+          <thead>
+            <tr>
+              <th><input class="checkbox" type="checkbox" aria-label="Select all services"></th>
+              <th data-sort="text">Service</th>
+              <th data-sort="text">Region</th>
+              <th data-sort="text">Status</th>
+              <th class="r" data-sort="num">Uptime</th>
+              <th class="r" data-sort="num">P95</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><input class="checkbox" type="checkbox" aria-label="Select brain-mcp"></td><td>brain-mcp</td><td>eu-central</td><td><span class="badge badge-ok">Live</span></td><td class="r">99.98%</td><td class="r">84 ms</td></tr>
+            <tr><td><input class="checkbox" type="checkbox" aria-label="Select gcommand"></td><td>gcommand</td><td>eu-central</td><td><span class="badge badge-ok">Live</span></td><td class="r">99.94%</td><td class="r">121 ms</td></tr>
+            <tr><td><input class="checkbox" type="checkbox" aria-label="Select state-api"></td><td>state-api</td><td>eu-central</td><td><span class="badge badge-warn">Degraded</span></td><td class="r">98.71%</td><td class="r">402 ms</td></tr>
+            <tr><td><input class="checkbox" type="checkbox" aria-label="Select g-site"></td><td>g-site</td><td>eu-central</td><td><span class="badge badge-ok">Live</span></td><td class="r">99.99%</td><td class="r">67 ms</td></tr>
+            <tr><td><input class="checkbox" type="checkbox" aria-label="Select baselinelabs"></td><td>baselinelabs</td><td>eu-north</td><td><span class="badge badge-ok">Live</span></td><td class="r">99.97%</td><td class="r">143 ms</td></tr>
+            <tr><td><input class="checkbox" type="checkbox" aria-label="Select render"></td><td>render</td><td>eu-central</td><td><span class="badge badge-ok">Live</span></td><td class="r">99.91%</td><td class="r">210 ms</td></tr>
+            <tr><td><input class="checkbox" type="checkbox" aria-label="Select adze"></td><td>adze</td><td>eu-west</td><td><span class="badge badge-ok">Live</span></td><td class="r">99.88%</td><td class="r">96 ms</td></tr>
+            <tr><td><input class="checkbox" type="checkbox" aria-label="Select period-api"></td><td>period-api</td><td>eu-central</td><td><span class="badge badge-info">Frozen</span></td><td class="r">99.62%</td><td class="r">188 ms</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <span class="cap">Click a header to sort, click again to reverse: one caret turns over rather than swapping for a second glyph. The head stays put while the body scrolls, its hairline carried by a shadow. Select-all sits in a third state while the selection is partial. Right-click any row for its actions.</span>
+  </section>
+
+  <section>
+    <div class="row">
+      <span class="label">Pagination</span>
+      <span class="cap" id="page-note">Showing page 2</span>
+    </div>
+    <nav class="g-pages" aria-label="Pagination">
+      <button class="btn btn-tertiary btn-sm btn-icon" data-page="prev" aria-label="Previous page"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M165.66,202.34a8,8,0,0,1-11.32,11.32l-80-80a8,8,0,0,1,0-11.32l80-80a8,8,0,0,1,11.32,11.32L91.31,128Z"/></svg></button>
+      <button class="btn btn-tertiary btn-sm btn-icon" data-page="1">1</button>
+      <button class="btn btn-tertiary btn-sm btn-icon" data-page="2" aria-current="page">2</button>
+      <button class="btn btn-tertiary btn-sm btn-icon" data-page="3">3</button>
+      <button class="btn btn-tertiary btn-sm btn-icon" data-page="4">4</button>
+      <span class="g-gap" aria-hidden="true">...</span>
+      <button class="btn btn-tertiary btn-sm btn-icon" data-page="12">12</button>
+      <button class="btn btn-tertiary btn-sm btn-icon" data-page="next" aria-label="Next page"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></svg></button>
+    </nav>
+    <span class="cap">Prev and next step between the buttons that are rendered, so the gap is jumped rather than paged into. A change fires a page event that bubbles.</span>
+  </section>
+
+  <div class="menu" popover id="row-menu" role="menu">
+    <button class="menu-item" role="menuitem"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M200,64V168a8,8,0,0,1-16,0V83.31L69.66,197.66a8,8,0,0,1-11.32-11.32L172.69,72H88a8,8,0,0,1,0-16H192A8,8,0,0,1,200,64Z"/></svg>Open live site</button>
+    <button class="menu-item" role="menuitem"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M216,32H88a8,8,0,0,0-8,8V80H40a8,8,0,0,0-8,8V216a8,8,0,0,0,8,8H168a8,8,0,0,0,8-8V176h40a8,8,0,0,0,8-8V40A8,8,0,0,0,216,32ZM160,208H48V96H160Zm48-48H176V88a8,8,0,0,0-8-8H96V48H208Z"/></svg>Copy service id<span class="kbd">C</span></button>
+    <hr class="separator">
+    <button class="menu-item danger" role="menuitem"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"/></svg>Stop service</button>
+  </div>
+<script>
+const count = document.getElementById("sel-count");
+const clear = document.getElementById("sel-clear");
+document.addEventListener("selection", (e) => {
+  const n = e.detail.count;
+  count.textContent = n ? `${n} of ${e.detail.total} selected` : "Nothing selected";
+  clear.disabled = !n;
+});
+clear.addEventListener("click", () => {
+  document.querySelectorAll(".table input.checkbox").forEach((b) => { b.checked = false; });
+  document.querySelector(".table tbody .checkbox").dispatchEvent(new Event("change", { bubbles: true }));
+});
+document.addEventListener("page", (e) => {
+  document.getElementById("page-note").textContent = `Showing page ${e.detail.page}`;
+});
+</script>
+</body>
+</html>

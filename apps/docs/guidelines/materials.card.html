@@ -1,0 +1,48 @@
+<!-- @dsCard group="Guidelines" name="Materials" subtitle="Named surface presets. Elevation is a border and a lit top edge, not a shadow." viewport="760x420" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Materials</title>
+<link rel="stylesheet" href="../assets/g.css">
+<style>
+  body { padding: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-4); }
+  .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--sp-4); }
+  .spec { margin-top: var(--sp-3); font-family: var(--font-mono); font-size: 11px; color: var(--text-placeholder); line-height: 1.7; }
+  .overlay-demo {
+    background: var(--overlay-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    box-shadow: var(--overlay-shadow);
+    padding: var(--pad-card);
+  }
+  .radii { display: flex; gap: var(--sp-4); align-items: flex-end; }
+  .r-demo { display: flex; flex-direction: column; gap: var(--sp-2); align-items: center; font-size: 11px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+  .r-demo .box { width: 72px; height: 44px; border: 1px solid var(--border); background: var(--fill-hover); }
+  .note { font-size: 12px; color: var(--text-secondary); max-width: 620px; line-height: 1.55; }
+</style>
+</head>
+<body>
+  <div class="grid">
+    <div class="card">
+      <span class="card-title">Card</span>
+      <div class="spec">--card-bg is surface-2<br>--card-border is slate-a6<br>inset 0 1px 0 slate-a5</div>
+    </div>
+    <div class="overlay-demo">
+      <span class="card-title">Overlay</span>
+      <div class="spec">--overlay-bg is surface-2<br>--overlay-shadow<br>Floating layers only</div>
+    </div>
+    <div class="well">
+      <span class="card-title">Well</span>
+      <div class="spec">--well-bg is slate-a3<br>--well-border is slate-a6<br>Code, quiet regions</div>
+    </div>
+  </div>
+  <div class="radii">
+    <div class="r-demo"><div class="box" style="border-radius:var(--radius-sm)"></div>Small, 4.5</div>
+    <div class="r-demo"><div class="box" style="border-radius:var(--radius)"></div>Control, 6.5</div>
+    <div class="r-demo"><div class="box" style="border-radius:var(--radius-card)"></div>Card, 9.5</div>
+    <div class="r-demo"><div class="box" style="border-radius:var(--radius-full);width:44px"></div>Pill, full</div>
+  </div>
+  <p class="note">In-flow elements never cast drop shadows. Linear's treatment applies instead: a 1px alpha border plus an <span class="mono">inset 0 1px 0</span> highlight reads as elevation without murk. Shadows are reserved for the two floating layers (menus, dialogs, toasts) that genuinely sit above the page. Translucency and glass are rejected: alpha is for composing borders and fills, not for blurring content behind surfaces.</p>
+</body>
+</html>

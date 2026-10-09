@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <g data-part="arrow-clip"><g data-part="arrow"><path d="M128 36 v100 M86 100 l42 42 42 -42"/></g></g>
+  <g data-part="tray"><path d="M40 158 v34 a16 16 0 0 0 16 16 h144 a16 16 0 0 0 16 -16 v-34"/></g>
+  <g data-part="check"><path pathLength="1" d="M56 110 l44 42 100 -98"/></g>
+</svg>

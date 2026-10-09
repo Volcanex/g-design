@@ -1,0 +1,48 @@
+<!-- @dsCard group="Guidelines" name="Motion" subtitle="Two curves, four durations, three springs generated as CSS linear()." viewport="760x600" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Motion</title>
+<link rel="stylesheet" href="../assets/g.css">
+<script defer src="../assets/g-ui.js"></script>
+<style>
+  body { padding: var(--sp-5); display: grid; grid-template-columns: 1fr 300px; gap: var(--sp-6); }
+  .rules { display: flex; flex-direction: column; gap: var(--sp-2); font-size: var(--font-size-ui); }
+  .rule { display: flex; gap: var(--sp-2); align-items: baseline; }
+  .rule .mono { color: var(--text-placeholder); font-size: 11px; white-space: nowrap; }
+  .demos { display: flex; flex-direction: column; gap: var(--sp-3); }
+  .spring-demo { display: flex; align-items: center; gap: var(--sp-3); }
+  .ball { width: 14px; height: 14px; border-radius: 50%; background: var(--accent-fill); translate: 0 0; }
+  .spring-demo.run .ball { transition: translate var(--_d) var(--_e); translate: 120px 0; }
+  .spring-demo span { font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary); width: 92px; }
+</style>
+</head>
+<body>
+  <div class="rules">
+    <h3>The rules</h3>
+    <div class="rule"><span class="mono">ease-out</span>Default for everything; ease-in-out only for movement on screen</div>
+    <div class="rule"><span class="mono">≤ 300ms</span>Hard ceiling. Only the sheet (500ms) exceeds it</div>
+    <div class="rule"><span class="mono">transform, opacity</span>The only animated properties without written justification</div>
+    <div class="rule"><span class="mono">scale(0.97)</span>Press feedback; nothing enters below scale(0.95)</div>
+    <div class="rule"><span class="mono">no ambient</span>No scroll reveals, no ambient motion, none on frequent actions</div>
+    <div class="rule"><span class="mono">interruptible</span>Transitions, not queued animations: five clicks is one movement</div>
+    <div class="rule"><span class="mono">reduced motion</span>Falls back to crossfades, never to nothing</div>
+    <h3 style="margin-top:8px">When not to animate</h3>
+    <div class="rule"><span class="mono">frequent</span>Actions repeated many times an hour carry no motion: typing feedback, table row hover, plain navigation clicks</div>
+    <div class="rule"><span class="mono">hover</span>Hover states change colour and border, never position or size; the button's 2% growth is the single exception</div>
+    <div class="rule"><span class="mono">ambient</span>Nothing moves because a surface looked static; motion answers an action or shows what changed</div>
+    <h3 style="margin-top:8px">Named principles</h3>
+    <div class="rule"><span class="mono">anticipation</span>Hold-to-delete: the trash lid opens and the body wiggles before anything is destroyed</div>
+    <div class="rule"><span class="mono">follow-through</span>The bell's clapper trails its body by 60ms; toasts settle on a spring past their resting point</div>
+  </div>
+  <div class="demos">
+    <h3>Springs</h3>
+    <div class="spring-demo" style="--_e:var(--spring-snap);--_d:var(--spring-snap-dur)"><span>snap 200ms</span><div class="ball"></div></div>
+    <div class="spring-demo" style="--_e:var(--spring-smooth);--_d:var(--spring-smooth-dur)"><span>smooth 300ms</span><div class="ball"></div></div>
+    <div class="spring-demo" style="--_e:var(--spring-sheet);--_d:var(--spring-sheet-dur)"><span>sheet 500ms</span><div class="ball"></div></div>
+    <button class="btn btn-secondary btn-sm" onclick="document.querySelectorAll('.spring-demo').forEach(d=>d.classList.toggle('run'))">Run springs</button>
+    <p style="font-size:12px;color:var(--text-secondary);line-height:1.55">Generated as CSS <span class="mono">linear()</span> from visualDuration and bounce at build time: zero JS at runtime, with an <span class="mono">ease-out</span> fallback where unsupported. Ad-hoc values are forbidden.</p>
+  </div>
+</body>
+</html>

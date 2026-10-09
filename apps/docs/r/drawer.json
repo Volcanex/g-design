@@ -1,0 +1,14 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "drawer",
+  "type": "registry:ui",
+  "title": "Drawer",
+  "description": "g-design drawer: g tokens over Base UI and friends. Pair with g.css (or tokens.css + the react shim).",
+  "files": [
+    {
+      "path": "components/g/drawer.jsx",
+      "content": "import { Drawer } from \"vaul\";\n\n/* The one 500ms surface. Vaul brings the gesture and velocity dismissal;\n   the curve is ease-ios per the motion spec. */\nexport function GDrawer({ trigger, title, children }) {\n  return (\n    <Drawer.Root>\n      <Drawer.Trigger asChild>{trigger}</Drawer.Trigger>\n      <Drawer.Portal>\n        <Drawer.Overlay className=\"rdrawer-overlay\" />\n        <Drawer.Content className=\"rdrawer\">\n          <div className=\"rdrawer-handle\" aria-hidden=\"true\" />\n          <Drawer.Title className=\"dlg-title\">{title}</Drawer.Title>\n          {children}\n        </Drawer.Content>\n      </Drawer.Portal>\n    </Drawer.Root>\n  );\n}\n",
+      "type": "registry:ui"
+    }
+  ]
+}

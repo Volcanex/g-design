@@ -1,0 +1,46 @@
+/* g-segmented: two to four joined options, one chosen. Native radios do the
+   state, so a form reads it and the keyboard works with no script. A label
+   per option, the input inside it, visually hidden but still focusable. */
+
+.g-segmented {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--well-bg);
+  font-family: var(--font-ui);
+}
+.g-segmented[data-block] { display: flex; }
+.g-segmented[data-block] > label { flex: 1 1 0; }
+
+.g-segmented > label {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: calc(var(--h-2) - 6px);
+  padding: 0 var(--sp-2);
+  border-radius: calc(var(--radius) - 2px);
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+.g-segmented > label > input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.g-segmented > label:hover { color: var(--text-primary); }
+.g-segmented > label:has(input:checked) { background: var(--fill-active); color: var(--text-primary); }
+.g-segmented > label:has(input:focus-visible) { outline: 2px solid var(--focus-ring); outline-offset: 1px; }
+.g-segmented > label:has(input:disabled) { opacity: 0.45; cursor: default; }
+.g-segmented > label svg { width: 14px; height: 14px; }
+
+.g-segmented-sm > label { height: calc(var(--h-1) - 6px); padding: 0 var(--sp-1); font-size: 11px; }

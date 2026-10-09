@@ -1,0 +1,116 @@
+<!-- @dsCard group="Components" name="Inputs" subtitle="Slider, progress, meter, dropzone. Controls that carry a number and show it." viewport="760x560" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Inputs</title>
+<link rel="stylesheet" href="../assets/g.css">
+<script defer src="../assets/g-ui.js"></script>
+<style>
+  body { padding: var(--sp-5); display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-5) var(--sp-6); align-items: start; }
+  .col { display: flex; flex-direction: column; gap: var(--sp-5); }
+  section { display: flex; flex-direction: column; gap: var(--sp-3); }
+  .row { display: flex; align-items: center; gap: var(--sp-3); }
+  .cap { font-size: 12px; color: var(--text-secondary); }
+  .head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-3); font-size: var(--font-size-ui); }
+  .head .v { color: var(--text-secondary); font-size: 12px; }
+  .meters { display: flex; flex-direction: column; gap: var(--sp-3); }
+</style>
+</head>
+<body>
+  <div class="col">
+    <section>
+      <span class="label">Slider</span>
+      <span class="g-slider" data-output data-suffix="%">
+        <input type="range" min="0" max="100" value="35" aria-label="Traffic to the new build">
+      </span>
+      <span class="cap">The readout rides the thumb, so the number and the position it describes read as one thing. Keyboard is the native one: arrows, page keys, home and end.</span>
+      <span class="g-slider">
+        <input type="range" min="1" max="8" step="1" value="3" aria-label="Replicas">
+      </span>
+      <span class="cap">Without data-output it is a bare rail. Steps snap.</span>
+    </section>
+    <section>
+      <span class="label">Progress</span>
+      <div class="head"><span>Deploying g-site</span><span class="v num" id="dep-pct">0%</span></div>
+      <div class="g-progress" id="dep" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Deploying g-site"></div>
+      <div class="row">
+        <button class="btn btn-secondary btn-sm" onclick="deploy()">Run a deploy</button>
+        <button class="btn btn-tertiary btn-sm" onclick="reset()">Reset</button>
+      </div>
+      <span class="cap">Setting aria-valuenow is the whole API. The bar watches its own attribute, so the accessible value cannot drift from the painted one.</span>
+      <div class="g-progress" data-indeterminate aria-label="Waiting for the build agent"></div>
+      <span class="cap">Indeterminate sweeps on transform alone at 1.4s. Reduced motion stops it and holds a dimmed full bar.</span>
+    </section>
+  </div>
+
+  <div class="col">
+    <section>
+      <span class="label">Meter</span>
+      <div class="meters">
+        <div class="head"><span>Disk on h</span><span class="v num" id="disk-v">41 of 80 GB</span></div>
+        <div class="g-meter" id="disk" data-value="41" data-max="80" data-warn-at="56" data-danger-at="68" aria-label="Disk on h"></div>
+        <div class="head"><span>Memory</span><span class="v num">3.1 of 4 GB</span></div>
+        <div class="g-meter" data-value="3.1" data-max="4" data-warn-at="2.8" data-danger-at="3.6" aria-label="Memory"></div>
+        <div class="head"><span>Inode table</span><span class="v num">94%</span></div>
+        <div class="g-meter" data-value="94" data-warn-at="70" data-danger-at="90" aria-label="Inode table"></div>
+      </div>
+      <div class="row">
+        <button class="btn btn-secondary btn-sm" onclick="fillDisk(8)">Write 8 GB</button>
+        <button class="btn btn-tertiary btn-sm" onclick="fillDisk(-12)">Free 12 GB</button>
+      </div>
+      <span class="cap">A meter is a level, not a task. It crosses into amber at data-warn-at and red at data-danger-at, and the zone is an attribute, so the colour is never hand-set at the call site.</span>
+    </section>
+    <section>
+      <span class="label">Dropzone</span>
+      <div class="g-dropzone" id="dz">
+        <div class="g-dropzone-prompt">
+          <input type="file" multiple accept="image/*" aria-label="Add avatar images">
+          <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M240,136v64a16,16,0,0,1-16,16H32a16,16,0,0,1-16-16V136a16,16,0,0,1,16-16H72a8,8,0,0,1,0,16H32v64H224V136H184a8,8,0,0,1,0-16h40A16,16,0,0,1,240,136ZM85.66,77.66,120,43.31V128a8,8,0,0,0,16,0V43.31l34.34,34.35a8,8,0,0,0,11.32-11.32l-48-48a8,8,0,0,0-11.32,0l-48,48A8,8,0,0,0,85.66,77.66Z"/></svg>
+          <span class="g-dropzone-title">Drop avatars here, or click to browse</span>
+          <span class="g-dropzone-hint">PNG or JPG, up to 2 MB each</span>
+        </div>
+      </div>
+      <span class="cap">The file input is the only store. A drop writes into it, so a plain form submit carries exactly what is listed. Removing a file fires a bubbling files event.</span>
+    </section>
+  </div>
+<script>
+const dep = document.getElementById("dep");
+const depPct = document.getElementById("dep-pct");
+let depTimer;
+
+function setDep(v) {
+  dep.setAttribute("aria-valuenow", v);
+  depPct.textContent = v + "%";
+}
+function deploy() {
+  clearInterval(depTimer);
+  setDep(0);
+  depTimer = setInterval(() => {
+    const next = Math.min(100, +dep.getAttribute("aria-valuenow") + 12);
+    setDep(next);
+    if (next === 100) {
+      clearInterval(depTimer);
+      g.toast({ title: "Edition 42 is live", desc: "example.com", kind: "ok" });
+    }
+  }, 420);
+}
+function reset() {
+  clearInterval(depTimer);
+  setDep(0);
+}
+
+const disk = document.getElementById("disk");
+function fillDisk(by) {
+  const next = Math.max(0, Math.min(80, +disk.dataset.value + by));
+  disk.dataset.value = next;
+  document.getElementById("disk-v").textContent = next + " of 80 GB";
+}
+
+document.getElementById("dz").addEventListener("files", (e) => {
+  const n = e.detail.files.length;
+  g.toast({ title: n ? n + (n === 1 ? " file ready" : " files ready") : "No files", kind: "ok" });
+});
+</script>
+</body>
+</html>

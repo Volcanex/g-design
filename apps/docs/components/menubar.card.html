@@ -1,0 +1,66 @@
+<!-- @dsCard group="Components" name="Menubar" subtitle="An application menubar built from the shipped menu. Hover to switch, arrows to walk, Escape to leave." viewport="760x360" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Menubar</title>
+<link rel="stylesheet" href="../assets/g.css">
+<script defer src="../assets/g-ui.js"></script>
+<style>
+  body { padding: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-4); }
+  .cap { font-size: 12px; color: var(--text-secondary); line-height: 1.5; max-width: 640px; }
+  .frame { border: 1px solid var(--border-subtle); border-radius: var(--radius-card); overflow: hidden; }
+  .stage { height: 220px; background: var(--surface-1); }
+  .readout { padding: var(--sp-3); font-size: var(--font-size-ui); color: var(--text-secondary); }
+</style>
+</head>
+<body>
+  <div class="frame">
+    <nav class="g-menubar" aria-label="Application">
+      <button class="g-menubar-item" popovertarget="m-file">File</button>
+      <button class="g-menubar-item" popovertarget="m-edit">Edit</button>
+      <button class="g-menubar-item" popovertarget="m-view">View</button>
+      <button class="g-menubar-item" popovertarget="m-effects">Effects</button>
+    </nav>
+    <div class="stage"><div class="readout" id="readout">Nothing chosen yet</div></div>
+  </div>
+
+  <div class="menu" popover id="m-file">
+    <button class="menu-item">New<span class="kbd">Ctrl</span><span class="kbd">N</span></button>
+    <button class="menu-item">Open<span class="kbd">Ctrl</span><span class="kbd">O</span></button>
+    <hr class="separator">
+    <button class="menu-item">Save<span class="kbd">Ctrl</span><span class="kbd">S</span></button>
+    <button class="menu-item">Export video</button>
+  </div>
+  <div class="menu" popover id="m-edit">
+    <button class="menu-item">Undo<span class="kbd">Ctrl</span><span class="kbd">Z</span></button>
+    <button class="menu-item">Redo<span class="kbd">Ctrl</span><span class="kbd">Y</span></button>
+    <hr class="separator">
+    <button class="menu-item">Cut<span class="kbd">Ctrl</span><span class="kbd">X</span></button>
+    <button class="menu-item">Copy<span class="kbd">Ctrl</span><span class="kbd">C</span></button>
+    <button class="menu-item" disabled>Paste<span class="kbd">Ctrl</span><span class="kbd">V</span></button>
+  </div>
+  <div class="menu" popover id="m-view">
+    <button class="menu-item">Zoom in<span class="kbd">Ctrl</span><span class="kbd">+</span></button>
+    <button class="menu-item">Zoom out<span class="kbd">Ctrl</span><span class="kbd">-</span></button>
+    <button class="menu-item">Fit to window<span class="kbd">Ctrl</span><span class="kbd">B</span></button>
+  </div>
+  <div class="menu" popover id="m-effects">
+    <button class="menu-item">Repeat last effect<span class="kbd">Ctrl</span><span class="kbd">F</span></button>
+    <div class="menu-heading">Blur</div>
+    <button class="menu-item">Gaussian</button>
+    <button class="menu-item">Box</button>
+    <button class="menu-item">Bloom</button>
+    <div class="menu-heading">Stylize</div>
+    <button class="menu-item">Drop shadow</button>
+    <button class="menu-item">Posterize</button>
+  </div>
+
+  <span class="cap">Each item is a button with a popovertarget naming an ordinary menu. Once one menu is open, moving the pointer along the bar switches menus without a click; ArrowLeft and ArrowRight do the same from the keyboard, from the bar or from inside a menu. Headings inside a menu group its items and are not focusable.</span>
+  <script>
+    document.querySelectorAll('.menu-item').forEach((b) => b.addEventListener('click', () => {
+      document.getElementById('readout').textContent = 'Chose ' + b.firstChild.textContent.trim();
+    }));
+  </script>
+</body>
+</html>

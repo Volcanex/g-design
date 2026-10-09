@@ -1,0 +1,14 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "tabs",
+  "type": "registry:ui",
+  "title": "Tabs",
+  "description": "g-design tabs: g tokens over Base UI and friends. Pair with g.css (or tokens.css + the react shim).",
+  "files": [
+    {
+      "path": "components/g/tabs.jsx",
+      "content": "import { Tabs } from \"@base-ui/react/tabs\";\n\nexport function GTabs({ tabs }) {\n  return (\n    <Tabs.Root defaultValue={tabs[0].value}>\n      <Tabs.List className=\"tabs rtabs\">\n        {tabs.map((t) => (\n          <Tabs.Tab key={t.value} value={t.value} className=\"tab\">\n            {t.label}\n          </Tabs.Tab>\n        ))}\n        <Tabs.Indicator className=\"rtab-indicator\" />\n      </Tabs.List>\n      {tabs.map((t) => (\n        <Tabs.Panel key={t.value} value={t.value} className=\"rtab-panel\">\n          {t.content}\n        </Tabs.Panel>\n      ))}\n    </Tabs.Root>\n  );\n}\n",
+      "type": "registry:ui"
+    }
+  ]
+}

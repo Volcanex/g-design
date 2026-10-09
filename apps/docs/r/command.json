@@ -1,0 +1,14 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "command",
+  "type": "registry:ui",
+  "title": "Command",
+  "description": "g-design command: g tokens over Base UI and friends. Pair with g.css (or tokens.css + the react shim).",
+  "files": [
+    {
+      "path": "components/g/command.jsx",
+      "content": "import { Command } from \"cmdk\";\n\nexport function CommandPanel({ groups }) {\n  return (\n    <Command className=\"card rcmdk\" label=\"Command menu\">\n      <Command.Input className=\"cmdk-input\" placeholder=\"Type a command or search…\" />\n      <Command.List className=\"cmdk-list\">\n        <Command.Empty className=\"cmdk-empty\">No results. Try fewer letters.</Command.Empty>\n        {groups.map((g) => (\n          <Command.Group key={g.heading} heading={g.heading}>\n            {g.items.map((i) => (\n              <Command.Item key={i.label} className=\"menu-item\" onSelect={i.onSelect}>\n                {i.label}\n              </Command.Item>\n            ))}\n          </Command.Group>\n        ))}\n      </Command.List>\n    </Command>\n  );\n}\n",
+      "type": "registry:ui"
+    }
+  ]
+}

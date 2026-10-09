@@ -1,0 +1,63 @@
+<!-- @dsCard group="Guidelines" name="The accent slot" subtitle="Four variables rebrand an entire app. Red and green are not for sale." viewport="760x440" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The accent slot</title>
+<link rel="stylesheet" href="../assets/g.css">
+<script defer src="../assets/g-ui.js"></script>
+<style>
+  body { padding: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-4); }
+  .brands { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--sp-4); }
+  .brand-demo { display: flex; flex-direction: column; gap: var(--sp-3); }
+  .brand-demo .who { font-size: 11px; color: var(--text-placeholder); font-family: var(--font-mono); }
+  .frame { border: 1px solid var(--border-subtle); border-radius: var(--radius-card); padding: var(--sp-4); display: flex; flex-direction: column; gap: var(--sp-3); }
+  .frame .top { display: flex; align-items: center; gap: 8px; }
+  .frame .mark { width: 20px; height: 20px; border-radius: var(--radius-sm); background: var(--accent-fill); color: var(--accent-fg); display: grid; place-items: center; font-size: 11px; font-weight: 500; }
+  .frame b { font-size: 13px; font-weight: 500; }
+  .frame .controls { display: flex; align-items: center; gap: var(--sp-3); }
+  .cap { font-size: 12px; color: var(--text-secondary); max-width: 640px; line-height: 1.55; }
+</style>
+</head>
+<body>
+  <div class="brands">
+    <div class="brand-demo">
+      <span class="who">Default, the contrast primary</span>
+      <div class="frame">
+        <div class="top"><span class="mark">g</span><b>Console</b></div>
+        <div class="controls">
+          <button class="btn btn-primary btn-sm">Deploy</button>
+          <input type="checkbox" class="checkbox" checked aria-label="Check">
+          <input type="checkbox" class="switch" checked aria-label="Switch">
+        </div>
+        <button class="btn btn-danger btn-sm" style="align-self:flex-start" data-icon="trash">Delete</button>
+      </div>
+    </div>
+    <div class="brand-demo" style="--accent-fill:#2e7d64; --accent-fill-hover:#286f58; --accent-fg:#ffffff; --accent-edge:#286f58">
+      <span class="who">--accent-*: Kontrol green</span>
+      <div class="frame">
+        <div class="top"><span class="mark">K</span><b>Kontrol</b></div>
+        <div class="controls">
+          <button class="btn btn-primary btn-sm">Log today</button>
+          <input type="checkbox" class="checkbox" checked aria-label="Check">
+          <input type="checkbox" class="switch" checked aria-label="Switch">
+        </div>
+        <button class="btn btn-danger btn-sm" style="align-self:flex-start" data-icon="trash">Delete</button>
+      </div>
+    </div>
+    <div class="brand-demo" style="--accent-fill:#6e56cf; --accent-fill-hover:#654dc4; --accent-fg:#ffffff; --accent-edge:#654dc4">
+      <span class="who">--accent-*: violet</span>
+      <div class="frame">
+        <div class="top"><span class="mark">a</span><b>Adze</b></div>
+        <div class="controls">
+          <button class="btn btn-primary btn-sm">Publish</button>
+          <input type="checkbox" class="checkbox" checked aria-label="Check">
+          <input type="checkbox" class="switch" checked aria-label="Switch">
+        </div>
+        <button class="btn btn-danger btn-sm" style="align-self:flex-start" data-icon="trash">Delete</button>
+      </div>
+    </div>
+  </div>
+  <p class="cap">The entire per-app override surface is four variables: <span class="mono">--accent-fill</span>, <span class="mono">--accent-fill-hover</span>, <span class="mono">--accent-fg</span> and <span class="mono">--accent-edge</span>, set on any scope. Every primary button, checkbox, switch, focus accent and brand mark follows with zero component changes. The danger button ignores all three brands on purpose: red and green carry meaning, not identity, and are never overridable.</p>
+</body>
+</html>

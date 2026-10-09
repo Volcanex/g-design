@@ -1,0 +1,14 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "stat",
+  "type": "registry:ui",
+  "title": "Stat",
+  "description": "g-design stat: g tokens over Base UI and friends. Pair with g.css (or tokens.css + the react shim).",
+  "files": [
+    {
+      "path": "components/g/stat.jsx",
+      "content": "import NumberFlow from \"@number-flow/react\";\n\n/* Every animated numeric goes through NumberFlow; it respects the user's\n   reduced-motion preference. */\nexport function Stat({ label, value, suffix, format }) {\n  return (\n    <div className=\"card stat\">\n      <span className=\"k\">{label}</span>\n      <span className=\"v\">\n        <NumberFlow value={value} format={format} respectMotionPreference suffix={suffix} />\n      </span>\n    </div>\n  );\n}\n",
+      "type": "registry:ui"
+    }
+  ]
+}

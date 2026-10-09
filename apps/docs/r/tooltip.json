@@ -1,0 +1,14 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "tooltip",
+  "type": "registry:ui",
+  "title": "Tooltip",
+  "description": "g-design tooltip: g tokens over Base UI and friends. Pair with g.css (or tokens.css + the react shim).",
+  "files": [
+    {
+      "path": "components/g/tooltip.jsx",
+      "content": "import { Tooltip } from \"@base-ui/react/tooltip\";\n\n/* One provider per app: 300ms warm-up shared by every tooltip, instant\n   between neighbours. */\nexport function TipProvider({ children }) {\n  return <Tooltip.Provider delay={300}>{children}</Tooltip.Provider>;\n}\n\nexport function Tip({ text, children }) {\n  return (\n    <Tooltip.Root>\n      <Tooltip.Trigger render={children} />\n      <Tooltip.Portal>\n        <Tooltip.Positioner sideOffset={6}>\n          <Tooltip.Popup className=\"tooltip rtip\">{text}</Tooltip.Popup>\n        </Tooltip.Positioner>\n      </Tooltip.Portal>\n    </Tooltip.Root>\n  );\n}\n",
+      "type": "registry:ui"
+    }
+  ]
+}

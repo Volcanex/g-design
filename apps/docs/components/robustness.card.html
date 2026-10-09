@@ -1,0 +1,91 @@
+<!-- @dsCard group="Components" name="Robustness" subtitle="Every component under adversarial input. Spam it, interrupt it, thrash it." viewport="760x560" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Robustness</title>
+<link rel="stylesheet" href="../assets/g.css">
+<script defer src="../assets/g-ui.js"></script>
+<style>
+  body { padding: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-4); }
+  .tests { display: flex; flex-direction: column; gap: 8px; }
+  .test { display: grid; grid-template-columns: 150px 1fr auto; gap: var(--sp-3); align-items: center; font-size: 12px; color: var(--text-secondary); }
+  .test .name { font-weight: 500; color: var(--text-primary); font-size: var(--font-size-ui); }
+  .subjects { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; }
+  .cap { font-size: 12px; color: var(--text-secondary); max-width: 620px; line-height: 1.55; }
+</style>
+</head>
+<body>
+  <div style="display:flex;align-items:center;gap:10px">
+    <button class="btn btn-primary" id="run">Run the gauntlet</button>
+    <span class="badge badge-plain" id="verdict">Not run</span>
+  </div>
+  <div class="tests">
+    <div class="test"><span class="name">Spam press</span><span>Approve clicked 15 times in 600ms; timers reset, never stack</span><span class="badge badge-plain" id="t-spam">Waiting</span></div>
+    <div class="test"><span class="name">Interrupt dialog</span><span>Opened and closed 6 times mid-animation</span><span class="badge badge-plain" id="t-dlg">Waiting</span></div>
+    <div class="test"><span class="name">Toast flood</span><span>10 toasts in 400ms; stack stays capped and ordered</span><span class="badge badge-plain" id="t-toast">Waiting</span></div>
+    <div class="test"><span class="name">Copy spam</span><span>12 rapid clicks resolve to one clean copied state</span><span class="badge badge-plain" id="t-copy">Waiting</span></div>
+    <div class="test"><span class="name">Interrupted hold</span><span>5 pressed-then-released holds; nothing left mid-sweep</span><span class="badge badge-plain" id="t-hold">Waiting</span></div>
+    <div class="test"><span class="name">Theme thrash</span><span>Theme flipped 8 times in a burst</span><span class="badge badge-plain" id="t-theme">Waiting</span></div>
+  </div>
+  <div class="subjects">
+    <button class="btn btn-go confirm-btn" data-revert data-label="Approve" data-label-done="Approved" id="s-approve"><span class="confirm-label">Approve</span></button>
+    <button class="btn btn-danger hold-btn" data-hold-ms="900" id="s-hold"><span>Hold to delete</span></button>
+    <button class="btn btn-secondary copy-btn" data-copy="robustness" id="s-copy"><span class="copy-label">Copy</span></button>
+  </div>
+  <p class="cap">Every test asserts real end-state, not just the absence of exceptions: one uncaught error anywhere fails the run. Fast scrolling, spammed input and interrupted gestures are the checklist; nothing here queues an animation.</p>
+
+  <dialog class="dlg" id="r-dlg"><div class="dlg-body"><span class="dlg-title">Interruption target</span><span class="dlg-desc">Opened and closed faster than its own transition.</span></div></dialog>
+
+<script>
+let errors = 0;
+window.addEventListener("error", () => { errors++; });
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const set = (id, ok) => g.status(document.getElementById(id), { kind: ok ? "ok" : "danger", label: ok ? "Pass" : "Fail" });
+
+async function gauntlet() {
+  errors = 0;
+  g.status(document.getElementById("verdict"), { label: "Running" });
+
+  const approve = document.getElementById("s-approve");
+  for (let i = 0; i < 15; i++) { approve.click(); await sleep(40); }
+  await sleep(300);
+  set("t-spam", errors === 0 && approve.hasAttribute("data-done"));
+
+  const dlg = document.getElementById("r-dlg");
+  for (let i = 0; i < 6; i++) { dlg.showModal(); await sleep(60); dlg.close(); await sleep(60); }
+  await sleep(300);
+  set("t-dlg", errors === 0 && !dlg.open);
+
+  for (let i = 0; i < 10; i++) { g.toast({ title: "Flood " + (i + 1) }); await sleep(40); }
+  await sleep(400);
+  const visible = [...document.querySelectorAll(".toast")].filter((t) => t.style.opacity !== "0");
+  set("t-toast", errors === 0 && visible.length <= 4);
+
+  const copy = document.getElementById("s-copy");
+  for (let i = 0; i < 12; i++) { copy.click(); await sleep(30); }
+  await sleep(200);
+  set("t-copy", errors === 0 && copy.hasAttribute("data-copied"));
+
+  const hold = document.getElementById("s-hold");
+  for (let i = 0; i < 5; i++) {
+    hold.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }));
+    await sleep(150);
+    hold.dispatchEvent(new PointerEvent("pointerup", { bubbles: true }));
+    await sleep(60);
+  }
+  await sleep(200);
+  set("t-hold", errors === 0 && !hold.hasAttribute("data-holding"));
+
+  for (let i = 0; i < 8; i++) { g.theme(i % 2 ? "dark" : "light"); await sleep(40); }
+  g.theme("dark");
+  await sleep(200);
+  set("t-theme", errors === 0);
+
+  const pass = [...document.querySelectorAll(".tests .badge")].every((b) => b.textContent === "Pass");
+  g.status(document.getElementById("verdict"), { kind: pass ? "ok" : "danger", label: pass ? "All pass" : "Failures" });
+}
+document.getElementById("run").addEventListener("click", gauntlet);
+</script>
+</body>
+</html>

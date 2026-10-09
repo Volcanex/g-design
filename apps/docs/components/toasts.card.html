@@ -1,0 +1,69 @@
+<!-- @dsCard group="Components" name="Toasts" subtitle="Stacked with scale and a 14px offset. Actions, undo, progress, loading that resolves." viewport="760x460" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Toasts</title>
+<link rel="stylesheet" href="../assets/g.css">
+<script defer src="../assets/g-ui.js"></script>
+<style>
+  body { padding: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-5); }
+  section { display: flex; flex-direction: column; gap: var(--sp-3); }
+  .row { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; }
+  .cap { font-size: 12px; color: var(--text-secondary); max-width: 560px; line-height: 1.55; }
+</style>
+</head>
+<body>
+  <section>
+    <span class="label">Kinds</span>
+    <div class="row">
+      <button class="btn btn-secondary" onclick="g.toast({title:'Edition published', desc:'example.com is live', kind:'ok'})">Success</button>
+      <button class="btn btn-secondary" onclick="g.toast({title:'Deploy failed', desc:'Health probe timed out after 30s. Retrying in 1 minute.', kind:'danger'})">Failure</button>
+      <button class="btn btn-secondary" onclick="g.toast({title:'Draft saved'})">Plain</button>
+    </div>
+    <span class="cap">Success and failure carry their icon; a plain toast is just the fact. Errors say what happened and what happens next, with no apology and no exception strings.</span>
+  </section>
+  <section>
+    <span class="label">With an action</span>
+    <div class="row">
+      <button class="btn btn-secondary" onclick="g.toast({title:'Member removed', desc:'JK no longer has access', kind:'ok', duration:6000, action:{label:'Undo', onClick:()=>g.toast({title:'Member restored', kind:'ok'})}})">Remove member</button>
+      <button class="btn btn-secondary" onclick="const t=g.toast({title:'Deploying g-site', desc:'Edition 42', kind:'loading'}); setTimeout(()=>t.update({title:'Deployed', desc:'Live in 2.4s', kind:'ok'}), 2200)">Deploy, then resolve</button>
+    </div>
+    <span class="cap">An action button rides the toast; Undo gets a longer timer. A loading toast is sticky until it resolves, then dismisses itself like any other.</span>
+  </section>
+  <section>
+    <span class="label">Progress</span>
+    <div class="row">
+      <button class="btn btn-secondary" onclick="upload()">Upload three assets</button>
+      <button class="btn btn-secondary" onclick="reindex()">Reindex</button>
+    </div>
+    <span class="cap">A measurable job gets a filled bar and a percentage; the fill only moves forward. Work with no measurable end sweeps instead of lying about a number. The bar leaves with the loading state, so the resolved toast is just the outcome.</span>
+  </section>
+  <section>
+    <span class="label">The stack</span>
+    <div class="row">
+      <button class="btn btn-secondary" onclick="['brain-mcp','gcommand','state-api','g-site'].forEach((s,i)=>setTimeout(()=>g.toast({title:s+' redeployed', kind:'ok'}), i*280))">Fire four</button>
+    </div>
+    <span class="cap">Newest lands on top; the rest recede at 14px and 5% scale per step, three visible. Hovering the stack pauses every timer. The word stays the same through the flow: a Publish button makes a Published toast.</span>
+  </section>
+<script>
+function upload() {
+  const t = g.toast({ title: "Uploading three assets", desc: "0%", kind: "loading", progress: 0 });
+  let p = 0;
+  /* reported often and in small steps, so the fill reads as one movement */
+  const step = setInterval(() => {
+    p = Math.min(1, p + 0.04);
+    t.update({ progress: p, desc: Math.round(p * 100) + "%" });
+    if (p === 1) {
+      clearInterval(step);
+      setTimeout(() => t.update({ title: "Upload complete", desc: "Three assets added", kind: "ok", progress: null }), 450);
+    }
+  }, 130);
+}
+function reindex() {
+  const t = g.toast({ title: "Reindexing the workspace", desc: "This can take a minute", kind: "loading", progress: true });
+  setTimeout(() => t.update({ title: "Reindexed", desc: "1,284 records", kind: "ok", progress: null }), 3200);
+}
+</script>
+</body>
+</html>

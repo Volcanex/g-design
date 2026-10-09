@@ -1,0 +1,47 @@
+<!-- @dsCard group="Guidelines" name="Tailwind proof" subtitle="The same tokens back raw CSS and Tailwind v4 utilities. Twins, pixel for pixel." viewport="760x420" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Tailwind proof</title>
+<link rel="stylesheet" href="../assets/g.css">
+<link rel="stylesheet" href="../assets/tw.css">
+<style>
+  body { padding: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-4); }
+  .halves { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4); }
+  .half-label { font-size: 11px; font-weight: 500; color: var(--text-placeholder); margin-bottom: 8px; }
+  .cap { font-size: 12px; color: var(--text-secondary); max-width: 620px; line-height: 1.55; }
+</style>
+</head>
+<body>
+  <div class="halves">
+    <div id="raw-half">
+      <div class="half-label">Raw CSS: .card, .btn, .badge</div>
+      <div class="card" style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="card-title">Production database</span>
+          <span class="badge badge-ok">Live</span>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-secondary">Preview</button>
+          <button class="btn btn-tertiary">Cancel</button>
+        </div>
+      </div>
+    </div>
+    <div id="tw-half">
+      <div class="half-label">Tailwind v4 utilities, @theme inline</div>
+      <div class="bg-surface-2 border border-edge-subtle rounded-cardr p-4 shadow-[inset_0_1px_0_var(--highlight)] flex flex-col gap-3">
+        <div class="flex items-center gap-2">
+          <span class="font-ui text-ui font-medium text-ink">Production database</span>
+          <span class="inline-flex items-center gap-[5px] h-5 px-2 rounded-full border border-okedge bg-okwash text-oktext text-xs font-[450] leading-none before:content-[''] before:size-[5px] before:rounded-full before:bg-current">Live</span>
+        </div>
+        <div class="flex gap-2">
+          <button class="inline-flex items-center justify-center h-8 px-3 rounded-control border border-edge bg-transparent font-ui text-ui font-[450] tracking-[-0.003em] leading-none text-ink cursor-pointer transition duration-[140ms] hover:bg-hoverfill hover:border-edge-hover hover:scale-[1.02] active:scale-[0.97]">Preview</button>
+          <button class="inline-flex items-center justify-center h-8 px-3 rounded-control border border-edge-subtle bg-transparent font-ui text-ui font-[450] tracking-[-0.003em] leading-none text-ink-2 cursor-pointer transition duration-[140ms] hover:bg-hoverfill hover:text-ink hover:border-edge hover:scale-[1.02] active:scale-[0.97]">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="cap">One set of custom properties feeds both. The Tailwind side maps semantic tokens through <span class="mono">@theme inline</span> in <span class="mono">tailwind/tw-input.css</span>, compiled at build time with the v4 CLI and no config file. Preflight is skipped, so both halves share the same base. The build screenshots both halves and diffs them; parity is checked, not assumed.</p>
+</body>
+</html>

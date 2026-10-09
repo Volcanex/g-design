@@ -1,0 +1,103 @@
+<!-- @dsCard group="Components" name="Feedback & overlays" subtitle="Badges, skeletons that mirror their content, tabs, menu, dialog, toasts." viewport="760x620" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Feedback and overlays</title>
+<link rel="stylesheet" href="../assets/g.css">
+<script defer src="../assets/g-ui.js"></script>
+<style>
+  body { padding: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-5); }
+  section { display: flex; flex-direction: column; gap: var(--sp-3); }
+  .row { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; }
+  .cap { font-size: 12px; color: var(--text-secondary); }
+  .skel-pair { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4); }
+  .skel-pair[data-overlay] { grid-template-columns: 1fr; position: relative; max-width: 360px; }
+  .skel-pair[data-overlay] > .card:first-child { position: absolute; inset: 0; opacity: 0.5; pointer-events: none; z-index: 1; }
+  .line-item { display: flex; align-items: center; gap: var(--sp-3); }
+  .line-item .lines { flex: 1; display: flex; flex-direction: column; gap: var(--sp-2); }
+  .tabpanels { font-size: var(--font-size-ui); color: var(--text-secondary); padding: var(--sp-3) var(--sp-1); }
+</style>
+</head>
+<body>
+  <section>
+    <span class="label">Status</span>
+    <div class="row">
+      <span class="badge badge-ok" id="status-demo">Live</span>
+      <span class="badge badge-warn">Degraded</span>
+      <span class="badge badge-danger">Down</span>
+      <span class="badge badge-info">Beta</span>
+      <span class="badge badge-plain">Archived</span>
+      <button class="btn btn-tertiary btn-sm" onclick="nextStatus()">Simulate change</button>
+      <span style="flex:1"></span>
+      <span class="avatar-stack"><span class="avatar">RA</span><span class="avatar">MH</span><span class="avatar">+3</span></span>
+      <span class="spinner" role="status" aria-label="Loading"></span>
+      <span class="kbd">⌘</span><span class="kbd">K</span>
+    </div>
+    <span class="cap">A status blinks a few times as it flips, so the change registers.</span>
+  </section>
+  <section>
+    <div class="row"><span class="label">Skeleton mirrors its content</span><button class="btn btn-tertiary btn-sm" onclick="document.querySelector('.skel-pair').toggleAttribute('data-overlay')">Prove it</button></div>
+    <div class="skel-pair">
+      <div class="card line-item">
+        <span class="skeleton" style="width:26px;height:26px;border-radius:50%"></span>
+        <span class="lines"><span class="skeleton skeleton-text" style="width:60%"></span><span class="skeleton skeleton-text" style="width:35%;height:.75em"></span></span>
+      </div>
+      <div class="card line-item">
+        <span class="avatar">RA</span>
+        <span class="lines"><span style="font-size:13px;font-weight:500">Robin Ashby</span><span style="font-size:11px;color:var(--text-secondary)">deployed g-site</span></span>
+      </div>
+    </div>
+    <span class="cap">Same layout tokens on both sides so they cannot drift. Prove it superimposes the skeleton on the loaded card; the shapes align exactly. Shimmer runs left to right, and a 350ms delay stops quick loads flashing it.</span>
+  </section>
+  <section>
+    <span class="label">Tabs</span>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" aria-selected="true" aria-controls="p-over">Overview</button>
+      <button class="tab" role="tab" aria-controls="p-logs">Logs</button>
+      <button class="tab" role="tab" aria-controls="p-set">Settings</button>
+    </div>
+    <div class="tabpanels">
+      <div id="p-over" role="tabpanel">The indicator slides between tabs: 200ms ease-out on transform and width.</div>
+      <div id="p-logs" role="tabpanel" hidden>Nothing new in the last hour.</div>
+      <div id="p-set" role="tabpanel" hidden>Settings live here.</div>
+    </div>
+  </section>
+  <section>
+    <span class="label">Overlays</span>
+    <div class="row">
+      <button class="btn btn-secondary" popovertarget="demo-menu">Actions</button>
+      <button class="btn btn-secondary" onclick="document.getElementById('demo-dlg').showModal()">Delete service…</button>
+      <button class="btn btn-secondary" onclick="g.toast({title:'Deployment started',desc:'g-site, edition 42',kind:'ok'})">Toast</button>
+      <button class="btn btn-tertiary" data-tip="Tooltips share a warm-up: 300ms once, then instant between neighbours">Hover me</button>
+      <button class="btn btn-tertiary" data-tip="See, no wait this time">Then me</button>
+    </div>
+  </section>
+
+  <div class="menu" popover id="demo-menu" role="menu">
+    <button class="menu-item" role="menuitem"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M216,32H88a8,8,0,0,0-8,8V80H40a8,8,0,0,0-8,8V216a8,8,0,0,0,8,8H168a8,8,0,0,0,8-8V176h40a8,8,0,0,0,8-8V40A8,8,0,0,0,216,32ZM160,208H48V96H160Zm48-48H176V88a8,8,0,0,0-8-8H96V48H208Z"/></svg>Duplicate<span class="kbd">D</span></button>
+    <button class="menu-item" role="menuitem"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M200,64V168a8,8,0,0,1-16,0V83.31L69.66,197.66a8,8,0,0,1-11.32-11.32L172.69,72H88a8,8,0,0,1,0-16H192A8,8,0,0,1,200,64Z"/></svg>Open live site</button>
+    <hr class="separator">
+    <button class="menu-item danger" role="menuitem"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"/></svg>Delete</button>
+  </div>
+
+  <dialog class="dlg" id="demo-dlg" aria-labelledby="dlg-t">
+    <div class="dlg-body">
+      <span class="dlg-title" id="dlg-t">Delete state-api?</span>
+      <span class="dlg-desc">The service stops immediately and its domain is released. Deployments and logs are kept for 30 days, so this can be undone until 3 October.</span>
+    </div>
+    <div class="dlg-foot">
+      <button class="btn btn-secondary" onclick="this.closest('dialog').close()">Cancel</button>
+      <button class="btn btn-danger" onclick="this.closest('dialog').close();g.toast({title:'state-api deleted',desc:'Restorable until 3 October',kind:'danger'})"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"/></svg>Delete service</button>
+    </div>
+  </dialog>
+<script>
+const STATES = [["danger", "Down"], ["ok", "Live"], ["warn", "Degraded"]];
+let si = 0;
+function nextStatus() {
+  const [kind, label] = STATES[si++ % STATES.length];
+  g.status(document.getElementById("status-demo"), { kind, label });
+}
+</script>
+</body>
+</html>

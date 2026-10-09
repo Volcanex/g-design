@@ -1,0 +1,115 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "g-design",
+  "homepage": "https://github.com/Volcanex/g-design",
+  "items": [
+    {
+      "name": "button",
+      "type": "registry:ui",
+      "title": "Button",
+      "description": "g-design button: g tokens over Base UI and friends. Pair with g.css (or tokens.css + the react shim).",
+      "files": [
+        {
+          "path": "components/g/button.jsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "command",
+      "type": "registry:ui",
+      "title": "Command",
+      "description": "g-design command: g tokens over Base UI and friends. Pair with g.css (or tokens.css + the react shim).",
+      "files": [
+        {
+          "path": "components/g/command.jsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "dialog",
+      "type": "registry:ui",
+      "title": "Dialog",
+      "description": "g-design dialog: g tokens over Base UI and friends. Pair with g.css (or tokens.css + the react shim).",
+      "files": [
+        {
+          "path": "components/g/dialog.jsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "drawer",
+      "type": "registry:ui",
+      "title": "Drawer",
+      "description": "g-design drawer: g tokens over Base UI and friends. Pair with g.css (or tokens.css + the react shim).",
+      "files": [
+        {
+          "path": "components/g/drawer.jsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "menu",
+      "type": "registry:ui",
+      "title": "Menu",
+      "description": "g-design menu: g tokens over Base UI and friends. Pair with g.css (or tokens.css + the react shim).",
+      "files": [
+        {
+          "path": "components/g/menu.jsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "stat",
+      "type": "registry:ui",
+      "title": "Stat",
+      "description": "g-design stat: g tokens over Base UI and friends. Pair with g.css (or tokens.css + the react shim).",
+      "files": [
+        {
+          "path": "components/g/stat.jsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "switch",
+      "type": "registry:ui",
+      "title": "Switch",
+      "description": "g-design switch: g tokens over Base UI and friends. Pair with g.css (or tokens.css + the react shim).",
+      "files": [
+        {
+          "path": "components/g/switch.jsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "tabs",
+      "type": "registry:ui",
+      "title": "Tabs",
+      "description": "g-design tabs: g tokens over Base UI and friends. Pair with g.css (or tokens.css + the react shim).",
+      "files": [
+        {
+          "path": "components/g/tabs.jsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "tooltip",
+      "type": "registry:ui",
+      "title": "Tooltip",
+      "description": "g-design tooltip: g tokens over Base UI and friends. Pair with g.css (or tokens.css + the react shim).",
+      "files": [
+        {
+          "path": "components/g/tooltip.jsx",
+          "type": "registry:ui"
+        }
+      ]
+    }
+  ]
+}

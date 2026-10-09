@@ -1,0 +1,14 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "button",
+  "type": "registry:ui",
+  "title": "Button",
+  "description": "g-design button: g tokens over Base UI and friends. Pair with g.css (or tokens.css + the react shim).",
+  "files": [
+    {
+      "path": "components/g/button.jsx",
+      "content": "export function Button({ variant = \"secondary\", size, loading, className, children, disabled, ...props }) {\n  const cls = [\"btn\", `btn-${variant}`, size && `btn-${size}`, className].filter(Boolean).join(\" \");\n  return (\n    <button\n      className={cls}\n      data-loading={loading || undefined}\n      aria-busy={loading || undefined}\n      disabled={disabled || loading}\n      {...props}\n    >\n      {children}\n      <span className=\"spinner\" aria-hidden=\"true\" />\n    </button>\n  );\n}\n",
+      "type": "registry:ui"
+    }
+  ]
+}

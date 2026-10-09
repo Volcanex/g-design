@@ -1,0 +1,7 @@
+[project]
+name = "g-design"
+version = "1.5.0"
+description = "g-design, the G-System design language: Radix slate tokens, a framework-free component layer and reference docs"
+
+[tool.gcore]
+depends = []

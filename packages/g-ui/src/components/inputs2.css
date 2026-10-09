@@ -1,0 +1,263 @@
+/* g-ui components: slider, progress, meter, dropzone.
+   Value-carrying controls. Each one keeps its number in the DOM the browser
+   already owns (the range input, aria-valuenow, the file input's FileList),
+   so the paint below is only ever a read of that. */
+
+/* ---------------------------------------------------------------- slider */
+
+/* .g-slider is the wrapper; it carries --_p (0..1, set by the behaviour
+   layer on input) and draws the rail, so the native input is left holding
+   nothing but its thumb and its keyboard. */
+.g-slider {
+  position: relative;
+  display: block;
+}
+.g-slider[data-output] { padding-top: 18px; }
+
+.g-slider::before,
+.g-slider::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 6px;
+  height: 4px;
+  border-radius: var(--radius-full);
+  pointer-events: none;
+}
+.g-slider::before { right: 0; background: var(--fill-active); }
+/* the fill stops under the thumb centre, which travels 8px..100%-8px */
+.g-slider::after {
+  width: calc(8px + var(--_p, 0) * (100% - 16px));
+  background: var(--accent-fill);
+}
+
+.g-slider input[type="range"] {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 16px;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.g-slider input[type="range"]::-webkit-slider-runnable-track {
+  height: 16px;
+  background: transparent;
+}
+.g-slider input[type="range"]::-moz-range-track {
+  height: 4px;
+  background: transparent;
+}
+.g-slider input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border: none;
+  border-radius: 50%;
+  background: var(--accent-fill);
+  box-shadow: 0 0 0 2px var(--surface-1);
+  transition: transform var(--dur-base) var(--ease-out);
+}
+.g-slider input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border: none;
+  border-radius: 50%;
+  background: var(--accent-fill);
+  box-shadow: 0 0 0 2px var(--surface-1);
+  transition: transform var(--dur-base) var(--ease-out);
+}
+.g-slider input[type="range"]:hover::-webkit-slider-thumb { transform: scale(1.12); }
+.g-slider input[type="range"]:hover::-moz-range-thumb { transform: scale(1.12); }
+.g-slider input[type="range"]:active::-webkit-slider-thumb { transform: scale(0.94); }
+.g-slider input[type="range"]:active::-moz-range-thumb { transform: scale(0.94); }
+.g-slider input[type="range"]:focus { outline: none; }
+.g-slider input[type="range"]:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 3px;
+  border-radius: var(--radius-full);
+}
+.g-slider input[type="range"]:disabled { cursor: default; opacity: 0.45; }
+
+/* the readout rides the thumb rather than sitting in a fixed corner, so the
+   number and the position it describes are never read as two facts */
+.g-slider-out {
+  position: absolute;
+  top: 0;
+  left: calc(8px + var(--_p, 0) * (100% - 16px));
+  translate: -50% 0;
+  font-size: 12px;
+  line-height: 1;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  pointer-events: none;
+  transition: color var(--dur-base) var(--ease-out);
+}
+.g-slider-out::after { content: attr(data-suffix); position: absolute; left: 100%; top: 0; }
+.g-slider:hover .g-slider-out,
+.g-slider:focus-within .g-slider-out { color: var(--text-primary); }
+
+/* ---------------------------------------------------------------- progress + meter */
+
+.g-progress,
+.g-meter {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 6px;
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background: var(--fill-active);
+}
+.g-progress-fill,
+.g-meter-fill {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent-fill);
+}
+.g-progress-fill { transition: width var(--dur-slow) var(--ease-out); }
+.g-meter-fill { transition: width var(--dur-slow) var(--ease-out), background var(--dur-base) var(--ease-out); }
+
+/* Indeterminate: one segment sweeps the track on transform alone, so the
+   layout never reflows and the loop can be cut dead under reduced motion. */
+.g-progress[data-indeterminate] .g-progress-fill {
+  width: 34%;
+  transition: none;
+  animation: g-progress-sweep 1.4s linear infinite;
+}
+@keyframes g-progress-sweep {
+  from { transform: translateX(-105%); }
+  to { transform: translateX(300%); }
+}
+
+.g-meter[data-zone="ok"] .g-meter-fill { background: var(--ok-text); }
+.g-meter[data-zone="warn"] .g-meter-fill { background: var(--warn-text); }
+.g-meter[data-zone="danger"] .g-meter-fill { background: var(--danger-text); }
+
+/* ---------------------------------------------------------------- dropzone */
+
+.g-dropzone {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-3);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  background: var(--well-bg);
+  transition: border-color var(--dur-base) var(--ease-out), background var(--dur-base) var(--ease-out);
+}
+.g-dropzone:hover { border-color: var(--border-hover); }
+.g-dropzone[data-dragover] {
+  border-color: var(--border-hover);
+  background: var(--fill-hover);
+}
+.g-dropzone:focus-within {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* the input covers the prompt only, never the file list, so a remove button
+   below it stays clickable and does not re-open the picker */
+.g-dropzone-prompt {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: var(--sp-3);
+  text-align: center;
+}
+.g-dropzone input[type="file"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+.g-dropzone input[type="file"]:disabled { cursor: default; }
+.g-dropzone-prompt svg {
+  width: 20px;
+  height: 20px;
+  color: var(--text-placeholder);
+  transition: color var(--dur-base) var(--ease-out), translate var(--dur-base) var(--ease-out);
+}
+.g-dropzone[data-dragover] .g-dropzone-prompt svg {
+  color: var(--text-primary);
+  translate: 0 -2px;
+}
+.g-dropzone-title { font-size: var(--font-size-ui); line-height: var(--lh-2); font-weight: 500; }
+.g-dropzone-hint { font-size: 12px; line-height: var(--lh-1); color: var(--text-secondary); }
+
+.g-dropzone-files {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.g-dropzone-files:empty { display: none; }
+.g-dropzone-file {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--h-control-sm);
+  padding: 0 4px 0 8px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--surface-1);
+  font-size: var(--font-size-ui);
+  animation: g-file-in var(--dur-slow) var(--ease-out) backwards;
+}
+@keyframes g-file-in {
+  from { opacity: 0; translate: 0 3px; }
+  to { opacity: 1; translate: 0 0; }
+}
+.g-dropzone-file svg { width: 14px; height: 14px; flex: none; color: var(--text-secondary); }
+.g-dropzone-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.g-dropzone-size { font-size: 12px; line-height: var(--lh-2); color: var(--text-secondary); flex: none; }
+
+/* ---------------------------------------------------------------- adaptation */
+
+/* 44px hit area on coarse pointers; the negative margins keep the wrapper
+   16px tall, so the rail and thumb do not move. */
+@media (pointer: coarse) {
+  .g-slider input[type="range"] { height: 44px; margin: -14px 0; }
+  .g-slider input[type="range"]::-webkit-slider-runnable-track { height: 44px; }
+  .g-slider input[type="range"]::-webkit-slider-thumb { margin-top: 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .g-progress[data-indeterminate] .g-progress-fill {
+    animation: none !important;
+    width: 100%;
+    opacity: 0.45;
+  }
+  .g-dropzone-file { animation: none; }
+}
+
+/* Pinned: the bar is an edge of its panel, not an object in it. At rest it
+   IS the hairline separator; the fill thickens to 3px while work runs, so the
+   panel never carries a rule and a track side by side. */
+.g-progress-pinned { position: sticky; top: 0; z-index: 1; height: 3px; border-radius: 0; background: transparent; overflow: visible; }
+.g-progress-pinned::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 1px; background: var(--border-subtle); }
+.g-progress-pinned .g-progress-fill { position: relative; border-radius: 0; height: 1px; transition: width var(--dur-slow) var(--ease-out), height var(--dur-base) var(--ease-out); }
+.g-progress-pinned[aria-valuenow]:not([aria-valuenow="0"]) .g-progress-fill, .g-progress-pinned[data-indeterminate] .g-progress-fill { height: 3px; }
+/* Readout: percent first, then whatever the job can honestly report. The
+   facts are separated by a gap off the spacing scale, never by a glyph. */
+.progress-readout { display: inline-flex; align-items: baseline; gap: var(--sp-2); font-family: var(--font-mono); font-size: 11px; line-height: var(--lh-1); color: var(--text-secondary); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.progress-readout .pct { font-weight: 500; color: var(--text-primary); }

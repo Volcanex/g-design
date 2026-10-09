@@ -1,0 +1,137 @@
+/* ---- charts (g.chart) --------------------------------------------------
+   Dependency-free SVG renderers. Colour stays in the markup as
+   var(--chart-N) strings, so a theme switch recolours a chart live and no
+   re-render is needed. Everything that is not colour or geometry is here. */
+
+.g-chart { display: flex; flex-direction: column; gap: var(--sp-2); min-width: 0; }
+.g-chart > svg { display: block; flex: 1 1 auto; min-height: 0; overflow: visible; }
+.g-chart text {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  fill: var(--text-placeholder);
+}
+.g-chart .num { font-variant-numeric: tabular-nums; }
+.g-chart .center-value { fill: var(--text-primary); font-weight: 500; }
+
+/* Donut with its legend beside rather than under it. */
+.g-chart[data-layout="side"] { flex-direction: row; align-items: center; gap: var(--sp-4); }
+.g-chart[data-layout="side"] .g-chart-legend { flex-direction: column; flex-wrap: nowrap; gap: var(--sp-2); }
+
+.g-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2) var(--sp-4);
+  font-size: 11px;
+  line-height: var(--lh-1);
+  color: var(--text-secondary);
+}
+.g-chart-key { display: inline-flex; align-items: baseline; gap: 6px; white-space: nowrap; }
+.g-chart-key i {
+  width: 7px; height: 7px;
+  flex: none;
+  border-radius: 50%;
+  translate: 0 -1px;
+}
+.g-chart-key b {
+  margin-left: 2px;
+  color: var(--text-primary);
+  font-weight: 450;
+  font-variant-numeric: tabular-nums;
+}
+
+.g-spark { display: block; height: var(--h-2); }
+
+/* Retained scatter geometry moves together, without an entrance or fades. */
+.g-chart [data-scatter-point], .g-chart [data-scatter-line-label] {
+  transition: translate var(--spring-smooth-dur) var(--spring-smooth);
+}
+.g-chart [data-scatter-pivot] {
+  transition: translate var(--spring-smooth-dur) var(--spring-smooth), rotate var(--spring-smooth-dur) var(--spring-smooth);
+}
+.g-chart [data-scatter-frontier] {
+  transition: d var(--spring-smooth-dur) var(--spring-smooth);
+}
+.g-chart [data-scatter-point][data-hollow] text { fill: var(--text-placeholder); }
+
+/* Breakdown: a score taken apart, one row per candidate on a shared axis.
+   Gains are solid on the upper lane, costs are hatched on the lower one,
+   so the two read apart without a second colour. */
+.g-breakdown-rows { display: flex; flex-direction: column; gap: var(--sp-1); }
+[data-breakdown-row] {
+  display: flex; flex-direction: column; gap: var(--sp-1);
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  outline: none;
+}
+[data-breakdown-row][data-focus], [data-breakdown-row]:focus-visible { background: var(--fill-hover); }
+[data-breakdown-row]:focus-visible { border-color: var(--focus-ring); }
+[data-breakdown-row][data-active] { border-color: var(--accent-edge); }
+.g-breakdown-head { display: flex; align-items: baseline; gap: var(--sp-2); font-size: var(--font-size-ui); line-height: var(--lh-2); min-height: var(--lh-2); }
+.g-breakdown-label { color: var(--text-secondary); white-space: nowrap; }
+[data-breakdown-row][data-active] .g-breakdown-label { color: var(--text-primary); font-weight: 600; }
+.g-breakdown-badge:empty { display: none; }
+.g-breakdown-total { margin-left: auto; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+[data-breakdown-row][data-hollow] .g-breakdown-total { color: var(--text-placeholder); }
+.g-breakdown-track { position: relative; height: var(--sp-5); }
+.g-breakdown-track > i { position: absolute; display: block; }
+.g-breakdown-seg {
+  top: 2px; height: 8px;
+  background: var(--seg);
+  border-radius: 1px;
+}
+.g-breakdown-seg[data-cost] {
+  top: 10px;
+  background: repeating-linear-gradient(135deg, var(--seg) 0 1.5px, transparent 1.5px 4px);
+  box-shadow: inset 0 0 0 1px var(--seg);
+}
+[data-breakdown-row][data-hollow] .g-breakdown-seg:not([data-cost]) {
+  background: repeating-linear-gradient(135deg, var(--seg) 0 1px, transparent 1px 3px);
+  box-shadow: inset 0 0 0 1px var(--seg);
+}
+.g-breakdown-zero { top: 0; bottom: 0; width: 1px; background: var(--border-subtle); }
+.g-breakdown-guide { top: -4px; bottom: -4px; width: 0; border-left: 1px dashed var(--accent-edge); }
+.g-breakdown-guide[hidden] { display: none; }
+.g-breakdown-gap { top: 21px; height: 3px; background: var(--text-placeholder); border-radius: 2px; }
+.g-breakdown-mark { top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--text-primary); border-radius: 1px; }
+[data-breakdown-row][data-active] .g-breakdown-mark { background: var(--accent-edge); }
+.g-breakdown-note { margin: 0; font-size: 12px; line-height: var(--lh-1); color: var(--text-secondary); min-height: var(--lh-1); }
+.g-breakdown-note:empty { display: none; }
+.g-chart-key[data-cost] i { border-radius: 1px; }
+.g-breakdown-seg, .g-breakdown-gap, .g-breakdown-guide, .g-breakdown-mark, .g-breakdown-zero {
+  transition: left var(--spring-smooth-dur) var(--spring-smooth), width var(--spring-smooth-dur) var(--spring-smooth);
+}
+/* Entrance is a wipe from the left edge, once per row. */
+.g-breakdown-track[data-reveal] { clip-path: inset(-6px 100% -6px 0); transition: clip-path 600ms cubic-bezier(0.2, 0.7, 0.2, 1); }
+.g-breakdown-track[data-reveal][data-on] { clip-path: inset(-6px 0 -6px 0); }
+
+/* Focus from a linked chart rings the point. */
+.g-chart [data-scatter-point][data-focus] > circle:first-child { display: inline; stroke-dasharray: 2 2; }
+
+/* Entrance: lines draw themselves, bars rise off the baseline. Once per
+   element, applied by the renderer, never replayed on a re-render unless
+   g.chart.replay(host) re-arms it first. */
+.g-chart [data-draw] {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 900ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.g-chart [data-draw][data-on] { stroke-dashoffset: 0; }
+.g-chart [data-rise] {
+  transform: scaleY(0);
+  transform-box: view-box;
+  transition: transform 600ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.g-chart [data-rise][data-on] { transform: scaleY(1); }
+.g-chart [data-fade] { opacity: 0; transition: opacity 500ms var(--ease-out); }
+.g-chart [data-fade][data-on] { opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .g-chart [data-scatter-point], .g-chart [data-scatter-line-label],
+  .g-chart [data-scatter-pivot], .g-chart [data-scatter-frontier],
+  .g-breakdown-seg, .g-breakdown-gap, .g-breakdown-guide, .g-breakdown-mark, .g-breakdown-zero { transition: none; }
+  .g-breakdown-track[data-reveal] { clip-path: none; }
+  .g-chart [data-draw] { stroke-dasharray: none; stroke-dashoffset: 0; }
+  .g-chart [data-rise] { transform: none; }
+  .g-chart [data-fade] { opacity: 1; }
+}

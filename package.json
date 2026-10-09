@@ -1,0 +1,22 @@
+{
+  "name": "g-design",
+  "version": "0.1.0",
+  "description": "g-design, the G-System design language: tokens generated from @radix-ui/colors and a framework-free UI layer",
+  "scripts": {
+    "build": "node scripts/build.mjs"
+  },
+  "dependencies": {
+    "@phosphor-icons/core": "^2.1.1",
+    "@radix-ui/colors": "^3.0.0",
+    "number-flow": "^0.6.2"
+  },
+  "private": true,
+  "license": "SEE LICENSE IN LICENSE",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.3",
+    "playwright": "^1.63.0",
+    "postcss-html": "^2.0.0",
+    "stylelint": "^17.14.1",
+    "tailwindcss": "^4.3.3"
+  }
+}

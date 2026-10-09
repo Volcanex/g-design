@@ -1,0 +1,8 @@
+node_modules/
+.venv-gadmin/
+__pycache__/
+*.pyc
+
+# build intermediates: regenerated from packages/g-tokens/fonts on every build
+packages/g-tokens/dist/fonts/
+packages/g-ui-react/demo/public/fonts/

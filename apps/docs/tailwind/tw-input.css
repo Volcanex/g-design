@@ -1,0 +1,25 @@
+/* Tailwind v4, CSS-first. No config file. Theme and utilities only: no
+   preflight, so the raw-CSS half of the proof page is untouched. The same
+   custom properties back both worlds. */
+@import "tailwindcss/theme" layer(theme);
+@import "tailwindcss/utilities" layer(utilities);
+@source "../guidelines/tailwind-proof.card.html";
+
+@theme inline {
+  --color-*: initial;
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--text-primary);
+  --color-ink-2: var(--text-secondary);
+  --color-edge: var(--border);
+  --color-edge-subtle: var(--border-subtle);
+  --color-edge-hover: var(--border-hover);
+  --color-hoverfill: var(--fill-hover);
+  --color-okwash: var(--green-a3);
+  --color-okedge: var(--green-a4);
+  --color-oktext: var(--ok-text);
+  --radius-control: 6.5px;
+  --radius-cardr: 9.5px;
+  --font-ui: "InterVariable", ui-sans-serif, system-ui, sans-serif;
+  --text-ui: 13px;
+}

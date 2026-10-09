@@ -1,0 +1,52 @@
+<!-- @dsCard group="Guidelines" name="The greys rule" subtitle="Twelve Radix steps, six permitted. Fills and borders are alpha." viewport="760x560" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The greys rule</title>
+<link rel="stylesheet" href="../assets/g.css">
+<style>
+  body { padding: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-4); }
+  .intro { font-size: var(--font-size-ui); color: var(--text-secondary); max-width: 560px; }
+  .strip { display: flex; flex-direction: column; gap: var(--sp-1); }
+  .step { display: grid; grid-template-columns: 44px 28px 1fr 190px; gap: var(--sp-3); align-items: center; font-size: 12px; }
+  .sw { width: 44px; height: 24px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); }
+  .step .n { color: var(--text-placeholder); font-variant-numeric: tabular-nums; }
+  .step .use { color: var(--text-secondary); }
+  .step .tok { color: var(--text-placeholder); font-family: var(--font-mono); font-size: 11px; text-align: right; }
+  .step[data-no] .use { color: var(--red-11); }
+  .step[data-no] .sw { position: relative; }
+  .step[data-no] .sw::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top right, transparent 47%, var(--red-11) 48%, var(--red-11) 52%, transparent 53%); opacity: .7; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4); }
+  .demo { border-radius: var(--radius-card); border: 1px solid var(--border-subtle); background: var(--surface-1); color: var(--text-primary); padding: var(--sp-4); }
+  .demo .card { margin-top: 8px; display: flex; align-items: center; gap: 8px; font-size: 12px; }
+</style>
+</head>
+<body>
+  <p class="intro">Radix slate gives twelve steps. A calm system uses six. Every interaction fill and every border is an <b>alpha</b> value so nested surfaces compose. Solid steps 3 to 7 as backgrounds are where murk comes from, and they are forbidden.</p>
+  <div class="strip">
+    <div class="step"><span class="sw" style="background:var(--slate-1)"></span><span class="n">1</span><span class="use">Page background</span><span class="tok">--surface-1</span></div>
+    <div class="step"><span class="sw" style="background:var(--slate-2)"></span><span class="n">2</span><span class="use">Card, panel, overlay</span><span class="tok">--surface-2</span></div>
+    <div class="step" data-no><span class="sw" style="background:var(--slate-3)"></span><span class="n">3</span><span class="use">Forbidden as solid. Use --fill-hover (a3)</span><span class="tok">--slate-a3</span></div>
+    <div class="step" data-no><span class="sw" style="background:var(--slate-4)"></span><span class="n">4</span><span class="use">Forbidden as solid. Use --fill-active (a4)</span><span class="tok">--slate-a4</span></div>
+    <div class="step" data-no><span class="sw" style="background:var(--slate-5)"></span><span class="n">5</span><span class="use">Forbidden as solid. The inset highlight is a5</span><span class="tok">--slate-a5</span></div>
+    <div class="step" data-no><span class="sw" style="background:var(--slate-6)"></span><span class="n">6</span><span class="use">Forbidden as solid. The hairline border is a6</span><span class="tok">--slate-a6</span></div>
+    <div class="step" data-no><span class="sw" style="background:var(--slate-7)"></span><span class="n">7</span><span class="use">Forbidden as solid. The control border is a7</span><span class="tok">--slate-a7</span></div>
+    <div class="step"><span class="sw" style="background:var(--slate-8)"></span><span class="n">8</span><span class="use">Hover border (a8), focus ring</span><span class="tok">--focus-ring</span></div>
+    <div class="step"><span class="sw" style="background:var(--slate-9)"></span><span class="n">9</span><span class="use">Placeholder text</span><span class="tok">--text-placeholder</span></div>
+    <div class="step" data-no><span class="sw" style="background:var(--slate-10)"></span><span class="n">10</span><span class="use">Unused</span><span class="tok">none</span></div>
+    <div class="step"><span class="sw" style="background:var(--slate-11)"></span><span class="n">11</span><span class="use">Secondary text</span><span class="tok">--text-secondary</span></div>
+    <div class="step"><span class="sw" style="background:var(--slate-12)"></span><span class="n">12</span><span class="use">Primary text, contrast fill</span><span class="tok">--text-primary</span></div>
+  </div>
+  <div class="cols">
+    <div class="demo">
+      <span class="label">Dark, the default</span>
+      <div class="card">Alpha borders compose <span class="badge badge-ok">Live</span></div>
+    </div>
+    <div class="demo" data-theme="light">
+      <span class="label">Light, same six tokens</span>
+      <div class="card">Alpha borders compose <span class="badge badge-ok">Live</span></div>
+    </div>
+  </div>
+</body>
+</html>

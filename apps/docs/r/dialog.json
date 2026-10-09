@@ -1,0 +1,14 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "dialog",
+  "type": "registry:ui",
+  "title": "Dialog",
+  "description": "g-design dialog: g tokens over Base UI and friends. Pair with g.css (or tokens.css + the react shim).",
+  "files": [
+    {
+      "path": "components/g/dialog.jsx",
+      "content": "import { Dialog } from \"@base-ui/react/dialog\";\n\nexport function GDialog({ trigger, title, desc, actions }) {\n  return (\n    <Dialog.Root>\n      <Dialog.Trigger render={trigger} />\n      <Dialog.Portal>\n        <Dialog.Backdrop className=\"rdlg-backdrop\" />\n        <Dialog.Popup className=\"rdlg\">\n          <div className=\"dlg-body\">\n            <Dialog.Title className=\"dlg-title\">{title}</Dialog.Title>\n            {desc && <Dialog.Description className=\"dlg-desc\">{desc}</Dialog.Description>}\n          </div>\n          {actions && <div className=\"dlg-foot\">{actions}</div>}\n        </Dialog.Popup>\n      </Dialog.Portal>\n    </Dialog.Root>\n  );\n}\n\nexport const DialogClose = Dialog.Close;\n",
+      "type": "registry:ui"
+    }
+  ]
+}

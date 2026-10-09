@@ -1,0 +1,66 @@
+<!-- @dsCard group="Components" name="States" subtitle="Empty, error and not found: each one says what happened and offers the next move." viewport="760x460" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>States</title>
+<link rel="stylesheet" href="../assets/g.css">
+<script defer src="../assets/g-ui.js"></script>
+<style>
+  body { padding: var(--sp-4) var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-2); }
+  .cap { font-size: 12px; color: var(--text-secondary); }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4); }
+  .card .empty { padding: var(--sp-2) var(--sp-5); gap: 8px; }
+  .acts { display: flex; gap: 8px; }
+  .empty .acts { margin-top: 4px; }
+  .state { display: flex; flex-direction: column; gap: var(--sp-2); height: 100%; }
+  .state .head { display: flex; align-items: center; gap: var(--sp-2); }
+  .state .head svg { width: 16px; height: 16px; flex: none; }
+  .state .d { font-size: 12px; color: var(--text-secondary); line-height: 1.55; flex: 1; }
+  .state .acts { margin-top: var(--sp-1); }
+  .state-danger { border-color: var(--red-a4); }
+  .state-danger .head svg { color: var(--danger-text); }
+  .nf-code { font-size: 26px; font-weight: 500; letter-spacing: -0.02em; color: var(--text-placeholder); font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="empty" data-icon="search">
+      <span class="e-title">No services match that filter</span>
+      <span class="e-desc">Try a shorter term, or add the first service to this project.</span>
+      <div class="acts">
+        <button class="btn btn-secondary btn-sm">Add a service</button>
+        <button class="btn btn-tertiary btn-sm">Clear the filter</button>
+      </div>
+    </div>
+  </div>
+  <span class="cap">Empty is an invitation: it names what was looked for and offers the action that fills the space.</span>
+
+  <div class="pair">
+    <div class="card state state-danger">
+      <div class="head">
+        <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-80V80a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,172Z"/></svg>
+        <span class="card-title">The build stopped at step 3</span>
+        <span style="flex:1"></span>
+        <span class="badge badge-danger">Failed</span>
+      </div>
+      <span class="d">esbuild could not resolve <span class="mono">@base-ui/react</span>. Adding it to the lockfile and building again clears this.</span>
+      <div class="acts">
+        <button class="btn btn-secondary btn-sm">Try again</button>
+        <button class="btn btn-tertiary btn-sm">Open the build log</button>
+      </div>
+    </div>
+
+    <div class="card state">
+      <span class="nf-code">404</span>
+      <span class="card-title">Nothing lives at that address</span>
+      <span class="d">The link may predate the last edition. The service index lists what is live right now.</span>
+      <div class="acts">
+        <button class="btn btn-secondary btn-sm">Open the service index</button>
+        <button class="btn btn-tertiary btn-sm">Search the archive</button>
+      </div>
+    </div>
+  </div>
+  <span class="cap">An error names the step that failed and the fix, then leads with a verb. A missing page points at where the thing went.</span>
+</body>
+</html>

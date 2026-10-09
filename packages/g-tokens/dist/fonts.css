@@ -1,0 +1,44 @@
+/* g-tokens fonts: Inter (UI), Space Grotesk (display, optional), JetBrains Mono. */
+
+@font-face {
+  font-family: "InterVariable";
+  src: url("fonts/InterVariable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Space Grotesk";
+  src: url("fonts/SpaceGrotesk-Variable.woff2") format("woff2");
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("fonts/JetBrainsMono-Variable.woff2") format("woff2");
+  font-weight: 100 800;
+  font-style: normal;
+  font-display: swap;
+}
+/* Metric-matched fallback: Arial adjusted to Inter's metrics so the swap
+   never shifts layout. */
+@font-face {
+  font-family: "Inter Fallback";
+  src: local("Arial");
+  size-adjust: 107%;
+  ascent-override: 90.44%;
+  descent-override: 22.52%;
+  line-gap-override: 0%;
+}
+
+:root {
+  /* One-variable family swap: point --font-ui elsewhere and everything follows. */
+  --font-ui: "InterVariable", "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-ui); /* opt in to Space Grotesk per app */
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* Inter features: contextual alternates and ligatures on, optical sizing on.
+     Tabular numbers are opt-in via font-variant-numeric where data aligns. */
+  --font-features-ui: "calt" 1, "liga" 1, "cv05" 1, "cv11" 1;
+}

@@ -1,0 +1,102 @@
+Third-party notices for g-design
+
+The code in this repo is under PolyForm Noncommercial 1.0.0 (see LICENSE). The third-party material below keeps its own licence, and each of
+those licences still applies to it.
+
+Fonts
+  Inter, JetBrains Mono and Space Grotesk, under the SIL Open Font License 1.1.
+  Originals in packages/g-tokens/fonts/, subsets in dist/fonts/,
+  apps/docs/assets/fonts/ and apps/docs/react/fonts/. The copyright notices
+  and the full licence text are in OFL.txt in each of those folders, and
+  scripts/vendor.mjs copies it to consumers with the fonts.
+
+Phosphor icons (MIT), Copyright (c) 2023 Phosphor Icons
+  g.css, g-admin.css, g-ui.js and the docs cards embed icon glyph paths from
+  @phosphor-icons/core.
+
+Radix Colors (MIT), Copyright (c) 2021 Radix
+  The build generates the colour scales in packages/g-tokens/dist/tokens.css
+  and every built g.css from @radix-ui/colors.
+
+number-flow (MIT), Copyright (c) 2024 Maxwell Barvian
+  The build copies it unchanged into apps/docs/assets/vendor/number-flow/,
+  with its LICENSE.md beside it. apps/docs/assets/vendor/esm-env.js is a three-line
+  shim written for this repo. It stands in for esm-env (MIT, Copyright 2022
+  Benjamin McCann) and contains none of its code.
+
+Tailwind CSS (MIT), Copyright (c) Tailwind Labs, Inc.
+  The Tailwind CLI generates apps/docs/assets/tw.css, which keeps its licence
+  banner.
+
+React lab bundle, apps/docs/react/assets/
+  Vite bundles these packages into the React lab page:
+  aria-hidden (MIT): Copyright (c) 2017 Anton Korzunov
+  @babel/runtime (MIT): Copyright (c) 2014-present Sebastian McKenzie and other contributors
+  @base-ui/react (MIT): Copyright (c) 2019 Material-UI SAS
+  @base-ui/utils (MIT): Copyright (c) 2019 Material-UI SAS
+  cmdk (MIT): Copyright (c) 2022 Paco Coursey
+  detect-node-es (MIT): Copyright (c) 2017 Ilya Kantor
+  esm-env (MIT): Copyright 2022 Benjamin McCann
+  @floating-ui/core (MIT): Copyright (c) 2021-present Floating UI contributors
+  @floating-ui/dom (MIT): Copyright (c) 2021-present Floating UI contributors
+  @floating-ui/react-dom (MIT): Copyright (c) 2021-present Floating UI contributors
+  @floating-ui/utils (MIT): Copyright (c) 2021-present Floating UI contributors
+  framer-motion (MIT): Copyright (c) 2018 Framer B.V.
+  get-nonce (MIT): Copyright (c) 2020 Anton Korzunov
+  motion (MIT): Copyright (c) 2024 [Motion](https://motion.dev) B.V.
+  motion-dom (MIT): Copyright (c) 2024 [Motion](https://motion.dev) B.V.
+  motion-utils (MIT): Copyright (c) 2024 [Motion](https://motion.dev) B.V.
+  number-flow (MIT): Copyright (c) 2024 Maxwell Barvian
+  @number-flow/react (MIT): Copyright (c) 2024 Maxwell Barvian
+  @radix-ui/primitive (MIT): Copyright (c) 2022 WorkOS
+  @radix-ui/react-compose-refs (MIT): Copyright (c) 2022 WorkOS
+  @radix-ui/react-context (MIT): Copyright (c) 2022 WorkOS
+  @radix-ui/react-dialog (MIT): Copyright (c) 2022 WorkOS
+  @radix-ui/react-dismissable-layer (MIT): Copyright (c) 2022 WorkOS
+  @radix-ui/react-focus-guards (MIT): Copyright (c) 2022 WorkOS
+  @radix-ui/react-focus-scope (MIT): Copyright (c) 2022 WorkOS
+  @radix-ui/react-id (MIT): Copyright (c) 2022 WorkOS
+  @radix-ui/react-portal (MIT): Copyright (c) 2022 WorkOS
+  @radix-ui/react-presence (MIT): Copyright (c) 2022 WorkOS
+  @radix-ui/react-primitive (MIT): Copyright (c) 2022 WorkOS
+  @radix-ui/react-slot (MIT): Copyright (c) 2022 WorkOS
+  @radix-ui/react-use-callback-ref (MIT): Copyright (c) 2022 WorkOS
+  @radix-ui/react-use-controllable-state (MIT): Copyright (c) 2022 WorkOS
+  @radix-ui/react-use-effect-event (MIT): Copyright (c) 2022 WorkOS
+  @radix-ui/react-use-layout-effect (MIT): Copyright (c) 2022 WorkOS
+  react (MIT): Copyright (c) Meta Platforms, Inc. and affiliates.
+  react-dom (MIT): Copyright (c) Meta Platforms, Inc. and affiliates.
+  react-remove-scroll (MIT): Copyright (c) 2017 Anton Korzunov
+  react-remove-scroll-bar (MIT): Anton Korzunov (package author, no LICENSE file shipped)
+  react-style-singleton (MIT): Copyright (c) 2017 Anton Korzunov
+  reselect (MIT): Copyright (c) 2015-2018 Reselect Contributors
+  scheduler (MIT): Copyright (c) Meta Platforms, Inc. and affiliates.
+  sonner (MIT): Copyright (c) 2023 Emil Kowalski
+  tslib (0BSD): Copyright (c) Microsoft Corporation.
+  use-callback-ref (MIT): Copyright (c) 2017 Anton Korzunov
+  use-sidecar (MIT): Copyright (c) 2017 Anton Korzunov
+  use-sync-external-store (MIT): Copyright (c) Meta Platforms, Inc. and affiliates.
+  vaul (MIT): Copyright (c) 2023 Emil Kowalski
+  tslib is under 0BSD, which needs no notice. It is listed for completeness.
+
+MIT License text
+  Every MIT entry above comes under these terms, with its own copyright line
+  as given:
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
