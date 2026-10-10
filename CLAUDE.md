@@ -16,7 +16,7 @@ Fonts, icon glyphs and vendored libraries keep their own licences, listed in
 (OS-zine) and the discarded `g-design-neutral` draft as the base for ALL
 new g work. Built to the "g-system design language: build brief" (2026-09).
 `packages/g-tokens` is the product; `packages/g-icons` the animated icon
-set; `packages/g-ui` the framework-free layer (plus `src/components/`
+set; `packages/g-brand` the g mark (logo and app icon); `packages/g-ui` the framework-free layer (plus `src/components/`
 fragments); `packages/g-ui-react` the React layer; `apps/docs`
 demonstrates it.
 
@@ -26,7 +26,7 @@ One command vendors the built assets into a consumer:
 
     node scripts/vendor.mjs <target-static-dir>
 
-That copies `g.css`, `g-ui.js` and `fonts/` (stamped with the version) into
+That copies `g.css`, `g-ui.js`, `fonts/` and `brand/` (the g mark) (stamped with the version) into
 the target. The consumer links two files and is done. Copying is deliberate:
 no runtime coupling back to this repo, the redundancy is safe. Re-run to
 update. Declare `design = "g-system@<version>"` in the consumer's

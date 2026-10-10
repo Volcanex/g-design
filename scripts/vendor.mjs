@@ -2,7 +2,8 @@
    Usage: node scripts/vendor.mjs <target-static-dir>
    e.g.   node scripts/vendor.mjs ../g-command-web/core/static/css/gsys
 
-   Copies dist/g.css, dist/g-ui.js and dist/fonts/ into the target and
+   Copies dist/g.css, dist/g-ui.js, dist/fonts/ and the g mark
+   (packages/g-brand, as brand/) into the target and
    stamps each file with the version, so a project can tell how far behind
    it is. Copying, not linking, is deliberate: the redundancy is safe, and
    a consumer never breaks because this repo moved. Re-run to update. */
@@ -33,5 +34,10 @@ for (const f of ["g.css", "g-ui.js", "g-admin.css", "g-admin.js"]) {
   writeFileSync(join(out, f), stamp + readFileSync(join(dist, f), "utf8"));
 }
 cpSync(join(dist, "fonts"), join(out, "fonts"), { recursive: true });
-console.log(`g-design@${version} -> ${out} (g.css, g-ui.js, g-admin.css, g-admin.js, fonts/)`);
+// The g mark needs no build; it goes straight from its package.
+for (const f of ["mark.svg", "icon.svg"]) {
+  mkdirSync(join(out, "brand"), { recursive: true });
+  cpSync(join(root, "packages/g-brand", f), join(out, "brand", f));
+}
+console.log(`g-design@${version} -> ${out} (g.css, g-ui.js, g-admin.css, g-admin.js, fonts/, brand/)`);
 console.log('Link with: <link rel="stylesheet" href=".../g.css"> and <script defer src=".../g-ui.js"></script>');

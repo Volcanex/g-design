@@ -87,7 +87,7 @@ spammed input and interrupted animation, and must stay green.
 
 ```toml
 [tool.gcore]
-design = "g-system@1.5.0"
+design = "g-system@1.6.0"
 ```
 
 The label still says `g-system`, the old name of this repo, because the
