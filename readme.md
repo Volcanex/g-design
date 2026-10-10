@@ -4,8 +4,7 @@ The design language of G-System, used by every project in it. Neutral, calm,
 polished software: Radix slate on a dark default, Inter, alpha fills and
 borders, and motion that answers actions.
 
-This repo is source-available under the PolyForm Noncommercial 1.0.0 licence.
-It is not open source.
+This repo is open source under the GNU Affero General Public License v3.0.
 
 ## Shape
 
@@ -100,6 +99,7 @@ React projects can pull components from the registry in `apps/docs/r/`.
 
 ## Licence
 
-PolyForm Noncommercial 1.0.0, see `LICENSE`. Copyright Gabriel Penman. The
-fonts, the Phosphor icon glyphs, the Radix colour scales and the vendored
-libraries keep their own licences, listed in `THIRD_PARTY_NOTICES`.
+Copyright (C) 2026 Gabriel Penman. Licensed under the GNU Affero General
+Public License v3.0 only, see `LICENSE`. The fonts, the Phosphor icon glyphs,
+the Radix colour scales and the vendored libraries keep their own licences,
+listed in `THIRD_PARTY_NOTICES`.

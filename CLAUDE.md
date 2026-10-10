@@ -9,7 +9,7 @@ prefixes, custom element names and file names (`g.css`, `g-ui.js`,
 this repo imports it.
 
 **Owner:** Gabriel Penman
-**Licence:** PolyForm Noncommercial 1.0.0 (`LICENSE`), source-available.
+**Licence:** GNU AGPL v3.0 only (`LICENSE`), open source.
 Fonts, icon glyphs and vendored libraries keep their own licences, listed in
 `THIRD_PARTY_NOTICES`. `OFL.txt` travels with the fonts into every copy.
 **What:** The house design language. It replaces `g-design-language`
