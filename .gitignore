@@ -6,3 +6,8 @@ __pycache__/
 # build intermediates: regenerated from packages/g-tokens/fonts on every build
 packages/g-tokens/dist/fonts/
 packages/g-ui-react/demo/public/fonts/
+
+# Secrets stay local: an .env never goes to a public repo.
+.env
+.env.*
+!.env.example
