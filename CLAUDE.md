@@ -71,7 +71,13 @@ It reports edges off the grid (from their own container, and from the top
 of the page), half-pixel edges, and sibling gaps off the spacing scale,
 grouped by selector. `--max` makes it a gate for an e2e suite. It needs
 playwright, which is a devDependency here and is expected to be one in the
-consumer that runs it.
+consumer that runs it. The measuring itself is `rhythm-measure.mjs`, which
+the g-levels spacing sensor (`correct.ui.spacing`) imports too, so change
+it there and both stay in step.
+
+`skills/g-spacing/SKILL.md` is the layout taste checklist (touching,
+overlap, fit, even gaps, alignment, sibling screens), written from
+Gabriel's corrections. The g-env installer links it into `~/.agents/skills`.
 
 ## Gotchas
 
