@@ -19,8 +19,9 @@ page that uses those numbers still goes wrong.
    and its text, a badge, pill, button or cell at least `--sp-2` either side.
    ("cards touching text", "the bb and sb badges stuck in the top left with no padding")
 2. Nothing touches text it is not part of. An image, mascot, icon or chart sits at
-   least `--sp-2` from neighbouring text. ("the george is touching this text,
-   there needs to be a little more buffer")
+   least `--sp-2` from neighbouring text, measured from its painted pixels, not its
+   box, and at least a quarter of the type size beside display type. ("the george
+   is touching this text, there needs to be a little more buffer")
 3. An icon button keeps room either side of its icon and takes its height from
    `--h-*`. ("the edit and settings buttons are super squished and need a little
    padding either side of the icon")
@@ -34,9 +35,10 @@ page that uses those numbers still goes wrong.
    leave the box and poke through the roof", "some of the graphs still get clipped")
 6. Nothing is cut off. Truncate on purpose, with an ellipsis and a way to read the
    rest. ("have a read more button if it overflows")
-7. The page fits a 390px phone and a landscape phone, with no sideways scroll and
-   no control off the edge. ("it doesn't fit on the page", "make sure the race
-   lobby all fits on the landscape phone, 80% of it does")
+7. The page fits every width from a 320px phone to a 1440px desktop, and a
+   landscape phone, with no sideways scroll and no control off the edge. ("it
+   doesn't fit on the page", "make sure the race lobby all fits on the landscape
+   phone, 80% of it does")
 
 **Even and aligned**
 
@@ -68,22 +70,45 @@ page that uses those numbers still goes wrong.
 17. Less is more. Fewer elements with more space, and a wall of text becomes a
     table, a chart or a list. ("we should be able to see the info not read it")
 
+**Every state, not just the loaded one**
+
+18. Loading, error and long text hold the layout. A slot keeps its size while it
+    waits, an error is a designed message in that slot (never a stack trace or a
+    raw status), and a label twice as long wraps or truncates on purpose.
+19. Fixed and sticky bars never cover content. Scrolled to the top or the bottom,
+    every line and control is clear of the header, footer and floating buttons.
+
 ## Checking a page
 
-Mechanical half, from any directory:
+Mechanical half, from any directory, on any web UI (g-site pages, Baseline pages
+and decks, apps on localhost):
 
     python3 /home/gabriel/g-levels/glevels/spacing.py <url | file.html | pages/<slug>/content.html> [more sibling screens]
 
-It renders every target at 1280x800 and 390x844 in one Chromium, exits 1 on clear
-faults (items 1 to 7, 11 and 16 when they are unambiguous) and lists leads for a
-reviewer (grid, gaps, alignment, sizes, bands, tap targets). A g-site page file is
-compiled fresh and served over the running g-site, so it checks the edit, not the
-deploy. Pass sibling screens together and their landmarks are compared. Grid
-numbers come from g-design's `rhythm-audit.mjs`, through the shared
-`packages/g-ui/scripts/rhythm-measure.mjs`.
+It renders every target at 320, 390, 768 and 1440 wide in one Chromium, then the
+loading (requests held), error (requests fail) and long-text (WCAG text spacing,
+longer labels) states at 390. It exits 1 on clear faults (items 1 to 7, 11, 16
+and 19 when they are unambiguous) and lists leads for a reviewer (grid, gaps,
+alignment, sizes, bands, tap targets, state shifts, and Impeccable's layout
+detectors). In a stress state only sideways scroll and text on text block.
 
-Review half: someone who did not build the page opens the screenshots the sensor
-prints, at both widths, and goes down the checklist. The rubric is in the gate,
+- `--steps N` presses the step key (`--step-key`, default ArrowRight) N times and
+  measures each slide or wizard step as a sibling screen.
+- `--landscape` adds a 844x390 phone held sideways.
+- `--storage-state FILE`, `--header 'Name: value'` and `--wait-for SELECTOR` get
+  into a logged-in app; secrets are never printed.
+- `--viewports name=WxH,...` and `--states loaded,...` narrow a run; never
+  narrow one to quiet a finding.
+
+A g-site page file is compiled fresh and served over the running g-site, so it
+checks the edit, not the deploy. Pass sibling screens together and their
+landmarks are compared. Grid numbers come from g-design's `rhythm-audit.mjs`,
+through the shared `packages/g-ui/scripts/rhythm-measure.mjs`. A canvas page
+(Flutter, a game) only shows its HTML to the geometry: judge the canvas from the
+screenshots.
+
+Review half: someone who did not build the page opens every screenshot the sensor
+prints, at every width, state and step, full size, and goes down the checklist. The rubric is in the gate,
 `gates/correct.ui.spacing.toml` in g-levels, and `glevels brief --review` hands it
 over. Name each fault by screenshot, place and checklist number.
 
