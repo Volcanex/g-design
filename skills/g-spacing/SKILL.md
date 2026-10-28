@@ -78,6 +78,15 @@ page that uses those numbers still goes wrong.
 19. Fixed and sticky bars never cover content. Scrolled to the top or the bottom,
     every line and control is clear of the header, footer and floating buttons.
 
+**Wide screens**
+
+20. Inside an app shell, a page narrower than the screen sits left, against the rail,
+    with its own width kept. Centred, a narrow column floats. A thin page gets a
+    second column when something belongs beside it (a live preview, help for the
+    form, the selected item). When nothing does, it stays one column, still on the
+    left. ("on desktop aligning in the middle looks a bit off ... it should still
+    be aligned left", 2026-10-28)
+
 ## Checking a page
 
 Mechanical half, from any directory, on any web UI (g-site pages, Baseline pages
