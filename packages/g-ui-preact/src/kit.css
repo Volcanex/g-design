@@ -261,7 +261,8 @@ button.nav-item { width: 100%; }
   min-height: var(--h-control); margin: var(--sp-4) 0 0;
   font-size: 15px; line-height: var(--lh-2); font-weight: 500; color: var(--text-primary);
 }
-.section-head:first-child { margin-top: 0; }
+/* Only at the top of a card or stack: a head wrapped in its own block keeps its 16px. */
+:is(.card, .stack, .stack-tight, .stack-loose) > .section-head:first-child { margin-top: 0; }
 .section-head > .grow { flex: 1 1 auto; }
 .section-sub { margin: calc(var(--sp-1) - var(--sp-4)) 0 0; font-size: var(--font-size-ui); line-height: var(--lh-2); color: var(--text-secondary); max-width: var(--col-text); }
 
