@@ -1,0 +1,12 @@
+{
+  "name": "@g-design/ui-preact",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "The shared app view kit: shell CSS and Preact + htm components on g-design classes",
+  "main": "src/index.js",
+  "peerDependencies": {
+    "htm": "^3.1.1",
+    "preact": "^10.0.0"
+  }
+}
