@@ -22,12 +22,18 @@ same rule set before and after.
   `Button`, `IconButton`, `CopyButton`, `fallbackCopy`, `Menu`, `Empty`,
   `ErrorState`, `SkeletonRows`, `Loaded`, `PageHead`, `Field`, `Badge`,
   `useId`, `useEvent`, `useDebounced`, `useGInit`, `useToggle`.
-- `shell.js` `AppShell`, `NavItem`, `NavGroup` (one level of nesting), `NavToggle`, `useNavSheet`, `Brand`,
+- `shell.js` `AppShell`, `NavItem`, `NavGroup` (one level of nesting: a disclosure row, open
+  by default, never a page), `NavToggle`, `useNavSheet`, `Brand`, `RailToggle`,
   `UserFoot`, `currentTheme`, `setTheme`, `themeMenuItem`.
-- `rail.js` the collapsible rail, plain DOM with no imports: `wireRails`,
-  `wireRailToggle`, `applyRail`, `railCollapsed`. A server-rendered page loads
-  it as a module; `Brand` (with `RailToggle`) uses it in Preact. Open by
-  default, collapsed remembered per viewer under a `railKey` in localStorage.
+- `rail.js` the rail, plain DOM with no imports: `wireRails`, `wireRailToggle`, `wireGroups`,
+  `applyRail`, `railPinned`, `setGroupOpen`, `groupOpen`. A server-rendered page loads it as
+  a module; `Brand` (with `RailToggle`), `AppShell` and `NavGroup` use it in Preact. From 721px
+  the rail is collapsed to icons by default; a 150ms rest of the pointer, or keyboard focus,
+  opens it over the content (`data-rail-peek`, no reflow), and it closes 300ms after the
+  pointer leaves, when focus leaves, or on Escape. The button beside the brand pins it open
+  ("Keep open", the content then makes room) and collapses it again ("Collapse"). Pinned is
+  remembered per viewer under a `railKey` in localStorage (value `pinned`), closed groups under
+  `<railKey>:closed`; every access is guarded. Phones keep the sheet with the whole tree.
 - `cursor.js` your own cursor, plain DOM with no imports: `wireOwnCursor`,
   `paintOwnCursor`, `cursorSvgs`, `cursorUrl`, `cursorRgb`, `ownCursorColor`,
   `CURSOR_KEY`, `DEFAULT_CURSOR`. Studio's coworking pointer as every app's default,
@@ -68,6 +74,15 @@ message moves under Details.
   extend, build new last) and the voice rules in copy.
 
 ## Gotchas
+
+- The rail never moves what it holds: everything in the aside keeps its open-width layout
+  (`.g-shell > aside > *` is `--rail-w` less the padding) and the collapsed rail only clips
+  it, with labels faded. A child's icon sits 4px past the group's guide line, which drops
+  from the parent's icon, so it is in the same place collapsed and open. Keep a new rail
+  element inside that geometry, or opening the rail will slide it.
+- Two shells on one page (Studio inside Command) each wire their own rail; every rule and
+  listener keeps to its own `:scope > aside`, so hovering one never opens the other. Give
+  each its own `railKey`.
 
 - Studio imports `kit.css` first in its app.css, ahead of its own
   styles, so Studio overrides still win on equal specificity.
