@@ -22,7 +22,7 @@ same rule set before and after.
   `Button`, `IconButton`, `CopyButton`, `fallbackCopy`, `Menu`, `Empty`,
   `ErrorState`, `SkeletonRows`, `Loaded`, `PageHead`, `Field`, `Badge`,
   `useId`, `useEvent`, `useDebounced`, `useGInit`, `useToggle`.
-- `shell.js` `AppShell`, `NavItem`, `NavToggle`, `useNavSheet`, `Brand`,
+- `shell.js` `AppShell`, `NavItem`, `NavGroup` (one level of nesting), `NavToggle`, `useNavSheet`, `Brand`,
   `UserFoot`, `currentTheme`, `setTheme`, `themeMenuItem`.
 - `index.js` all of the above.
 

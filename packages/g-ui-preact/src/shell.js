@@ -59,6 +59,22 @@ export function NavItem({ to, icon, label, current, badge, onClick, target, chil
   </a>`;
 }
 
+/* A rail parent with its children, one level deep (kit.css .nav-group). The parent is a page
+   (`item`, NavItem props); `children` are NavItems given class "nav-child". The children show
+   while the parent or a child is current (`current`), and the twist opens them by hand. */
+export function NavGroup({ item, current, label = "Show pages", children }) {
+  const [manual, setManual] = useState(null);
+  const open = manual === null ? !!current : manual;
+  return html`<div class="nav-group" data-open=${open ? "" : undefined}>
+    <div class="nav-group-row">
+      <${NavItem} ...${item} />
+      <button class="nav-twist" type="button" aria-label=${label} aria-expanded=${open ? "true" : "false"}
+        onClick=${() => setManual(!open)}></button>
+    </div>
+    <div class="nav-children">${children}</div>
+  </div>`;
+}
+
 /* ------------------------------------------------------------------ sidebar */
 
 export function Brand({ href, name }) {
