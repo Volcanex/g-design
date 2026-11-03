@@ -6,7 +6,9 @@ those licences still applies to it.
 Fonts
   Inter, JetBrains Mono and Space Grotesk, under the SIL Open Font License 1.1.
   Originals in packages/g-tokens/fonts/, subsets in dist/fonts/,
-  apps/docs/assets/fonts/ and apps/docs/react/fonts/. The copyright notices
+  apps/docs/assets/fonts/ and apps/docs/react/fonts/. Inter is also in
+  packages/g-ui-swift/Sources/GDesignUI/Resources/Fonts/ as InterVariable.ttf
+  and InterVariable-Italic.ttf for native apps. The copyright notices
   and the full licence text are in OFL.txt in each of those folders, and
   scripts/vendor.mjs copies it to consumers with the fonts.
 

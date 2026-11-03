@@ -17,7 +17,7 @@ Fonts, icon glyphs and vendored libraries keep their own licences, listed in
 new g work. Built to the "g-system design language: build brief" (2026-09).
 `packages/g-tokens` is the product; `packages/g-icons` the animated icon
 set; `packages/g-brand` the g mark (logo and app icon); `packages/g-ui` the framework-free layer (plus `src/components/`
-fragments); `packages/g-ui-react` the React layer; `apps/docs`
+fragments); `packages/g-ui-react` the React layer; `packages/g-ui-swift` the SwiftUI layer (`GDesignUI`, used by the native apps); `apps/docs`
 demonstrates it.
 
 ## Using g-design in a project
