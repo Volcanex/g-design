@@ -24,6 +24,10 @@ same rule set before and after.
   `useId`, `useEvent`, `useDebounced`, `useGInit`, `useToggle`.
 - `shell.js` `AppShell`, `NavItem`, `NavGroup` (one level of nesting), `NavToggle`, `useNavSheet`, `Brand`,
   `UserFoot`, `currentTheme`, `setTheme`, `themeMenuItem`.
+- `rail.js` the collapsible rail, plain DOM with no imports: `wireRails`,
+  `wireRailToggle`, `applyRail`, `railCollapsed`. A server-rendered page loads
+  it as a module; `Brand` (with `RailToggle`) uses it in Preact. Open by
+  default, collapsed remembered per viewer under a `railKey` in localStorage.
 - `index.js` all of the above.
 
 ## Using it

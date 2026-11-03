@@ -5,7 +5,7 @@ description: "How a g app is navigated: the left rail as the one place-to-place 
 
 # g-navigation
 
-The kit pieces are `.nav-list`, `.nav-item`, `.nav-group` (NavGroup) and `.app-topbar` in
+The kit pieces are `.nav-list`, `.nav-item`, `.nav-group` (NavGroup), `.g-rail-toggle` (rail.js) and `.topbar-slim` in
 `packages/g-ui-preact`. These rules decide which one a new place gets.
 
 1. **One navigation surface.** The left rail is the only place-to-place navigation. No tab
@@ -21,10 +21,12 @@ The kit pieces are `.nav-list`, `.nav-item`, `.nav-group` (NavGroup) and `.app-t
 5. **Detail routes** (one note, one ticket) are not in the rail; they light the view they
    belong to.
 6. **Rail headings group by intent**, not by repo: 3 to 6 groups of 2 to 8 entries.
-7. **Top bar** exists only to carry the state and verbs of the object on the page (Studio's
-   workspace: draft state, undo, publish). Otherwise there is none beside the rail: the title
-   lives in the page head. On a phone a bar stays for the menu button and the title. When
-   present it is `--h-5`, 48px with its rule. The kit hides an `.app-topbar` without
-   `.has-actions` from 721px up.
-8. **The page head** (title, one line, modes, page actions) is the same component in the
+7. **Top bar.** Studio's workspace bar carries the state and verbs of the object (draft
+   state, undo, publish). Command keeps a slim bar (`.topbar-slim`, `--h-5`, 48px with its
+   rule) with the page title, a breadcrumb when the page is nested (`.topbar-crumbs`:
+   Parent, caret, Page) and page-level actions. What else belongs in it is still open.
+   On a phone the bar also carries the menu button.
+8. **Collapsible rail.** A toggle beside the brand (`Brand`, or `.g-rail-toggle` with
+   `rail.js`). Open by default; collapsed is icon-only with tooltips, remembered per viewer.
+9. **The page head** (title, one line, modes, page actions) is the same component in the
    same place on every view.
