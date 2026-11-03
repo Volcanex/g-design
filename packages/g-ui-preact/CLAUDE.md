@@ -28,6 +28,11 @@ same rule set before and after.
   `wireRailToggle`, `applyRail`, `railCollapsed`. A server-rendered page loads
   it as a module; `Brand` (with `RailToggle`) uses it in Preact. Open by
   default, collapsed remembered per viewer under a `railKey` in localStorage.
+- `cursor.js` your own cursor, plain DOM with no imports: `wireOwnCursor`,
+  `paintOwnCursor`, `cursorSvgs`, `cursorUrl`, `cursorRgb`, `ownCursorColor`,
+  `CURSOR_KEY`, `DEFAULT_CURSOR`. Studio's coworking pointer as every app's default,
+  tinted from the coworking palette in kit.css (red until a colour is picked, read from
+  Studio's `gs.cowork-color` key). No presence, only the pointer.
 - `index.js` all of the above.
 
 ## Using it

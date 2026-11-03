@@ -23,10 +23,15 @@ The kit pieces are `.nav-list`, `.nav-item`, `.nav-group` (NavGroup), `.g-rail-t
 6. **Rail headings group by intent**, not by repo: 3 to 6 groups of 2 to 8 entries.
 7. **Top bar.** Studio's workspace bar carries the state and verbs of the object (draft
    state, undo, publish). Command keeps a slim bar (`.topbar-slim`, `--h-5`, 48px with its
-   rule) with the page title, a breadcrumb when the page is nested (`.topbar-crumbs`:
-   Parent, caret, Page) and page-level actions. What else belongs in it is still open.
-   On a phone the bar also carries the menu button.
+   rule) that shows where you are and nothing else: the page title, and a breadcrumb when
+   the page is nested (`.topbar-crumbs`: Parent, caret, Page). A view's controls (modes,
+   filters, its primary action) stay in its page head (R9), not in the bar. On a phone the
+   bar also carries the menu button.
 8. **Collapsible rail.** A toggle beside the brand (`Brand`, or `.g-rail-toggle` with
    `rail.js`). Open by default; collapsed is icon-only with tooltips, remembered per viewer.
 9. **The page head** (title, one line, modes, page actions) is the same component in the
    same place on every view.
+10. **One product.** Command and Studio wear the same rail, brand row (`Brand`, the
+   wordmark at 16px), collapse toggle, top bar height, gutters (`--gutter`, hubs included),
+   type and cursor (`cursor.js`, the coworking red by default). A difference between them is
+   fixed in the kit, never in one app.
