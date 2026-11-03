@@ -9,7 +9,8 @@ same rule set before and after.
 
 - `kit.css` the app shell look on g.css classes, alias tokens only: shell
   (sidebar, brand, nav items and heads, user foot, top bar, nav sheet),
-  content page widths, page head, layout helpers (row, stack, muted, ...),
+  content page widths, page head (one row, its h1 `.sr-only` because the top bar names the
+  page), section heads (`.section-head`, `.section-sub`: one rhythm for every page), layout helpers (row, stack, muted, ...),
   cards (card-head, flush), lists, facts, cols-2, empty, error and skeleton
   states, fields and form grid, links, dialog sizes, menu headings,
   disclosure rows, phone rules (hide-sm, show-sm), the rail skeleton, and
