@@ -68,19 +68,22 @@ export function Brand({ href, name }) {
   </a>`;
 }
 
-/* The signed-in person at the foot of the sidebar, with their menu. */
-export function UserFoot({ name, email, initials, items, menuLabel = "Account" }) {
+/* The signed-in person at the foot of the sidebar, with their menu. menuSide="right" opens the
+   menu beside the rail instead of over its last links (Menu's side). */
+export function UserFoot({ name, email, initials, items, menuLabel = "Account", menuSide }) {
   return html`<div class="side-foot">
     <span class="avatar" aria-hidden="true">${initials}</span>
     <span class="who"><span>${name}</span><span>${email}</span></span>
-    <${Menu} label=${menuLabel} icon="dots-three" align="end" items=${items} />
+    <${Menu} label=${menuLabel} icon="dots-three" align="end" side=${menuSide} items=${items} />
   </div>`;
 }
 
 /* ------------------------------------------------------------------ shell */
 
 /* brand, nav and foot fill the sidebar; title shows in the top bar on a phone; actions sit
-   at the top bar's end. topbar=false drops the top bar (an app that draws its own). */
+   at the top bar's end. topbar=false drops the top bar (an app that draws its own). The bar is
+   .app-topbar, plus .has-actions when it carries actions, so an app can drop a bar that is only
+   the menu button wherever the rail sits beside the content. */
 export function AppShell({ brand, nav, foot, title, actions, topbar = true, closeKey, children }) {
   const [open, setOpen] = useNavSheet(closeKey);
   return html`<div class="g-shell" data-nav-open=${open ? "" : undefined}>
@@ -90,7 +93,7 @@ export function AppShell({ brand, nav, foot, title, actions, topbar = true, clos
       ${foot}
     </aside>
     <main>
-      ${topbar && html`<header class="topbar">
+      ${topbar && html`<header class=${`topbar app-topbar${actions ? " has-actions" : ""}`}>
         <${NavToggle} open=${open} setOpen=${setOpen} />
         <span class="topbar-title show-sm">${title}</span>
         <span class="grow"></span>

@@ -39,14 +39,16 @@ Not wired into `scripts/build.mjs`; there is nothing to build.
 The app wires itself in at startup:
 
     setIcons(paths);                        // the glyphs it draws
-    configure({ report, reportLabel, reportedLabel, offlineTitle });
+    configure({ report, reportLabel, reportedLabel, offlineTitle, errorCopy, errorFallback });
 
 `report(err)` resolves true when an error was sent somewhere; without it no
 error shows a report button. App knowledge (routes, the session, who to send
 errors to, product copy) stays in the app and comes in as props: `Brand`
-takes `href` and `name`, `UserFoot` takes the person and the menu items,
-`AppShell` takes `brand`, `nav`, `foot`, `topbar` and `closeKey` (the route,
-so the phone sheet closes on navigation).
+takes `href` and `name`, `UserFoot` takes the person, the menu items and
+`menuSide`, `AppShell` takes `brand`, `nav`, `foot`, `topbar` and `closeKey`
+(the route, so the phone sheet closes on navigation). `errorCopy` maps an
+error code to `[title, sentence]` for `ErrorState`; with it the server's terse
+message moves under Details.
 
 ## Rules
 

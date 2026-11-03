@@ -145,6 +145,9 @@
 
 .empty-actions { display: flex; gap: var(--sp-2); flex-wrap: wrap; justify-content: center; }
 .state-error svg { color: var(--danger-text); }
+.state-error-more { font-size: 13px; color: var(--text-muted); }
+.state-error-more summary { cursor: pointer; }
+.state-error-more .e-desc { margin-top: var(--sp-1); }
 .skel-rows { display: flex; flex-direction: column; gap: var(--sp-2); padding: var(--sp-2) 0; }
 
 .field-top { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-2); }
