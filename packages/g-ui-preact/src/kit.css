@@ -125,6 +125,17 @@ button.nav-item { width: 100%; }
    another shell nested in its content (Studio inside Command).
      <div class="brand-row"><a class="brand">...</a><button class="g-rail-toggle"></button></div> */
 .brand-row { display: flex; align-items: center; gap: var(--sp-1); min-width: 0; }
+/* A long rail scrolls between its brand and its foot, which stay put: the pin button beside the
+   G is always in reach, however far down the current page is. They sit flush with the rail's
+   edges (its --sp-3 padding taken back) on its own surface. */
+.g-shell > aside > .brand-row {
+  position: sticky; top: calc(-1 * var(--sp-3)); z-index: 2;
+  margin-top: calc(-1 * var(--sp-3)); padding-top: var(--sp-3); background: var(--surface-1);
+}
+.g-shell > aside > .side-foot {
+  position: sticky; bottom: calc(-1 * var(--sp-3)); z-index: 2;
+  margin-bottom: calc(-1 * var(--sp-3)); padding-bottom: var(--sp-3); background: var(--surface-1);
+}
 .brand-row > .brand { flex: 1 1 auto; min-width: 0; }
 .g-rail-toggle {
   flex: none; display: grid; place-items: center;
