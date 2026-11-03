@@ -236,7 +236,7 @@ button.nav-item { width: 100%; }
        </div>
        <div class="page-actions">...</div>
      </div> */
-.page-head { display: flex; align-items: center; gap: var(--sp-2) var(--sp-3); flex-wrap: wrap; min-width: 0; }
+.page-head { display: flex; align-items: center; gap: var(--sp-1) var(--sp-3); flex-wrap: wrap; min-width: 0; }  /* 4px row gap: twice over the break, 8px to the description */
 .page-head-text { display: flex; flex-direction: column; gap: var(--sp-1); min-width: 0; flex: 1 1 240px; }
 /* The one-row head: its badge row and actions share a line and the description drops below. */
 .page-head-text:has(> .row-tight) { display: contents; }
