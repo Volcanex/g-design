@@ -243,7 +243,10 @@ button.nav-item { width: 100%; }
 .page-head-text > .row-tight { flex: 1 1 0; min-width: 0; flex-wrap: nowrap; overflow: hidden; min-height: var(--h-control); }
 .page-head-text > .row-tight > * { flex: none; }
 .page-head-text > .row-tight > .badge { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.page-head-text:has(> .row-tight) > .page-sub { order: 2; flex: 1 0 100%; }
+/* A full-width break after the badges and actions, so the description always starts its own
+   line; the description keeps its reading measure. */
+.page-head:has(> .page-head-text > .row-tight ~ .page-sub)::after { content: ""; order: 2; flex: 0 0 100%; height: 0; }
+.page-head-text:has(> .row-tight) > .page-sub { order: 3; flex: 0 1 auto; }
 .page-head .page-title { font-size: 18px; line-height: var(--lh-3); font-weight: 500; display: flex; align-items: center; gap: var(--sp-2); margin: 0; }
 .page-sub { margin: 0; font-size: var(--font-size-ui); line-height: var(--lh-2); color: var(--text-secondary); max-width: var(--col-text); }
 .page-actions { order: 1; display: flex; align-items: center; gap: var(--sp-2); flex: 0 1 auto; flex-wrap: nowrap; min-width: 0; max-width: 100%; overflow-x: auto; scrollbar-width: none; }
