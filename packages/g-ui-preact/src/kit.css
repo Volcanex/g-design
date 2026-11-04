@@ -116,8 +116,7 @@ button.nav-item { width: 100%; }
 .side-foot .who span:last-child { color: var(--text-placeholder); font-size: 11px; }
 
 /* The rail (rail.js), from 721px up. Collapsed to icons by default; hovering it for a moment or
-   moving focus into it opens it as an overlay above the content (data-rail-peek), so the
-   content never reflows; the toggle beside the brand pins it open (data-rail="pinned") and the
+   moving focus into it opens it (data-rail-peek) and the content moves over, never hidden under it; the toggle beside the brand pins it open (data-rail="pinned") and the
    content then makes room. Everything inside keeps its open-width layout in every state and the
    rail only clips it, so opening reveals labels where they already are instead of moving
    anything. Width and the content's shift ease on --spring-smooth (perceived 300ms); labels
@@ -153,9 +152,8 @@ button.nav-item { width: 100%; }
   .g-shell > aside > * { flex: none; width: calc(var(--rail-w) - 2 * var(--sp-3)); }
   .g-shell > aside > .side-foot { margin-top: auto; }
   .g-shell[data-rail="collapsed"] > aside { width: var(--rail-mini); }
-  /* Raised while it peeks, so it floats over a second shell in the content too (Command's rail
-     over the embedded Studio's, whose aside comes later at the same z-index). */
-  .g-shell[data-rail="collapsed"][data-rail-peek] > aside { width: var(--rail-w); box-shadow: var(--shadow-overlay); z-index: 40; }
+  .g-shell[data-rail="collapsed"][data-rail-peek] { grid-template-columns: var(--rail-w) minmax(0, 1fr); }
+  .g-shell[data-rail="collapsed"][data-rail-peek] > aside { width: var(--rail-w); }
   .g-shell[data-rail-ready] { transition: grid-template-columns var(--spring-smooth-dur) var(--spring-smooth); }
   .g-shell[data-rail-ready] > aside { transition: width var(--spring-smooth-dur) var(--spring-smooth), box-shadow var(--dur-slow) var(--ease-out); }
 
