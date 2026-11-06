@@ -379,7 +379,8 @@ a:hover { text-decoration-color: currentColor; }
    edge is the effect and the panel's opacity is never animated. The clip
    reaches 64px past the box at rest so the shadow is not cut. A dialog
    unrolls from its top edge on the sheet spring (500ms perceived) and rolls
-   back up on the smooth spring (300ms perceived); its content stays rendered
+   back up on --ease-in-out over 330ms (a spring would leave at full speed and
+   read as a cut); its content stays rendered
    until that exit ends (the kit's Dialog keeps it, onExited says when). */
 dialog.dlg {
   width: min(440px, calc(100vw - 32px));
@@ -396,10 +397,10 @@ dialog.dlg {
   clip-path: inset(-64px -64px 100% -64px);
   translate: 0 6px;
   transition:
-    clip-path var(--spring-smooth-dur) var(--spring-smooth),
-    translate var(--spring-smooth-dur) var(--spring-smooth),
-    overlay var(--spring-smooth-dur) allow-discrete,
-    display var(--spring-smooth-dur) allow-discrete;
+    clip-path var(--spring-snap-dur) var(--ease-in-out),
+    translate var(--spring-snap-dur) var(--ease-in-out),
+    overlay var(--spring-snap-dur) var(--ease-in-out) allow-discrete,
+    display var(--spring-snap-dur) var(--ease-in-out) allow-discrete;
 }
 dialog.dlg[open] {
   clip-path: inset(-64px);
@@ -407,8 +408,8 @@ dialog.dlg[open] {
   transition:
     clip-path var(--spring-sheet-dur) var(--spring-sheet),
     translate var(--spring-sheet-dur) var(--spring-sheet),
-    overlay var(--spring-sheet-dur) allow-discrete,
-    display var(--spring-sheet-dur) allow-discrete;
+    overlay var(--spring-sheet-dur) var(--ease-out) allow-discrete,
+    display var(--spring-sheet-dur) var(--ease-out) allow-discrete;
 }
 @starting-style {
   dialog.dlg[open] { clip-path: inset(-64px -64px 100% -64px); translate: 0 6px; }
@@ -417,11 +418,11 @@ dialog.dlg[open] {
 dialog.dlg::backdrop {
   background: rgb(0 0 0 / 0.44);
   opacity: 0;
-  transition: opacity var(--spring-smooth-dur) var(--ease-out), overlay var(--spring-smooth-dur) allow-discrete, display var(--spring-smooth-dur) allow-discrete;
+  transition: opacity var(--spring-snap-dur) var(--ease-in-out), overlay var(--spring-snap-dur) var(--ease-in-out) allow-discrete, display var(--spring-snap-dur) var(--ease-in-out) allow-discrete;
 }
 dialog.dlg[open]::backdrop {
   opacity: 1;
-  transition: opacity var(--spring-smooth-dur) var(--ease-out), overlay var(--spring-sheet-dur) allow-discrete, display var(--spring-sheet-dur) allow-discrete;
+  transition: opacity var(--spring-smooth-dur) var(--ease-out), overlay var(--spring-sheet-dur) var(--ease-out) allow-discrete, display var(--spring-sheet-dur) var(--ease-out) allow-discrete;
 }
 @starting-style { dialog.dlg[open]::backdrop { opacity: 0; } }
 

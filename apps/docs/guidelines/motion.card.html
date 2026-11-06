@@ -1,4 +1,4 @@
-<!-- @dsCard group="Guidelines" name="Motion" subtitle="Two curves, four durations, three springs generated as CSS linear()." viewport="760x600" -->
+<!-- @dsCard group="Guidelines" name="Motion" subtitle="Three curves, four durations, three springs generated as CSS linear()." viewport="760x600" -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -21,13 +21,13 @@
 <body>
   <div class="rules">
     <h3>The rules</h3>
-    <div class="rule"><span class="mono">ease-out</span>Default for everything; ease-in-out only for movement on screen</div>
+    <div class="rule"><span class="mono">ease-out</span>Default for everything; ease-in-out for movement on screen and for exits</div>
     <div class="rule"><span class="mono">≤ 300ms</span>Hard ceiling. Only the sheet (500ms) exceeds it</div>
     <div class="rule"><span class="mono">transform, opacity</span>The only animated properties without written justification</div>
     <div class="rule"><span class="mono">scale(0.97)</span>Press feedback; nothing enters below scale(0.95)</div>
     <div class="rule"><span class="mono">no ambient</span>No scroll reveals, no ambient motion, none on frequent actions</div>
     <div class="rule"><span class="mono">interruptible</span>Transitions, not queued animations: five clicks is one movement</div>
-    <div class="rule"><span class="mono">clip-path</span>Overlays reveal behind a moving mask, not a fade: a dialog unrolls on the sheet spring and rolls up on smooth, a toast rises and drops on smooth. The panel's opacity never animates; the backdrop's dim eases</div>
+    <div class="rule"><span class="mono">clip-path</span>Overlays reveal behind a moving mask, not a fade: a dialog unrolls on the sheet spring and rolls up on --ease-in-out, since a spring leaves at full speed and an exit on one reads as a cut; a toast rises and drops on smooth. The panel's opacity never animates; the backdrop's dim eases</div>
     <div class="rule"><span class="mono">exits play out</span>Content stays rendered until its exit ends: the kit's Dialog keeps its body and calls onExited; a toast leaves when its last transition has</div>
     <div class="rule"><span class="mono">reduced motion</span>Falls back to crossfades, never to nothing</div>
     <h3 style="margin-top:8px">When not to animate</h3>

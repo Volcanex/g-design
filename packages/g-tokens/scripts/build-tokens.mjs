@@ -220,9 +220,11 @@ const staticTokens = `  /* ---- aliasing layer: components reference these, neve
   --font-size-body: 14px;
   --row-h: var(--h-4);
 
-  /* ---- motion: two curves, four durations, three springs ---- */
+  /* ---- motion: three curves, four durations, three springs ---- */
   --ease-out: cubic-bezier(0.2, 0, 0, 1);
   --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
+  /* for exits: a spring leaves at full speed and reads as a cut, this ramps up and down */
+  --ease-in-out: cubic-bezier(0.45, 0, 0.4, 1);
   --dur-fast: 100ms;
   --dur-base: 140ms;
   --dur-slow: 200ms;

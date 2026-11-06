@@ -48,7 +48,7 @@ A failing gate fails the build.
   on `[data-theme]` because var() substitutes where a property is declared.
 - **Elevation** is a 1px alpha border plus an inset top highlight. Drop
   shadows exist only on the floating layers: menu, dialog, toast.
-- **Motion.** Two curves, four durations (100/140/200/500ms), three
+- **Motion.** Three curves, four durations (100/140/200/500ms), three
   springs generated as CSS `linear()` at build time. Nothing over 300ms
   except the sheet. Transitions, never queued animations. Reduced motion
   falls back to crossfades.
