@@ -346,7 +346,9 @@ a.btn { text-decoration: none; }
 /* Larger sizes of g-design's dialog for change lists and pickers; the
    chrome (border, radius, motion, backdrop) is the component's own. */
 dialog.dlg { max-height: calc(100dvh - 32px); }
-dialog.dlg[open] { display: flex; flex-direction: column; }
+/* Flex whether open or not, so the layout holds while the masked exit plays after close(). */
+dialog.dlg { display: flex; flex-direction: column; }
+dialog.dlg:not([open]) { display: none; }
 dialog.dlg-sm { width: min(400px, calc(100vw - 32px)); }
 dialog.dlg-md { width: min(480px, calc(100vw - 32px)); }
 dialog.dlg-lg { width: min(720px, calc(100vw - 32px)); }

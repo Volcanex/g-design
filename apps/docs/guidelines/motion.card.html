@@ -27,6 +27,8 @@
     <div class="rule"><span class="mono">scale(0.97)</span>Press feedback; nothing enters below scale(0.95)</div>
     <div class="rule"><span class="mono">no ambient</span>No scroll reveals, no ambient motion, none on frequent actions</div>
     <div class="rule"><span class="mono">interruptible</span>Transitions, not queued animations: five clicks is one movement</div>
+    <div class="rule"><span class="mono">clip-path</span>Overlays reveal behind a moving mask, not a fade: a dialog unrolls on the sheet spring and rolls up on snap, a toast rises on smooth and drops on snap. The panel's opacity never animates; the backdrop's dim eases</div>
+    <div class="rule"><span class="mono">exits play out</span>Content stays rendered until its exit ends: the kit's Dialog keeps its body and calls onExited; a toast leaves when its last transition has</div>
     <div class="rule"><span class="mono">reduced motion</span>Falls back to crossfades, never to nothing</div>
     <h3 style="margin-top:8px">When not to animate</h3>
     <div class="rule"><span class="mono">frequent</span>Actions repeated many times an hour carry no motion: typing feedback, table row hover, plain navigation clicks</div>

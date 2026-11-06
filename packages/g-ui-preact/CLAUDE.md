@@ -23,6 +23,11 @@ same rule set before and after.
   `Button`, `IconButton`, `CopyButton`, `fallbackCopy`, `Menu`, `Empty`,
   `ErrorState`, `SkeletonRows`, `Loaded`, `PageHead`, `Field`, `Badge`,
   `useId`, `useEvent`, `useDebounced`, `useGInit`, `useToggle`.
+  `Dialog` (and `Confirm`) keeps its body rendered through the masked exit
+  after `open` turns false, then calls `onExited`. Never mount a dialog only
+  while it is open (`${x && html`<${Dialog} open=${true}>`}`): the close has
+  nothing to animate. Keep it mounted with `open=false` and clear `x` in
+  `onExited`.
 - `shell.js` `AppShell`, `NavItem`, `NavGroup` (one level of nesting: a disclosure row, open
   by default, never a page), `NavToggle`, `useNavSheet`, `Brand`, `RailToggle`,
   `UserFoot`, `currentTheme`, `setTheme`, `themeMenuItem`.

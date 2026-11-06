@@ -77,12 +77,20 @@ export function ReportButton({ error, size = "sm", kind = "tertiary" }) {
    element, else the first field, else the first button) and returns to
    whatever opened it on close. Escape and a backdrop click close it unless
    `busy` is set. */
-export function Dialog({ open, onClose, title, desc, size = "md", busy = false, children, foot, class: cls = "", label }) {
+/* The body stays rendered after open turns false until the masked exit in g.css has ended,
+   then onExited fires. A consumer that mounts the dialog only while it has something to show
+   keeps it mounted with open=false and drops it in onExited, or the exit has nothing to play:
+     ${item && html`<${Dialog} open=${open} onClose=${() => setOpen(false)} onExited=${() => setItem(null)}>` */
+export function Dialog({ open, onClose, onExited, title, desc, size = "md", busy = false, children, foot, class: cls = "", label }) {
   const ref = useRef(null);
   const opener = useRef(null);
+  const [shown, setShown] = useState(!!open);
+  const exited = useRef(onExited);
+  exited.current = onExited;
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
+    if (open) setShown(true);
     if (open && !el.open) {
       opener.current = document.activeElement;
       el.showModal();
@@ -94,6 +102,20 @@ export function Dialog({ open, onClose, title, desc, size = "md", busy = false, 
       });
     } else if (!open && el.open) {
       el.close();
+      /* the clip-path (or, under reduced motion, opacity) transition on the dialog is its exit;
+         the timeout outlasts the longest motion token in case it never runs */
+      let done = false;
+      const finish = (e) => {
+        if (done || (e && (e.target !== el || !/^(clip-path|opacity)$/.test(e.propertyName)))) return;
+        done = true;
+        el.removeEventListener("transitionend", finish);
+        clearTimeout(timer);
+        setShown(false);
+        exited.current && exited.current();
+      };
+      el.addEventListener("transitionend", finish);
+      const timer = setTimeout(finish, 900);
+      return () => { done = true; el.removeEventListener("transitionend", finish); clearTimeout(timer); };
     }
   }, [open]);
   useEffect(() => () => {
@@ -111,7 +133,7 @@ export function Dialog({ open, onClose, title, desc, size = "md", busy = false, 
   const titleId = useId("dlg-title");
   return html`<dialog ref=${ref} class=${`dlg dlg-${size} ${cls}`} onCancel=${onCancel} onClick=${onClick}
       aria-labelledby=${title ? titleId : undefined} aria-label=${!title ? label : undefined}>
-    ${open && html`
+    ${(open || shown) && html`
       <div class="dlg-body">
         ${title && html`<div class="dlg-head"><h2 class="dlg-title" id=${titleId}>${title}</h2>
           <button class="btn btn-tertiary btn-sm btn-icon dlg-x" type="button" aria-label="Close" onClick=${() => !busy && onClose && onClose()} disabled=${busy}><${Icon} name="x" /></button></div>`}
@@ -130,7 +152,7 @@ export function useId(prefix = "id") {
 }
 
 /* Confirm dialog for one decision. `danger` makes the confirm button red. */
-export function Confirm({ open, onClose, onConfirm, title, desc, confirmLabel = "Confirm", danger = false, children }) {
+export function Confirm({ open, onClose, onExited, onConfirm, title, desc, confirmLabel = "Confirm", danger = false, children }) {
   const [busy, setBusy] = useState(false);
   const run = async () => {
     setBusy(true);
@@ -138,7 +160,7 @@ export function Confirm({ open, onClose, onConfirm, title, desc, confirmLabel = 
     catch (e) { toastError(e); }
     finally { setBusy(false); }
   };
-  return html`<${Dialog} open=${open} onClose=${onClose} title=${title} desc=${desc} size="sm" busy=${busy}
+  return html`<${Dialog} open=${open} onClose=${onClose} onExited=${onExited} title=${title} desc=${desc} size="sm" busy=${busy}
     foot=${html`
       <button class="btn btn-secondary" type="button" onClick=${onClose} disabled=${busy}>Cancel</button>
       <${Button} kind=${danger ? "danger" : "primary"} busy=${busy} onClick=${run} icon=${danger ? "trash" : null}>${confirmLabel}<//>`}>
