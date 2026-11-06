@@ -379,7 +379,7 @@ a:hover { text-decoration-color: currentColor; }
    edge is the effect and the panel's opacity is never animated. The clip
    reaches 64px past the box at rest so the shadow is not cut. A dialog
    unrolls from its top edge on the sheet spring (500ms perceived) and rolls
-   back up on the snap spring (200ms perceived); its content stays rendered
+   back up on the smooth spring (300ms perceived); its content stays rendered
    until that exit ends (the kit's Dialog keeps it, onExited says when). */
 dialog.dlg {
   width: min(440px, calc(100vw - 32px));
@@ -396,10 +396,10 @@ dialog.dlg {
   clip-path: inset(-64px -64px 100% -64px);
   translate: 0 6px;
   transition:
-    clip-path var(--spring-snap-dur) var(--spring-snap),
-    translate var(--spring-snap-dur) var(--spring-snap),
-    overlay var(--spring-snap-dur) allow-discrete,
-    display var(--spring-snap-dur) allow-discrete;
+    clip-path var(--spring-smooth-dur) var(--spring-smooth),
+    translate var(--spring-smooth-dur) var(--spring-smooth),
+    overlay var(--spring-smooth-dur) allow-discrete,
+    display var(--spring-smooth-dur) allow-discrete;
 }
 dialog.dlg[open] {
   clip-path: inset(-64px);
@@ -417,7 +417,7 @@ dialog.dlg[open] {
 dialog.dlg::backdrop {
   background: rgb(0 0 0 / 0.44);
   opacity: 0;
-  transition: opacity var(--spring-snap-dur) var(--ease-out), overlay var(--spring-snap-dur) allow-discrete, display var(--spring-snap-dur) allow-discrete;
+  transition: opacity var(--spring-smooth-dur) var(--ease-out), overlay var(--spring-smooth-dur) allow-discrete, display var(--spring-smooth-dur) allow-discrete;
 }
 dialog.dlg[open]::backdrop {
   opacity: 1;
@@ -532,7 +532,7 @@ dialog.dlg[open]::backdrop {
     opacity var(--dur-slow) var(--ease-out);
 }
 /* Enter: the mask's top edge rises from the toast's foot (300ms perceived).
-   Leave: it drops back down on the snap spring, and g-ui.js removes the
+   Leave: it drops back down on the same spring, and g-ui.js removes the
    toast only once its last transition has ended. Opacity animates only for
    the stack's fourth and later toasts, which recede out of view. */
 .toast[data-entering] { translate: 0 16px; clip-path: inset(100% -48px -48px -48px); }
@@ -540,9 +540,9 @@ dialog.dlg[open]::backdrop {
   translate: 0 8px;
   clip-path: inset(100% -48px -48px -48px);
   transition:
-    clip-path var(--spring-snap-dur) var(--spring-snap),
-    translate var(--spring-snap-dur) var(--spring-snap),
-    scale var(--spring-snap-dur) var(--spring-snap);
+    clip-path var(--spring-smooth-dur) var(--spring-smooth),
+    translate var(--spring-smooth-dur) var(--spring-smooth),
+    scale var(--spring-smooth-dur) var(--spring-smooth);
 }
 /* Icons sit on the title's first line: a 15px glyph centred in the title's
    20px line-box, so the spinner and the status glyphs share one vertical. */
