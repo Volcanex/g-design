@@ -145,6 +145,19 @@ button.nav-item { width: 100%; }
 .g-rail-toggle svg { width: 16px; height: 16px; transition: scale var(--dur-fast) var(--ease-out); }
 .g-shell[data-rail="collapsed"] > aside .g-rail-toggle svg { scale: -1 1; }
 @media (max-width: 720px) { .g-rail-toggle { display: none; } }
+/* The nav list is the rail's scroll region, between the brand and the foot, so the foot never
+   sits over its last items (a rail taller than the window, Studio's editor at 900px). The aside
+   itself then has nothing to scroll; it still can for an app whose nav is not a .nav-list. */
+.g-shell > aside > .nav-list { flex: 0 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; scrollbar-width: none; }
+.g-shell > aside > .nav-list::-webkit-scrollbar { display: none; }
+/* While more of the list is below, its last 16px are masked off at the foot's rule; the mask
+   shrinks to nothing over the end of the scroll. A list that fits has no timeline and no mask. */
+@supports (animation-timeline: scroll()) {
+  .g-shell > aside > .nav-list {
+    mask-image: linear-gradient(to bottom, #000 calc(100% - var(--rail-more)), transparent);
+    animation: g-rail-more linear both; animation-timeline: scroll(self); animation-range: calc(100% - var(--sp-6)) 100%;
+  }
+}
 @media (min-width: 721px) {
   .g-shell { --rail-w: 224px; --rail-mini: 56px; grid-template-columns: var(--rail-w) minmax(0, 1fr); }
   .g-shell[data-rail="collapsed"] { grid-template-columns: var(--rail-mini) minmax(0, 1fr); }
@@ -190,6 +203,8 @@ button.nav-item { width: 100%; }
   .g-shell[data-rail="collapsed"]:not([data-rail-peek]) > aside .nav-children { margin-left: 0; border-left-color: transparent; }
   .g-shell[data-rail="collapsed"]:not([data-rail-peek]) > aside .nav-item.nav-child { height: var(--h-3); padding-left: var(--sp-2); }
 }
+@property --rail-more { syntax: "<length>"; inherits: false; initial-value: 0px; }
+@keyframes g-rail-more { from { --rail-more: var(--sp-4); } to { --rail-more: 0px; } }
 @media (min-width: 721px) and (prefers-reduced-motion: reduce) {
   /* No sliding width: the rail changes at once and its labels crossfade. */
   .g-shell > aside :is(.brand b, .nav-item > :not(svg, .ph), .nav-twist, .side-foot .who, .g-rail-toggle, [data-rail-hide]) { transition-duration: var(--dur-base) !important; }
