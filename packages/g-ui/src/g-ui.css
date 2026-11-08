@@ -10,6 +10,9 @@
    [hidden] rule; the hidden attribute must always win */
 [hidden] { display: none !important; }
 
+/* The canvas under the page: WKWebView's overscroll shows it, so it is never white. */
+html { background: var(--bg); }
+
 body {
   margin: 0;
   background: var(--surface-1);
@@ -920,7 +923,8 @@ dialog.cmdk {
   pointer-events: none;
   transition: opacity var(--dur-slow) var(--ease-out);
 }
-[data-nav-open] .g-scrim { opacity: 1; pointer-events: auto; }
+/* Child combinators: a shell opens its own sheet and scrim, never a nested shell's. */
+.g-shell[data-nav-open] > .g-scrim { opacity: 1; pointer-events: auto; }
 @media (max-width: 720px) {
   .g-shell { grid-template-columns: 1fr; }
   .g-shell > aside {
@@ -932,8 +936,7 @@ dialog.cmdk {
   }
   /* the scrim separates the sheet; a shadow here trips a software-raster
      compositing bug that washes the whole layer light */
-  [data-nav-open].g-shell > aside,
-  [data-nav-open] .g-shell > aside { translate: 0 0; border-right-color: var(--border); }
+  .g-shell[data-nav-open] > aside { translate: 0 0; border-right-color: var(--border); }
   .g-nav-toggle { display: inline-flex; }
 }
 
