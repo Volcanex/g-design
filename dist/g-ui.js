@@ -364,6 +364,9 @@
     return i === q.length;
   }
   function initCmdk(dlg) {
+    /* the dock's Go palette (rail.js, data-go) runs itself; every palette wires once */
+    if (dlg.hasAttribute("data-go") || dlg.hasAttribute("data-cmdk-init")) return;
+    dlg.setAttribute("data-cmdk-init", "");
     const input = dlg.querySelector(".cmdk-input");
     const list = dlg.querySelector(".cmdk-list");
     const empty = dlg.querySelector(".cmdk-empty");
@@ -394,14 +397,32 @@
       if (e.key === "ArrowUp") { e.preventDefault(); highlight(list, it[(cur - 1 + it.length) % it.length]); input.focus(); }
       if (e.key === "Enter" && cur >= 0) { it[cur].click(); dlg.close(); }
     });
+    dlg.cmdkToggle = () => {
+      if (dlg.open) dlg.close();
+      else { dlg.showModal(); input.value = ""; filter(); input.focus(); }
+    };
+    bindCmdkKey();
+  }
+  /* One Cmd+K (Ctrl+K) listener for the page, however many palettes it holds. It first asks
+     the page with a cancelable g:cmdk event on document: the kit's dock (rail.js) answers for
+     the innermost docked shell and takes it. Otherwise the last page palette toggles. */
+  let cmdkBound = false;
+  function bindCmdkKey() {
+    if (cmdkBound) return;
+    cmdkBound = true;
     document.addEventListener("keydown", (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
-        if (dlg.open) dlg.close();
-        else { dlg.showModal(); input.value = ""; filter(); input.focus(); }
-      }
+      if (!((e.metaKey || e.ctrlKey) && e.key === "k")) return;
+      const ask = new CustomEvent("g:cmdk", { cancelable: true });
+      document.dispatchEvent(ask);
+      if (ask.defaultPrevented) { e.preventDefault(); return; }
+      const dlg = [...document.querySelectorAll("dialog.cmdk[data-cmdk-init]")].pop();
+      if (!dlg) return;
+      e.preventDefault();
+      dlg.cmdkToggle();
     });
   }
+  g.cmdkKey = true;
+  bindCmdkKey();
 
   /* ---- view swap: page change inside persistent chrome ------------------ */
 
