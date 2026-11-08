@@ -67,6 +67,10 @@ for (const out of [join(root, "dist"), join(root, "apps/docs/assets")]) {
   writeFileSync(join(out, "g-admin.js"), adminJs);
 }
 
+// The app view kit's plain-DOM pieces, for the docs cards that show the shell (dock.card.html).
+mkdirSync(join(root, "apps/docs/assets/kit"), { recursive: true });
+for (const f of ["kit.css", "rail.js"]) cpSync(join(root, "packages/g-ui-preact/src", f), join(root, "apps/docs/assets/kit", f));
+
 // 3. Tailwind v4 proof: same tokens through @theme inline, no config file.
 run("npx @tailwindcss/cli -i apps/docs/tailwind/tw-input.css -o apps/docs/assets/tw.css --minify");
 

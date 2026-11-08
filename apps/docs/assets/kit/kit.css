@@ -1,0 +1,615 @@
+/* g-ui-preact kit.css: the app shell look, lifted from Studio without changing a rule.
+   Classes on top of g.css (link g.css first); alias tokens only, no raw colours.
+   Works on plain HTML: nothing here needs the Preact components.
+
+   The shell markup:
+     <div class="g-shell">                           (data-nav-open while the phone sheet is open)
+       <aside aria-label="Main">
+         <a class="brand"><span class="g-mark"></span><b>Name</b></a>
+         <nav class="nav-list"><a class="nav-item" aria-current="page">...</a><div class="nav-head">Group</div></nav>
+         <div class="side-foot"><span class="avatar"></span><span class="who"><span>Name</span><span>email</span></span></div>
+       </aside>
+       <main>
+         <header class="topbar"><button class="g-nav-toggle"></button><span class="topbar-title"></span><span class="grow"></span></header>
+         <div class="content"><div class="content-page"><div class="page-head">...</div> cards, lists, tiles </div></div>
+       </main>
+       <div class="g-scrim"></div>
+     </div>
+   The page itself needs a fixed height so .content scrolls, not the body
+   (Studio: html, body { height: 100%; } body { overflow: hidden; }). */
+
+/* Buttons (g-admin ticket 1). g.css keeps a button's hidden spinner in the flex row, so every
+   Button carried an empty 14px slot plus a gap beside its label. Take it out of the flow at all
+   times: it already overlays the centre while loading, and the width still never changes.
+   `.empty svg` (the big empty-state glyph) also caught button icons inside empty states, so the
+   plus on "New" buttons drew at 24px; buttons keep their own 15px icon there. */
+.btn > .spinner { position: absolute; inset: 0; margin: auto; }
+.empty .btn svg { width: 15px; height: 15px; color: inherit; }
+
+/* ---------------------------------------------------------------- sidebar */
+
+.g-shell { height: 100dvh; }
+.g-shell > aside { overflow-y: auto; overscroll-behavior: contain; }
+.g-shell > main { display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden; }
+
+.brand {
+  display: flex; align-items: center; gap: var(--sp-2);
+  min-height: var(--h-3);
+  /* 4px in, so the 24px mark centres on the icon column (28px from the rail's edge) */
+  padding: var(--sp-1) var(--sp-2) var(--sp-3) var(--sp-1);
+  color: var(--text-primary); text-decoration: none;
+}
+.brand .g-mark { width: 24px; height: 24px; }
+/* The wordmark is the rail's one large label (g-admin ticket 3): the same size in every app. */
+.brand b { font-size: 16px; line-height: var(--lh-3); font-weight: 600; }
+
+.nav-item {
+  display: flex; align-items: center; gap: var(--sp-2);
+  height: var(--h-3); padding: 0 var(--sp-2);
+  border: none; border-radius: var(--radius-sm);
+  background: none; color: var(--text-secondary); text-decoration: none;
+  font-family: var(--font-ui); font-size: var(--font-size-ui); font-weight: 450;
+  cursor: pointer; text-align: left; flex: none;
+  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+.nav-item svg { width: 16px; height: 16px; flex: none; }
+.nav-item:hover { background: var(--fill-hover); color: var(--text-primary); }
+.nav-item[aria-current] { background: var(--fill-active); color: var(--text-primary); font-weight: 500; }
+.nav-item .badge { margin-left: auto; }
+.nav-list { display: flex; flex-direction: column; gap: var(--sp-1); }
+.nav-head { padding: var(--sp-4) var(--sp-2) var(--sp-1); font-size: 11px; line-height: var(--lh-1); font-weight: 500; color: var(--text-placeholder); }
+
+/* Nesting, one level (g-navigation R3). A group's parent is a disclosure row, not a page: a
+   button with the group's icon and name that opens and closes its children in place. Groups
+   are open by default (rail.js wireGroups, or NavGroup in Preact); each child carries its own
+   icon, set in a little from the parent's on a guide line that drops from the parent's icon.
+     <div class="nav-group" data-group="life" data-open>
+       <button class="nav-item nav-group-toggle" type="button" aria-expanded="true">
+         <svg/><span class="ellipsis">Life</span><span class="nav-caret"></span></button>
+       <div class="nav-children"><a class="nav-item nav-child" aria-current="page"><svg/><span class="ellipsis">Calendar</span></a></div>
+     </div>
+   The older form, a parent page with a twist button beside it (.nav-group-row, .nav-twist),
+   still draws for an app that has not moved yet. */
+.nav-group { display: flex; flex-direction: column; gap: var(--sp-1); }
+button.nav-item { width: 100%; }
+.nav-caret {
+  flex: none; width: 5px; height: 5px; margin: -3px var(--sp-1) 0 auto;
+  border-right: 1.5px solid var(--text-placeholder); border-bottom: 1.5px solid var(--text-placeholder);
+  rotate: -45deg; transition: rotate var(--dur-fast) var(--ease-out);
+}
+.nav-group[data-open] > .nav-group-toggle .nav-caret { rotate: 45deg; }
+.nav-group-row { display: flex; align-items: center; gap: 2px; min-width: 0; }
+.nav-group-row > .nav-item { flex: 1 1 auto; min-width: 0; }
+.nav-twist {
+  flex: none; display: grid; place-items: center;
+  width: var(--h-1); height: var(--h-3); padding: 0;
+  border: none; border-radius: var(--radius-sm); background: none; color: var(--text-placeholder); cursor: pointer;
+}
+.nav-twist:hover { background: var(--fill-hover); color: var(--text-primary); }
+.nav-twist::before {
+  content: ""; width: 5px; height: 5px; margin-top: -2px;
+  border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor;
+  rotate: -45deg; transition: rotate var(--dur-fast) var(--ease-out);
+}
+.nav-group[data-open] > .nav-group-row > .nav-twist::before { rotate: 45deg; margin-top: -4px; }
+/* The guide line sits under the parent's icon (the rail's 12px inset, the item's 8px, half the
+   16px icon, less the line), and a child's icon starts 4px past it. Collapsed, the children
+   step back into the parent's column (the rail rules below). */
+.nav-children {
+  display: none; flex-direction: column; gap: 2px;
+  margin-left: 15px; padding-left: 0;
+  border-left: 1px solid var(--border-subtle);
+}
+.nav-group[data-open] > .nav-children { display: flex; }
+.nav-item.nav-child { height: var(--h-2); padding-left: var(--sp-1); }
+.nav-group-row + .nav-children .nav-item.nav-child { padding-left: var(--sp-2); }
+
+.side-foot {
+  margin-top: auto;
+  display: flex; align-items: center; gap: var(--sp-2);
+  padding: var(--sp-3) 0 0;
+  border-top: 1px solid var(--border-subtle);
+  min-width: 0;
+}
+.side-foot .who { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.side-foot .who span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; line-height: var(--lh-1); }
+.side-foot .who span:last-child { color: var(--text-placeholder); font-size: 11px; }
+
+/* The rail (rail.js), from 721px up. Collapsed to icons by default; hovering it for a moment or
+   moving focus into it opens it (data-rail-peek) and the content moves over, never hidden under it; the toggle beside the brand pins it open (data-rail="pinned") and the
+   content then makes room. Everything inside keeps its open-width layout in every state and the
+   rail only clips it, so opening reveals labels where they already are instead of moving
+   anything. Width and the content's shift ease on --spring-smooth (perceived 300ms); labels
+   fade on the same curve. Phones keep the sheet. Child combinators keep one shell's state off
+   another shell nested in its content (Studio inside Command).
+     <div class="brand-row"><a class="brand">...</a><button class="g-rail-toggle"></button></div> */
+.brand-row { display: flex; align-items: center; gap: var(--sp-1); min-width: 0; }
+/* A long rail scrolls between its brand and its foot, which stay put: the pin button beside the
+   G is always in reach, however far down the current page is. They sit flush with the rail's
+   edges (its --sp-3 padding taken back) on its own surface. */
+.g-shell > aside > .brand-row {
+  position: sticky; top: calc(-1 * var(--sp-3)); z-index: 2;
+  margin-top: calc(-1 * var(--sp-3)); padding-top: var(--sp-3); background: var(--surface-1);
+}
+.g-shell > aside > .side-foot {
+  position: sticky; bottom: calc(-1 * var(--sp-3)); z-index: 2;
+  margin-bottom: calc(-1 * var(--sp-3)); padding-bottom: var(--sp-3); background: var(--surface-1);
+}
+.brand-row > .brand { flex: 1 1 auto; min-width: 0; }
+.g-rail-toggle {
+  flex: none; display: grid; place-items: center;
+  width: var(--h-3); height: var(--h-3); padding: 0; margin-bottom: var(--sp-2);
+  border: none; border-radius: var(--radius-sm); background: none; color: var(--text-placeholder); cursor: pointer;
+}
+.g-rail-toggle:hover { background: var(--fill-hover); color: var(--text-primary); }
+.g-rail-toggle svg { width: 16px; height: 16px; transition: scale var(--dur-fast) var(--ease-out); }
+.g-shell[data-rail="collapsed"] > aside .g-rail-toggle svg { scale: -1 1; }
+@media (max-width: 720px) { .g-rail-toggle { display: none; } }
+/* The nav list is the rail's scroll region, between the brand and the foot, so the foot never
+   sits over its last items (a rail taller than the window, Studio's editor at 900px). The aside
+   itself then has nothing to scroll; it still can for an app whose nav is not a .nav-list. The
+   list ends on a hard edge at the foot's rule, and an item cut there shows there is more. */
+.g-shell > aside > .nav-list { flex: 0 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; scrollbar-width: none; }
+.g-shell > aside > .nav-list::-webkit-scrollbar { display: none; }
+/* The list clips at its own edges now, so its focus rings sit inside the item, as in a menubar. */
+.g-shell > aside > .nav-list :focus-visible { outline-offset: -2px; }
+@media (min-width: 721px) {
+  .g-shell { --rail-w: 224px; --rail-mini: 56px; grid-template-columns: var(--rail-w) minmax(0, 1fr); }
+  .g-shell[data-rail="collapsed"] { grid-template-columns: var(--rail-mini) minmax(0, 1fr); }
+  .g-shell > aside { position: relative; z-index: 30; width: var(--rail-w); overflow-x: hidden; }
+  .g-shell > aside > * { flex: none; width: calc(var(--rail-w) - 2 * var(--sp-3)); }
+  .g-shell > aside > .side-foot { margin-top: auto; }
+  .g-shell[data-rail="collapsed"] > aside { width: var(--rail-mini); }
+  .g-shell[data-rail="collapsed"][data-rail-peek] { grid-template-columns: var(--rail-w) minmax(0, 1fr); }
+  .g-shell[data-rail="collapsed"][data-rail-peek] > aside { width: var(--rail-w); }
+  .g-shell[data-rail-ready] { transition: grid-template-columns var(--spring-smooth-dur) var(--spring-smooth); }
+  .g-shell[data-rail-ready] > aside { transition: width var(--spring-smooth-dur) var(--spring-smooth), box-shadow var(--dur-slow) var(--ease-out); }
+
+  /* What only the open rail shows fades; it keeps its place and is clipped while collapsed. */
+  .g-shell > aside :is(.brand b, .nav-item > :not(svg, .ph), .nav-twist, .side-foot .who, .g-rail-toggle, [data-rail-hide]) {
+    transition: opacity var(--spring-smooth-dur) var(--spring-smooth);
+  }
+  .g-shell[data-rail="collapsed"]:not([data-rail-peek]) > aside :is(.brand b, .nav-item > :not(svg, .ph), .nav-twist, .side-foot .who, .g-rail-toggle, [data-rail-hide]) {
+    opacity: 0;
+  }
+  /* Collapsed, a section heading keeps its height (so peeking moves nothing) and shows as a
+     short rule under the icons. */
+  .g-shell > aside .nav-head { position: relative; transition: color var(--spring-smooth-dur) var(--spring-smooth); }
+  .g-shell > aside .nav-list > * + .nav-head::after {
+    content: ""; position: absolute; left: var(--sp-2); width: 16px; height: 1px;
+    top: calc(var(--sp-4) + var(--lh-1) / 2); background: var(--border);
+    opacity: 0; transition: opacity var(--spring-smooth-dur) var(--spring-smooth);
+  }
+  .g-shell[data-rail="collapsed"]:not([data-rail-peek]) > aside .nav-head { color: transparent; }
+  .g-shell[data-rail="collapsed"]:not([data-rail-peek]) > aside .nav-list > * + .nav-head::after { opacity: 1; }
+  /* Collapsed and settled, an item's hover and current fill hugs its icon. While the rail
+     closes (data-rail-settling) items keep their width, so labels fade instead of squeezing. */
+  .g-shell[data-rail="collapsed"]:not([data-rail-peek], [data-rail-settling]) > aside .nav-item { width: 32px; }
+  .g-shell[data-rail="collapsed"]:not([data-rail-peek], [data-rail-settling]) > aside .nav-children > .nav-item { width: 32px; }
+  /* Collapsed, nesting flattens: the guide line fades, children step out under their parent and
+     take its height, so the rail is one straight column of icons. Peeking brings the nesting back. */
+  .g-shell[data-rail-ready] > aside .nav-children {
+    transition: margin-left var(--spring-smooth-dur) var(--spring-smooth), border-color var(--spring-smooth-dur) var(--spring-smooth);
+  }
+  .g-shell[data-rail-ready] > aside .nav-item.nav-child {
+    transition: height var(--spring-smooth-dur) var(--spring-smooth), padding var(--spring-smooth-dur) var(--spring-smooth),
+      background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+  }
+  .g-shell[data-rail="collapsed"]:not([data-rail-peek]) > aside .nav-children { margin-left: 0; border-left-color: transparent; }
+  .g-shell[data-rail="collapsed"]:not([data-rail-peek]) > aside .nav-item.nav-child { height: var(--h-3); padding-left: var(--sp-2); }
+}
+@media (min-width: 721px) and (prefers-reduced-motion: reduce) {
+  /* No sliding width: the rail changes at once and its labels crossfade. */
+  .g-shell > aside :is(.brand b, .nav-item > :not(svg, .ph), .nav-twist, .side-foot .who, .g-rail-toggle, [data-rail-hide]) { transition-duration: var(--dur-base) !important; }
+}
+
+/* ---------------------------------------------------------------- top bar */
+
+.topbar {
+  display: flex; align-items: center; gap: var(--sp-2);
+  /* 48px with its rule in every app (g-navigation R10): Studio's workspace bar and Command's
+     slim bar are one height, a control with 8px above and below. */
+  min-height: var(--h-5);
+  padding: var(--sp-2) var(--gutter);
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--surface-1);
+  flex: none;
+  min-width: 0;
+}
+.topbar .page-title, .topbar-title { font-size: 15px; line-height: var(--lh-2); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.topbar .grow { flex: 1 1 auto; min-width: 0; }
+.topbar-group { display: flex; align-items: center; gap: var(--sp-1); flex: none; }
+/* The slim bar (g-navigation R7): 48px with its rule at every width, for an app whose bar
+   carries a title and a few actions rather than a document's state. */
+.topbar.topbar-slim { min-height: var(--h-5); padding-block: 0; }
+/* Where the page sits: Parent, a caret, Page. The parent is a link; the page is the title. */
+.topbar-crumbs { display: flex; align-items: center; gap: var(--sp-1); min-width: 0; font-size: 15px; line-height: var(--lh-2); }
+.topbar-crumbs a { color: var(--text-secondary); text-decoration: none; white-space: nowrap; flex: none; }
+.topbar-crumbs a:hover { color: var(--text-primary); }
+.topbar-crumbs .crumb-sep { flex: none; width: 5px; height: 5px; margin: 0 var(--sp-1) 0 2px; border-right: 1.5px solid var(--text-placeholder); border-bottom: 1.5px solid var(--text-placeholder); rotate: -45deg; }
+.topbar-crumbs .topbar-title { flex: 0 1 auto; }
+
+.content { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+.content-page {
+  width: 100%;
+  max-width: var(--col-page);
+  margin-inline: 0 auto;  /* left on wide screens: a centred narrow column floats */
+  padding: var(--sp-5) var(--gutter) var(--sp-7);
+  display: flex; flex-direction: column; gap: var(--sp-4);
+}
+.content-page.narrow { max-width: max(var(--col-content), 50%); }  /* at least half the space beside the rail */
+.content-page.text { max-width: var(--col-text); }
+
+/* ---------------------------------------------------------------- page rhythm */
+
+/* The page head. The top bar already names the page, so the head never says it again: its h1
+   is .sr-only (PageHead does this; a hand-written head writes <h1 class="sr-only">). What is left
+   is one row, at every width: the page's badges on the left, its actions on the right, never
+   wrapping onto a line of their own. A description, when the page needs one, is a second line.
+     <div class="page-head">
+       <div class="page-head-text">
+         <div class="row-tight"><h1 class="sr-only">Tickets</h1><span class="badge">98</span></div>
+         <p class="page-sub">How to use it, or where its data comes from. Never a restatement.</p>
+       </div>
+       <div class="page-actions">...</div>
+     </div> */
+.page-head { display: flex; align-items: center; gap: var(--sp-1) var(--sp-3); flex-wrap: wrap; min-width: 0; }  /* 4px row gap: twice over the break, 8px to the description */
+.page-head-text { display: flex; flex-direction: column; gap: var(--sp-1); min-width: 0; flex: 1 1 240px; }
+/* The one-row head: its badge row and actions share a line and the description drops below. */
+.page-head-text:has(> .row-tight) { display: contents; }
+.page-head-text > .row-tight { flex: 1 1 0; min-width: 0; flex-wrap: nowrap; overflow: hidden; min-height: var(--h-control); }
+.page-head-text > .row-tight > * { flex: none; }
+/* A badge row holding only the hidden h1 takes no height, so the description leads the head. */
+.page-head-text > .row-tight:not(:has(> :not(.sr-only))) { min-height: 0; }
+.page-head-text > .row-tight > .badge { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* A full-width break after the badges and actions, so the description always starts its own
+   line; the description keeps its reading measure. */
+.page-head:has(> .page-head-text > .row-tight ~ .page-sub)::after { content: ""; order: 2; flex: 0 0 100%; height: 0; }
+.page-head-text:has(> .row-tight) > .page-sub { order: 3; flex: 0 1 auto; }
+.page-head .page-title { font-size: 18px; line-height: var(--lh-3); font-weight: 500; display: flex; align-items: center; gap: var(--sp-2); margin: 0; }
+.page-sub { margin: 0; font-size: var(--font-size-ui); line-height: var(--lh-2); color: var(--text-secondary); max-width: var(--col-text); }
+.page-actions { order: 1; display: flex; align-items: center; gap: var(--sp-2); flex: 0 0 auto; flex-wrap: nowrap; min-width: 0; max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+.page-actions > * { flex: none; }
+/* A head with nothing visible left in it takes no room, so the page starts at its first block. */
+.page-head:not(:has(.page-actions, .page-sub, .badge, .btn, .legend, input, select)) { display: contents; }
+
+/* Sections: one rhythm for every page. A section head is 32px below what came before it (the
+   page stack's 16px plus its own 16px) and 16px above its body; a .section-sub under it sits
+   4px below the head. The head is one row: title, its badges, then actions pushed right.
+     <h2 class="section-head">Problems <span class="badge">1</span><span class="grow"></span>...</h2>
+     <p class="section-sub">One line on what the section shows.</p> */
+.section-head {
+  display: flex; align-items: center; gap: var(--sp-2); flex-wrap: nowrap; min-width: 0;
+  min-height: var(--h-control); margin: var(--sp-4) 0 0;
+  font-size: 15px; line-height: var(--lh-2); font-weight: 500; color: var(--text-primary);
+}
+/* Only at the top of a card or stack: a head wrapped in its own block keeps its 16px. */
+:is(.card, .stack, .stack-tight, .stack-loose) > .section-head:first-child { margin-top: 0; }
+.section-head > .grow { flex: 1 1 auto; }
+.section-sub { margin: calc(var(--sp-1) - var(--sp-4)) 0 0; font-size: var(--font-size-ui); line-height: var(--lh-2); color: var(--text-secondary); max-width: var(--col-text); }
+
+.row { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; min-width: 0; }
+.row-tight { display: flex; align-items: center; gap: var(--sp-2); flex-wrap: wrap; min-width: 0; }
+.stack { display: flex; flex-direction: column; gap: var(--sp-3); min-width: 0; }
+.stack-tight { display: flex; flex-direction: column; gap: var(--sp-2); min-width: 0; }
+.stack-loose { display: flex; flex-direction: column; gap: var(--sp-5); min-width: 0; }
+.grow { flex: 1 1 auto; min-width: 0; }
+.muted { color: var(--text-secondary); }
+.faint { color: var(--text-placeholder); }
+.small { font-size: 12px; line-height: var(--lh-1); }
+.ellipsis { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.wrap-any { overflow-wrap: anywhere; }
+
+.card-head { display: flex; align-items: center; flex-wrap: wrap; gap: var(--sp-3); padding-bottom: var(--sp-3); }
+.card-head .card-title { flex: 1 1 auto; }
+.card-sub { font-size: 12px; line-height: var(--lh-1); color: var(--text-secondary); }
+.card.flush { padding: 0; overflow: hidden; }
+.card.flush > .card-head { padding: var(--pad-card) var(--pad-card) var(--sp-3); }
+
+.list { display: flex; flex-direction: column; }
+.list-item {
+  display: flex; align-items: center; gap: var(--sp-3);
+  min-height: var(--h-5);
+  padding: var(--sp-3) 0;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: var(--font-size-ui); min-width: 0;
+}
+.list-item:last-child { border-bottom: none; }
+.list-item .main { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1 1 auto; }
+.list-item .main > :first-child { line-height: var(--lh-2); }
+.list-item .main > .sub { font-size: 12px; line-height: var(--lh-1); color: var(--text-secondary); overflow-wrap: anywhere; }
+.list-item .end { display: flex; align-items: center; gap: var(--sp-2); flex: none; margin-left: auto; }
+.list-item .when { font-size: 12px; color: var(--text-secondary); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.card > .list { margin: calc(-1 * var(--sp-3)) 0; }
+
+.facts { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: var(--sp-2) var(--sp-4); margin: 0; font-size: var(--font-size-ui); line-height: var(--lh-2); }
+.facts dt { color: var(--text-secondary); }
+.facts dd { margin: 0; overflow-wrap: anywhere; }
+
+.cols-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-4); align-items: start; }
+@media (max-width: 900px) { .cols-2 { grid-template-columns: minmax(0, 1fr); } }
+
+.empty-actions { display: flex; gap: var(--sp-2); flex-wrap: wrap; justify-content: center; }
+.state-error svg { color: var(--danger-text); }
+.state-error-more { font-size: 13px; color: var(--text-muted); }
+.state-error-more summary { cursor: pointer; }
+.state-error-more .e-desc { margin-top: var(--sp-1); }
+.skel-rows { display: flex; flex-direction: column; gap: var(--sp-2); padding: var(--sp-2) 0; }
+
+.field-top { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-2); }
+.char-count { font-size: 12px; line-height: var(--lh-1); color: var(--text-secondary); white-space: nowrap; }
+.char-count.over { color: var(--warn-text); }
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-4); }
+.form-grid .span-2 { grid-column: 1 / -1; }
+@media (max-width: 720px) { .form-grid { grid-template-columns: minmax(0, 1fr); } }
+.form-actions { display: flex; align-items: center; justify-content: flex-end; gap: var(--sp-2); flex-wrap: wrap; }
+
+a.link { color: var(--text-primary); text-decoration: underline; text-underline-offset: 2px; text-decoration-color: var(--border); }
+a.link:hover { text-decoration-color: currentColor; }
+a.btn { text-decoration: none; }
+.mono-url { font-family: var(--font-mono); font-size: 12px; line-height: var(--lh-2); overflow-wrap: anywhere; }
+
+/* ---------------------------------------------------------------- dialogs */
+
+/* Larger sizes of g-design's dialog for change lists and pickers; the
+   chrome (border, radius, motion, backdrop) is the component's own. */
+dialog.dlg { max-height: calc(100dvh - 32px); }
+/* Flex whether open or not, so the layout holds while the masked exit plays after close(). */
+dialog.dlg { display: flex; flex-direction: column; }
+dialog.dlg:not([open]) { display: none; }
+dialog.dlg-sm { width: min(400px, calc(100vw - 32px)); }
+dialog.dlg-md { width: min(480px, calc(100vw - 32px)); }
+dialog.dlg-lg { width: min(720px, calc(100vw - 32px)); }
+dialog.dlg-xl { width: min(960px, calc(100vw - 32px)); height: min(720px, calc(100dvh - 32px)); }
+dialog.dlg > .dlg-body { overflow-y: auto; min-height: 0; flex: 1 1 auto; gap: var(--sp-3); }
+dialog.dlg > .dlg-foot { flex: none; flex-wrap: wrap; }
+.dlg-head { display: flex; align-items: center; gap: var(--sp-2); }
+.dlg-head .dlg-title { flex: 1 1 auto; min-width: 0; }
+.dlg-x { margin: calc(-1 * var(--sp-1)) calc(-1 * var(--sp-2)) calc(-1 * var(--sp-1)) 0; }
+.dlg-foot .grow { margin-right: auto; }
+@media (max-width: 480px) {
+  dialog.dlg { margin: auto auto 0; width: 100vw !important; max-width: 100vw; border-radius: var(--radius-card) var(--radius-card) 0 0; max-height: calc(100dvh - 16px); }
+  dialog.dlg-xl { height: calc(100dvh - 16px); }
+}
+
+/* Menus: a link item looks like a button item. */
+a.menu-item { text-decoration: none; }
+.menu-heading { padding: var(--sp-2) var(--sp-2) var(--sp-1); font-size: 11px; line-height: var(--lh-1); font-weight: 500; color: var(--text-placeholder); }
+
+/* disclosure rows (change lists, history) */
+details.disclose { border-bottom: 1px solid var(--border-subtle); }
+details.disclose:last-child { border-bottom: none; }
+details.disclose > summary {
+  display: flex; align-items: center; gap: var(--sp-2);
+  min-height: var(--h-4); padding: var(--sp-2) 0;
+  cursor: pointer; list-style: none; font-size: var(--font-size-ui);
+}
+details.disclose > summary::-webkit-details-marker { display: none; }
+details.disclose > summary::before {
+  content: ""; flex: none; width: 5px; height: 5px; margin: 0 var(--sp-1) 0 2px;
+  border-right: 1.5px solid var(--text-secondary); border-bottom: 1.5px solid var(--text-secondary);
+  rotate: -45deg; transition: rotate var(--dur-fast) var(--ease-out);
+}
+details.disclose[open] > summary::before { rotate: 45deg; margin-top: -3px; }
+details.disclose > .disclose-body { padding: 0 0 var(--sp-3); display: flex; flex-direction: column; gap: var(--sp-2); }
+
+/* ---------------------------------------------------------------- mobile */
+
+@media (max-width: 720px) {
+  .topbar { padding: var(--sp-2) var(--gutter); min-height: calc(var(--h-control) + 2 * var(--sp-2)); }
+  .content-page { padding-top: var(--sp-4); }
+  /* .hide-sm drops a secondary table column on a phone: put it on that column's th and every td,
+     and keep two or three columns, so a table reflows instead of scrolling inside its card. */
+  .hide-sm { display: none !important; }
+}
+@media (min-width: 721px) { .show-sm { display: none !important; } }
+
+/* Rail skeleton row, while the nav loads. */
+.nav-skel { height: var(--h-3); border-radius: var(--radius-sm); }
+
+/* ---------------------------------------------------------------- tile grids */
+
+/* Dashboard tiles: a dense four-column grid of cards sized 1x1, 2x1 or 2x2. */
+.tile-grid { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-3);
+  grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: 132px; grid-auto-flow: dense; }
+.tile { display: flex; flex-direction: column; gap: var(--sp-2); min-width: 0; overflow: hidden; }
+.tile-1x1 { grid-column: span 1; grid-row: span 1; }
+.tile-2x1 { grid-column: span 2; grid-row: span 1; }
+.tile-2x2 { grid-column: span 2; grid-row: span 2; }
+.tile-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); min-width: 0; }
+.tile-title { font-weight: 600; color: inherit; text-decoration: none; min-width: 0; }
+.tile-title:hover { text-decoration: underline; }
+/* A tile that is itself the link (a hub tile for a child page): the whole card goes there. */
+a.tile { color: inherit; text-decoration: none; transition: border-color var(--dur-fast) var(--ease-out); }
+a.tile:hover { border-color: var(--border); }
+a.tile:hover .tile-title { text-decoration: underline; }
+.tile-tools { display: flex; gap: 2px; flex: none; }
+.tile-body { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: center; }
+.tile-num { font-size: var(--h-3); font-weight: 600; margin: 0; line-height: 1.1; }
+.tile-strong { font-weight: 600; margin: 0; }
+.tile-note { margin: 0; font-size: var(--font-size-ui); }
+@media (max-width: 720px) {
+  .tile-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 420px) {
+  .tile-grid { grid-template-columns: minmax(0, 1fr); }
+  .tile-2x1, .tile-2x2 { grid-column: span 1; }
+}
+
+/* ---------------------------------------------------------------- your own cursor */
+
+/* The coworking palette (Studio contracts.md, Coworking), which your own cursor is tinted
+   from. Studio draws presence in these ten; every g app uses them for the pointer, so the
+   cursor never changes between apps or at an embedded Studio's edge. */
+/* Dark is the default theme. One lightness for all ten, so no colour shouts over another; the
+   ink is a deep shade of the same hue, readable on its colour. */
+:root, [data-theme="dark"] {
+  --cowork-red: oklch(0.72 0.17 25);     --cowork-red-ink: oklch(0.24 0.07 25);
+  --cowork-orange: oklch(0.75 0.15 52);  --cowork-orange-ink: oklch(0.25 0.06 52);
+  --cowork-amber: oklch(0.81 0.14 82);   --cowork-amber-ink: oklch(0.27 0.06 82);
+  --cowork-lime: oklch(0.82 0.16 128);   --cowork-lime-ink: oklch(0.27 0.07 128);
+  --cowork-green: oklch(0.74 0.15 152);  --cowork-green-ink: oklch(0.24 0.06 152);
+  --cowork-teal: oklch(0.76 0.11 188);   --cowork-teal-ink: oklch(0.25 0.05 188);
+  --cowork-sky: oklch(0.76 0.12 230);    --cowork-sky-ink: oklch(0.24 0.05 230);
+  --cowork-blue: oklch(0.70 0.15 262);   --cowork-blue-ink: oklch(0.98 0.01 262);
+  --cowork-violet: oklch(0.70 0.16 298); --cowork-violet-ink: oklch(0.98 0.01 298);
+  --cowork-pink: oklch(0.74 0.16 350);   --cowork-pink-ink: oklch(0.25 0.07 350);
+  /* Agents wear one quiet colour of their own, never a person's. */
+  --cowork-agent: oklch(0.80 0.03 250);  --cowork-agent-ink: oklch(0.24 0.02 250);
+}
+[data-theme="light"] {
+  --cowork-red: oklch(0.62 0.20 25);     --cowork-red-ink: oklch(0.99 0.01 25);
+  --cowork-orange: oklch(0.68 0.17 52);  --cowork-orange-ink: oklch(0.22 0.06 52);
+  --cowork-amber: oklch(0.76 0.15 78);   --cowork-amber-ink: oklch(0.24 0.06 78);
+  --cowork-lime: oklch(0.74 0.17 128);   --cowork-lime-ink: oklch(0.22 0.07 128);
+  --cowork-green: oklch(0.62 0.16 152);  --cowork-green-ink: oklch(0.99 0.01 152);
+  --cowork-teal: oklch(0.62 0.11 190);   --cowork-teal-ink: oklch(0.99 0.01 190);
+  --cowork-sky: oklch(0.64 0.13 232);    --cowork-sky-ink: oklch(0.99 0.01 232);
+  --cowork-blue: oklch(0.56 0.18 262);   --cowork-blue-ink: oklch(0.99 0.01 262);
+  --cowork-violet: oklch(0.56 0.19 298); --cowork-violet-ink: oklch(0.99 0.01 298);
+  --cowork-pink: oklch(0.63 0.19 350);   --cowork-pink-ink: oklch(0.99 0.01 350);
+  --cowork-agent: oklch(0.52 0.03 250);  --cowork-agent-ink: oklch(0.99 0.01 250);
+}
+@media (prefers-color-scheme: light) {
+  [data-theme="system"] {
+    --cowork-red: oklch(0.62 0.20 25);     --cowork-red-ink: oklch(0.99 0.01 25);
+    --cowork-orange: oklch(0.68 0.17 52);  --cowork-orange-ink: oklch(0.22 0.06 52);
+    --cowork-amber: oklch(0.76 0.15 78);   --cowork-amber-ink: oklch(0.24 0.06 78);
+    --cowork-lime: oklch(0.74 0.17 128);   --cowork-lime-ink: oklch(0.22 0.07 128);
+    --cowork-green: oklch(0.62 0.16 152);  --cowork-green-ink: oklch(0.99 0.01 152);
+    --cowork-teal: oklch(0.62 0.11 190);   --cowork-teal-ink: oklch(0.99 0.01 190);
+    --cowork-sky: oklch(0.64 0.13 232);    --cowork-sky-ink: oklch(0.99 0.01 232);
+    --cowork-blue: oklch(0.56 0.18 262);   --cowork-blue-ink: oklch(0.99 0.01 262);
+    --cowork-violet: oklch(0.56 0.19 298); --cowork-violet-ink: oklch(0.99 0.01 298);
+    --cowork-pink: oklch(0.63 0.19 350);   --cowork-pink-ink: oklch(0.99 0.01 350);
+    --cowork-agent: oklch(0.52 0.03 250);  --cowork-agent-ink: oklch(0.99 0.01 250);
+  }
+}
+
+/* Set by cursor.js (paintOwnCursor, wireOwnCursor) as tinted SVGs with their hotspots. Only on
+   a mouse or trackpad, and never under forced colours, where the system cursors stay. */
+@media (pointer: fine) and (forced-colors: none) {
+  html[data-own-cursor], html[data-own-cursor] body { cursor: var(--cursor-arrow, auto); }
+  html[data-own-cursor] :is(a[href], button:not(:disabled), [role="button"], [role="menuitem"], [role="tab"], label, summary, select, .nav-item, .btn:not(:disabled)) { cursor: var(--cursor-hand, pointer); }
+  html[data-own-cursor] :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"], [type="button"], [type="submit"]), textarea, [contenteditable="true"], [contenteditable=""], .cm-content, .ProseMirror) { cursor: var(--cursor-text, text); }
+  html[data-own-cursor][data-dragging], html[data-own-cursor][data-dragging] * { cursor: var(--cursor-grab, grabbing) !important; }
+}
+
+/* ---------------------------------------------------------------- the dock and Go (rail.js) */
+
+/* Under 721px a shell whose rail has pinned links (data-pin) draws a bottom dock in <body>:
+   up to four slots and Go, 56px plus the home bar. rail.js marks the page html[data-g-dock],
+   the shell that owns the dock [data-dock] and a docked shell around it [data-dock-outer]. Go
+   is dialog.cmdk.g-go: a sheet above the dock on phones, the ordinary centred palette (Cmd+K)
+   from 721px. Nothing here draws from 721px up: the desktop is unchanged.
+     <nav class="g-dock"><div class="g-dock-row">
+       <button class="g-dock-slot" aria-current="page"><span class="g-dock-ico"><svg/></span><span class="g-dock-label">Home</span></button>
+       ...</div></nav> */
+.g-dock, .g-go-scrim { display: none; }
+.g-go .g-go-where { margin-left: auto; padding-left: var(--sp-2); font-size: 12px; color: var(--text-placeholder); white-space: nowrap; }
+.g-go .menu-item .badge { margin-left: var(--sp-2); }
+.g-go .g-go-where + .badge { margin-left: var(--sp-2); }
+.g-go .menu-item svg { width: 16px; height: 16px; flex: none; color: var(--text-secondary); }
+.g-go .g-go-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.g-go .menu-item[aria-current] { color: var(--text-primary); font-weight: 500; }
+.g-go .g-go-child { padding-left: var(--sp-6); }
+.g-go .g-go-group { display: flex; align-items: center; gap: var(--sp-2); padding: var(--sp-2) var(--sp-2) var(--sp-1); font-size: 12px; line-height: var(--lh-1); color: var(--text-secondary); }
+.g-go .g-go-group svg { width: 16px; height: 16px; }
+.g-go .g-go-brand { color: var(--text-secondary); }
+.g-go .g-go-all { margin-top: var(--sp-1); }
+.g-go .g-go-all .nav-caret { margin: -3px var(--sp-1) 0 auto; }
+.g-go .g-go-all[aria-expanded="true"] .nav-caret { rotate: 45deg; }
+
+@media (max-width: 720px) {
+  html[data-g-dock] { --g-dock-space: calc(56px + env(safe-area-inset-bottom)); }
+  html[data-g-dock][data-g-dock-hidden] { --g-dock-space: 0px; }
+
+  .g-dock {
+    display: block;
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 45;
+    padding: var(--sp-1) var(--sp-2) calc(var(--sp-1) + env(safe-area-inset-bottom));
+    background: var(--surface-1);
+    box-shadow: 0 -1px 0 var(--border-subtle);
+    transition: translate var(--spring-smooth-dur) var(--spring-smooth);
+  }
+  html[data-g-dock-hidden] .g-dock { translate: 0 calc(100% + 1px); transition: translate var(--dur-slow) var(--ease-in-out); }
+  .g-dock-row { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: var(--sp-1); }
+  .g-dock-row[data-in] { animation: g-dock-in var(--spring-smooth-dur) var(--spring-smooth) backwards; }
+  .g-dock-slot {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+    height: var(--h-5); min-width: 0; padding: 0;
+    border: none; border-radius: var(--radius-card); background: none;
+    color: var(--text-secondary); font: 450 11px/var(--lh-1) var(--font-ui);
+    cursor: pointer; -webkit-tap-highlight-color: transparent;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .g-dock-slot:disabled { opacity: 0.45; cursor: default; }
+  .g-dock-slot[aria-current] { color: var(--text-primary); }
+  .g-dock-ico {
+    position: relative; display: grid; place-items: center;
+    width: 48px; height: 28px; border-radius: 14px;
+    transition: background var(--dur-base) var(--ease-out);
+  }
+  .g-dock-ico svg { width: 20px; height: 20px; }
+  .g-dock-ico .g-mark { width: 18px; height: 18px; }
+  .g-dock-slot[aria-current] .g-dock-ico { background: var(--fill-active); }
+  .g-dock-label { max-width: 100%; padding: 0 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .g-dock-count {
+    position: absolute; top: -4px; right: 2px;
+    min-width: 16px; height: 16px; padding: 0 4px; border-radius: var(--radius-full);
+    background: var(--accent-fill); color: var(--accent-fg);
+    font-size: 10px; font-weight: 600; line-height: 16px; text-align: center; font-variant-numeric: tabular-nums;
+    box-shadow: 0 0 0 2px var(--surface-1);
+  }
+
+  /* Content ends above the dock: the outermost docked shell gives up the dock's height. */
+  html[data-g-dock] .g-shell[data-dock-outer] > main,
+  html[data-g-dock] .g-shell[data-dock]:not([data-dock-outer] .g-shell) > main { padding-bottom: var(--g-dock-space); }
+  /* The dock replaces the menu button, and the primary action it carries sits only in the dock. */
+  html[data-g-dock] .g-shell:is([data-dock], [data-dock-outer]) > main > .topbar .g-nav-toggle { display: none; }
+  html[data-g-dock] [data-dock-proxied] { display: none !important; }
+
+  /* Go: a sheet that rises from behind the dock, the search field at its foot in thumb reach. */
+  .g-go-scrim {
+    display: block;
+    position: fixed; inset: 0; z-index: 43;
+    background: rgb(0 0 0 / 0.44);
+    opacity: 0; pointer-events: none;
+    transition: opacity var(--spring-snap-dur) var(--ease-in-out);
+  }
+  html[data-g-go] .g-go-scrim { opacity: 1; pointer-events: auto; transition: opacity var(--spring-smooth-dur) var(--ease-out); }
+  dialog.dlg.g-go {
+    inset: auto 0 var(--g-dock-space, 0px) 0; margin: 0; z-index: 44;
+    width: 100%; max-width: 100%;
+    max-height: calc(100dvh - var(--g-dock-space, 0px) - env(safe-area-inset-top) - var(--sp-7));
+    flex-direction: column-reverse;
+    border-width: 1px 0 0; border-radius: 16px 16px 0 0;
+    clip-path: none;
+    translate: 0 calc(100% + var(--g-dock-space, 0px));
+  }
+  dialog.dlg.g-go[open] { display: flex; translate: 0 0; clip-path: none; }
+  @starting-style { dialog.dlg.g-go[open] { translate: 0 calc(100% + var(--g-dock-space, 0px)); } }
+  .g-go .cmdk-input {
+    flex: none; height: var(--h-5); padding: 0 var(--gutter);
+    border-bottom: none; border-top: 1px solid var(--border-subtle);
+    font-size: 16px;  /* iOS zooms into a smaller field */
+  }
+  .g-go .cmdk-list { flex: 1 1 auto; min-height: 0; max-height: none; padding: var(--sp-2) var(--sp-2) var(--sp-1); overscroll-behavior: contain; }
+  .g-go .menu-item { height: 44px; font-size: 15px; gap: var(--sp-3); }
+  .g-go .menu-item svg { width: 18px; height: 18px; }
+  .g-go .g-go-child { padding-left: var(--sp-7); }
+
+  /* Phones get the top of the screen too: the bar clears the notch, and a nested shell's bar
+     is the only one. */
+  .topbar { padding-top: calc(var(--sp-2) + env(safe-area-inset-top)); min-height: calc(var(--h-control) + 2 * var(--sp-2) + env(safe-area-inset-top)); }
+  .topbar.topbar-slim { padding-top: env(safe-area-inset-top); min-height: calc(var(--h-5) + env(safe-area-inset-top)); }
+  .g-shell:has(.g-shell > main > .topbar) > main > .topbar { display: none; }
+}
+@keyframes g-dock-in { from { opacity: 0; translate: 0 8px; } }
+@media (max-width: 720px) and (prefers-reduced-motion: reduce) {
+  .g-dock-row[data-in] { animation: none; }
+  html[data-g-dock-hidden] .g-dock { translate: 0 0; opacity: 0; pointer-events: none; transition: opacity var(--dur-base) var(--ease-out) !important; }
+  dialog.dlg.g-go, dialog.dlg.g-go[open] { translate: 0 0 !important; }
+  dialog.dlg.g-go:not([open]) { opacity: 0; }
+  @starting-style { dialog.dlg.g-go[open] { opacity: 0; } }
+}

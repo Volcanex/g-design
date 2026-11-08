@@ -494,3 +494,122 @@ a.tile:hover .tile-title { text-decoration: underline; }
   html[data-own-cursor] :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"], [type="button"], [type="submit"]), textarea, [contenteditable="true"], [contenteditable=""], .cm-content, .ProseMirror) { cursor: var(--cursor-text, text); }
   html[data-own-cursor][data-dragging], html[data-own-cursor][data-dragging] * { cursor: var(--cursor-grab, grabbing) !important; }
 }
+
+/* ---------------------------------------------------------------- the dock and Go (rail.js) */
+
+/* Under 721px a shell whose rail has pinned links (data-pin) draws a bottom dock in <body>:
+   up to four slots and Go, 56px plus the home bar. rail.js marks the page html[data-g-dock],
+   the shell that owns the dock [data-dock] and a docked shell around it [data-dock-outer]. Go
+   is dialog.cmdk.g-go: a sheet above the dock on phones, the ordinary centred palette (Cmd+K)
+   from 721px. Nothing here draws from 721px up: the desktop is unchanged.
+     <nav class="g-dock"><div class="g-dock-row">
+       <button class="g-dock-slot" aria-current="page"><span class="g-dock-ico"><svg/></span><span class="g-dock-label">Home</span></button>
+       ...</div></nav> */
+.g-dock, .g-go-scrim { display: none; }
+.g-go .g-go-where { margin-left: auto; padding-left: var(--sp-2); font-size: 12px; color: var(--text-placeholder); white-space: nowrap; }
+.g-go .menu-item .badge { margin-left: var(--sp-2); }
+.g-go .g-go-where + .badge { margin-left: var(--sp-2); }
+.g-go .menu-item svg { width: 16px; height: 16px; flex: none; color: var(--text-secondary); }
+.g-go .g-go-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.g-go .menu-item[aria-current] { color: var(--text-primary); font-weight: 500; }
+.g-go .g-go-child { padding-left: var(--sp-6); }
+.g-go .g-go-group { display: flex; align-items: center; gap: var(--sp-2); padding: var(--sp-2) var(--sp-2) var(--sp-1); font-size: 12px; line-height: var(--lh-1); color: var(--text-secondary); }
+.g-go .g-go-group svg { width: 16px; height: 16px; }
+.g-go .g-go-brand { color: var(--text-secondary); }
+.g-go .g-go-all { margin-top: var(--sp-1); }
+.g-go .g-go-all .nav-caret { margin: -3px var(--sp-1) 0 auto; }
+.g-go .g-go-all[aria-expanded="true"] .nav-caret { rotate: 45deg; }
+
+@media (max-width: 720px) {
+  html[data-g-dock] { --g-dock-space: calc(56px + env(safe-area-inset-bottom)); }
+  html[data-g-dock][data-g-dock-hidden] { --g-dock-space: 0px; }
+
+  .g-dock {
+    display: block;
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 45;
+    padding: var(--sp-1) var(--sp-2) calc(var(--sp-1) + env(safe-area-inset-bottom));
+    background: var(--surface-1);
+    box-shadow: 0 -1px 0 var(--border-subtle);
+    transition: translate var(--spring-smooth-dur) var(--spring-smooth);
+  }
+  html[data-g-dock-hidden] .g-dock { translate: 0 calc(100% + 1px); transition: translate var(--dur-slow) var(--ease-in-out); }
+  .g-dock-row { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: var(--sp-1); }
+  .g-dock-row[data-in] { animation: g-dock-in var(--spring-smooth-dur) var(--spring-smooth) backwards; }
+  .g-dock-slot {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+    height: var(--h-5); min-width: 0; padding: 0;
+    border: none; border-radius: var(--radius-card); background: none;
+    color: var(--text-secondary); font: 450 11px/var(--lh-1) var(--font-ui);
+    cursor: pointer; -webkit-tap-highlight-color: transparent;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .g-dock-slot:disabled { opacity: 0.45; cursor: default; }
+  .g-dock-slot[aria-current] { color: var(--text-primary); }
+  .g-dock-ico {
+    position: relative; display: grid; place-items: center;
+    width: 48px; height: 28px; border-radius: 14px;
+    transition: background var(--dur-base) var(--ease-out);
+  }
+  .g-dock-ico svg { width: 20px; height: 20px; }
+  .g-dock-ico .g-mark { width: 18px; height: 18px; }
+  .g-dock-slot[aria-current] .g-dock-ico { background: var(--fill-active); }
+  .g-dock-label { max-width: 100%; padding: 0 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .g-dock-count {
+    position: absolute; top: -4px; right: 2px;
+    min-width: 16px; height: 16px; padding: 0 4px; border-radius: var(--radius-full);
+    background: var(--accent-fill); color: var(--accent-fg);
+    font-size: 10px; font-weight: 600; line-height: 16px; text-align: center; font-variant-numeric: tabular-nums;
+    box-shadow: 0 0 0 2px var(--surface-1);
+  }
+
+  /* Content ends above the dock: the outermost docked shell gives up the dock's height. */
+  html[data-g-dock] .g-shell[data-dock-outer] > main,
+  html[data-g-dock] .g-shell[data-dock]:not([data-dock-outer] .g-shell) > main { padding-bottom: var(--g-dock-space); }
+  /* The dock replaces the menu button, and the primary action it carries sits only in the dock. */
+  html[data-g-dock] .g-shell:is([data-dock], [data-dock-outer]) > main > .topbar .g-nav-toggle { display: none; }
+  html[data-g-dock] [data-dock-proxied] { display: none !important; }
+
+  /* Go: a sheet that rises from behind the dock, the search field at its foot in thumb reach. */
+  .g-go-scrim {
+    display: block;
+    position: fixed; inset: 0; z-index: 43;
+    background: rgb(0 0 0 / 0.44);
+    opacity: 0; pointer-events: none;
+    transition: opacity var(--spring-snap-dur) var(--ease-in-out);
+  }
+  html[data-g-go] .g-go-scrim { opacity: 1; pointer-events: auto; transition: opacity var(--spring-smooth-dur) var(--ease-out); }
+  dialog.dlg.g-go {
+    inset: auto 0 var(--g-dock-space, 0px) 0; margin: 0; z-index: 44;
+    width: 100%; max-width: 100%;
+    max-height: calc(100dvh - var(--g-dock-space, 0px) - env(safe-area-inset-top) - var(--sp-7));
+    flex-direction: column-reverse;
+    border-width: 1px 0 0; border-radius: 16px 16px 0 0;
+    clip-path: none;
+    translate: 0 calc(100% + var(--g-dock-space, 0px));
+  }
+  dialog.dlg.g-go[open] { display: flex; translate: 0 0; clip-path: none; }
+  @starting-style { dialog.dlg.g-go[open] { translate: 0 calc(100% + var(--g-dock-space, 0px)); } }
+  .g-go .cmdk-input {
+    flex: none; height: var(--h-5); padding: 0 var(--gutter);
+    border-bottom: none; border-top: 1px solid var(--border-subtle);
+    font-size: 16px;  /* iOS zooms into a smaller field */
+  }
+  .g-go .cmdk-list { flex: 1 1 auto; min-height: 0; max-height: none; padding: var(--sp-2) var(--sp-2) var(--sp-1); overscroll-behavior: contain; }
+  .g-go .menu-item { height: 44px; font-size: 15px; gap: var(--sp-3); }
+  .g-go .menu-item svg { width: 18px; height: 18px; }
+  .g-go .g-go-child { padding-left: var(--sp-7); }
+
+  /* Phones get the top of the screen too: the bar clears the notch, and a nested shell's bar
+     is the only one. */
+  .topbar { padding-top: calc(var(--sp-2) + env(safe-area-inset-top)); min-height: calc(var(--h-control) + 2 * var(--sp-2) + env(safe-area-inset-top)); }
+  .topbar.topbar-slim { padding-top: env(safe-area-inset-top); min-height: calc(var(--h-5) + env(safe-area-inset-top)); }
+  .g-shell:has(.g-shell > main > .topbar) > main > .topbar { display: none; }
+}
+@keyframes g-dock-in { from { opacity: 0; translate: 0 8px; } }
+@media (max-width: 720px) and (prefers-reduced-motion: reduce) {
+  .g-dock-row[data-in] { animation: none; }
+  html[data-g-dock-hidden] .g-dock { translate: 0 0; opacity: 0; pointer-events: none; transition: opacity var(--dur-base) var(--ease-out) !important; }
+  dialog.dlg.g-go, dialog.dlg.g-go[open] { translate: 0 0 !important; }
+  dialog.dlg.g-go:not([open]) { opacity: 0; }
+  @starting-style { dialog.dlg.g-go[open] { opacity: 0; } }
+}

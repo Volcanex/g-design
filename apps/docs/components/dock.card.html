@@ -1,0 +1,141 @@
+<!-- @dsCard group="Screens" name="Dock" subtitle="Under 720px the rail's pinned places become a bottom dock, with Go for every other place. Open Studio to see a nested shell." viewport="390x844" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dock</title>
+<link rel="stylesheet" href="../assets/g.css">
+<link rel="stylesheet" href="../assets/kit/kit.css">
+<script>
+  // ?theme=light shows the light theme; the card keeps it as you move between places
+  (function () {
+    const t = new URLSearchParams(location.search).get("theme");
+    if (t === "light") document.documentElement.setAttribute("data-theme", "light");
+  })();
+</script>
+<script defer src="../assets/g-ui.js"></script>
+<style>
+  html, body { height: 100%; }
+  body { overflow: hidden; }
+  /* the nested shell fills the outer shell's content */
+  .content.holds-shell { display: flex; overflow: hidden; }
+  .content.holds-shell > .g-shell { flex: 1 1 auto; height: auto; min-height: 0; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script type="module">
+import { wireRails } from "../assets/kit/rail.js";
+
+/* Phosphor Regular (MIT) */
+const P = {"house": "M219.31,108.68l-80-80a16,16,0,0,0-22.62,0l-80,80A15.87,15.87,0,0,0,32,120v96a8,8,0,0,0,8,8h64a8,8,0,0,0,8-8V160h32v56a8,8,0,0,0,8,8h64a8,8,0,0,0,8-8V120A15.87,15.87,0,0,0,219.31,108.68ZM208,208H160V152a8,8,0,0,0-8-8H104a8,8,0,0,0-8,8v56H48V120l80-80,80,80Z", "chat-circle": "M128,24A104,104,0,0,0,36.18,176.88L24.83,210.93a16,16,0,0,0,20.24,20.24l34.05-11.35A104,104,0,1,0,128,24Zm0,192a87.87,87.87,0,0,1-44.06-11.81,8,8,0,0,0-6.54-.67L40,216,52.47,178.6a8,8,0,0,0-.66-6.54A88,88,0,1,1,128,216Z", "upload-simple": "M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0ZM93.66,77.66,120,51.31V144a8,8,0,0,0,16,0V51.31l26.34,26.35a8,8,0,0,0,11.32-11.32l-40-40a8,8,0,0,0-11.32,0l-40,40A8,8,0,0,0,93.66,77.66Z", "heart": "M178,40c-20.65,0-38.73,8.88-50,23.89C116.73,48.88,98.65,40,78,40a62.07,62.07,0,0,0-62,62c0,70,103.79,126.66,108.21,129a8,8,0,0,0,7.58,0C136.21,228.66,240,172,240,102A62.07,62.07,0,0,0,178,40ZM128,214.8C109.74,204.16,32,155.69,32,102A46.06,46.06,0,0,1,78,56c19.45,0,35.78,10.36,42.6,27a8,8,0,0,0,14.8,0c6.82-16.67,23.15-27,42.6-27a46.06,46.06,0,0,1,46,46C224,155.61,146.24,204.15,128,214.8Z", "calendar-blank": "M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208Z", "note": "M88,96a8,8,0,0,1,8-8h64a8,8,0,0,1,0,16H96A8,8,0,0,1,88,96Zm8,40h64a8,8,0,0,0,0-16H96a8,8,0,0,0,0,16Zm32,16H96a8,8,0,0,0,0,16h32a8,8,0,0,0,0-16ZM224,48V156.69A15.86,15.86,0,0,1,219.31,168L168,219.31A15.86,15.86,0,0,1,156.69,224H48a16,16,0,0,1-16-16V48A16,16,0,0,1,48,32H208A16,16,0,0,1,224,48ZM48,208H152V160a8,8,0,0,1,8-8h48V48H48Zm120-40v28.7L196.69,168Z", "paint-brush": "M232,32a8,8,0,0,0-8-8c-44.08,0-89.31,49.71-114.43,82.63A60,60,0,0,0,32,164c0,30.88-19.54,44.73-20.47,45.37A8,8,0,0,0,16,224H92a60,60,0,0,0,57.37-77.57C182.3,121.31,232,76.08,232,32ZM92,208H34.63C41.38,198.41,48,183.92,48,164a44,44,0,1,1,44,44Zm32.42-94.45q5.14-6.66,10.09-12.55A76.23,76.23,0,0,1,155,121.49q-5.9,4.94-12.55,10.09A60.54,60.54,0,0,0,124.42,113.55Zm42.7-2.68a92.57,92.57,0,0,0-22-22c31.78-34.53,55.75-45,69.9-47.91C212.17,55.12,201.65,79.09,167.12,110.87Z", "ticket": "M232,104a8,8,0,0,0,8-8V64a16,16,0,0,0-16-16H32A16,16,0,0,0,16,64V96a8,8,0,0,0,8,8,24,24,0,0,1,0,48,8,8,0,0,0-8,8v32a16,16,0,0,0,16,16H224a16,16,0,0,0,16-16V160a8,8,0,0,0-8-8,24,24,0,0,1,0-48ZM32,167.2a40,40,0,0,0,0-78.4V64H88V192H32Zm192,0V192H104V64H224V88.8a40,40,0,0,0,0,78.4Z", "browsers": "M216,40H72A16,16,0,0,0,56,56V72H40A16,16,0,0,0,24,88V200a16,16,0,0,0,16,16H184a16,16,0,0,0,16-16V184h16a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM184,88v16H40V88Zm0,112H40V120H184v80Zm32-32H200V88a16,16,0,0,0-16-16H72V56H216Z", "bell": "M221.8,175.94C216.25,166.38,208,139.33,208,104a80,80,0,1,0-160,0c0,35.34-8.26,62.38-13.81,71.94A16,16,0,0,0,48,200H88.81a40,40,0,0,0,78.38,0H208a16,16,0,0,0,13.8-24.06ZM128,216a24,24,0,0,1-22.62-16h45.24A24,24,0,0,1,128,216ZM48,184c7.7-13.24,16-43.92,16-80a64,64,0,1,1,128,0c0,36.05,8.28,66.73,16,80Z", "gear": "M128,80a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Zm88-29.84q.06-2.16,0-4.32l14.92-18.64a8,8,0,0,0,1.48-7.06,107.21,107.21,0,0,0-10.88-26.25,8,8,0,0,0-6-3.93l-23.72-2.64q-1.48-1.56-3-3L186,40.54a8,8,0,0,0-3.94-6,107.71,107.71,0,0,0-26.25-10.87,8,8,0,0,0-7.06,1.49L130.16,40Q128,40,125.84,40L107.2,25.11a8,8,0,0,0-7.06-1.48A107.6,107.6,0,0,0,73.89,34.51a8,8,0,0,0-3.93,6L67.32,64.27q-1.56,1.49-3,3L40.54,70a8,8,0,0,0-6,3.94,107.71,107.71,0,0,0-10.87,26.25,8,8,0,0,0,1.49,7.06L40,125.84Q40,128,40,130.16L25.11,148.8a8,8,0,0,0-1.48,7.06,107.21,107.21,0,0,0,10.88,26.25,8,8,0,0,0,6,3.93l23.72,2.64q1.49,1.56,3,3L70,215.46a8,8,0,0,0,3.94,6,107.71,107.71,0,0,0,26.25,10.87,8,8,0,0,0,7.06-1.49L125.84,216q2.16.06,4.32,0l18.64,14.92a8,8,0,0,0,7.06,1.48,107.21,107.21,0,0,0,26.25-10.88,8,8,0,0,0,3.93-6l2.64-23.72q1.56-1.48,3-3L215.46,186a8,8,0,0,0,6-3.94,107.71,107.71,0,0,0,10.87-26.25,8,8,0,0,0-1.49-7.06Zm-16.1-6.5a73.93,73.93,0,0,1,0,8.68,8,8,0,0,0,1.74,5.48l14.19,17.73a91.57,91.57,0,0,1-6.23,15L187,173.11a8,8,0,0,0-5.1,2.64,74.11,74.11,0,0,1-6.14,6.14,8,8,0,0,0-2.64,5.1l-2.51,22.58a91.32,91.32,0,0,1-15,6.23l-17.74-14.19a8,8,0,0,0-5-1.75h-.48a73.93,73.93,0,0,1-8.68,0,8,8,0,0,0-5.48,1.74L100.45,215.8a91.57,91.57,0,0,1-15-6.23L82.89,187a8,8,0,0,0-2.64-5.1,74.11,74.11,0,0,1-6.14-6.14,8,8,0,0,0-5.1-2.64L46.43,170.6a91.32,91.32,0,0,1-6.23-15l14.19-17.74a8,8,0,0,0,1.74-5.48,73.93,73.93,0,0,1,0-8.68,8,8,0,0,0-1.74-5.48L40.2,100.45a91.57,91.57,0,0,1,6.23-15L69,82.89a8,8,0,0,0,5.1-2.64,74.11,74.11,0,0,1,6.14-6.14A8,8,0,0,0,82.89,69L85.4,46.43a91.32,91.32,0,0,1,15-6.23l17.74,14.19a8,8,0,0,0,5.48,1.74,73.93,73.93,0,0,1,8.68,0,8,8,0,0,0,5.48-1.74L155.55,40.2a91.57,91.57,0,0,1,15,6.23L173.11,69a8,8,0,0,0,2.64,5.1,74.11,74.11,0,0,1,6.14,6.14,8,8,0,0,0,5.1,2.64l22.58,2.51a91.32,91.32,0,0,1,6.23,15l-14.19,17.74A8,8,0,0,0,199.87,123.66Z", "circle-half": "M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm8,16.37a86.4,86.4,0,0,1,16,3V212.67a86.4,86.4,0,0,1-16,3Zm32,9.26a87.81,87.81,0,0,1,16,10.54V195.83a87.81,87.81,0,0,1-16,10.54ZM40,128a88.11,88.11,0,0,1,80-87.63V215.63A88.11,88.11,0,0,1,40,128Zm160,50.54V77.46a87.82,87.82,0,0,1,0,101.08Z", "list": "M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM40,72H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16ZM216,184H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z", "plus": "M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"};
+const icon = (n) => `<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="${P[n]}"/></svg>`;
+
+const q = new URLSearchParams(location.search);
+const page = q.get("page") || "home";
+const keep = (params) => {
+  const u = new URLSearchParams(params);
+  if (q.get("theme")) u.set("theme", q.get("theme"));
+  return "?" + u.toString();
+};
+const cur = (yes) => (yes ? ' aria-current="page"' : "");
+const item = (href, ic, label, here, extra = "", badge = "") =>
+  `<a class="nav-item${extra.includes("nav-child") ? " nav-child" : ""}" href="${href}"${cur(here)} ${extra.replace("nav-child", "")}>${icon(ic)}<span class="ellipsis">${label}</span>${badge}</a>`;
+const foot = (name, email) => `<div class="side-foot"><span class="avatar" aria-hidden="true">${name[0]}</span>
+  <span class="who"><span>${name}</span><span>${email}</span></span>
+  <button class="btn btn-tertiary btn-sm btn-icon" type="button" aria-label="Switch theme" data-tip="Switch theme" data-theme-flip>${icon("circle-half")}</button></div>`;
+const bar = (title) => `<header class="topbar topbar-slim"><button class="btn btn-tertiary btn-sm btn-icon g-nav-toggle" type="button" aria-label="Open menu">${icon("list")}</button>
+  <span class="topbar-title">${title}</span><span class="grow"></span></header>`;
+
+const day = q.get("day") || "1";
+const pages = {
+  home: ["Home", `<div class="stack">
+    <div class="card"><div class="card-head"><span class="card-title">Today</span></div>
+      <div class="list">
+        <div class="list-item"><span class="main"><span>Renew the domain</span></span><span class="end when">Mon</span></div>
+        <div class="list-item"><span class="main"><span>Dentist</span></span><span class="end when">14:00</span></div>
+        <div class="list-item"><span class="main"><span>Levels review</span></span><span class="end when">16:00</span></div>
+      </div></div>
+    <div class="field"><label class="label" for="note">Quick note</label><input class="input" id="note" placeholder="Write a note"></div>
+  </div>`],
+  calendar: ["Calendar", `<div class="page-head"><div class="page-head-text"><div class="row-tight"><h1 class="sr-only">Calendar</h1><span class="badge">Day ${day}</span></div></div>
+    <div class="page-actions"><button class="btn btn-primary btn-sm" type="button" data-dock-action data-dock-label="Add todo" id="add-todo">${icon("plus")}Add todo</button></div></div>
+    <div class="card"><div class="list" id="todos">
+      <div class="list-item"><span class="main"><span>Send the Hollow Pine invoice</span></span><span class="end when">Tue</span></div>
+    </div></div>
+    <div class="row"><a class="btn btn-secondary btn-sm" href="${keep({ page: "calendar", day: String(+day + 1) })}" id="next-day">Next day</a></div>`],
+  upload: ["Upload", `<div class="card"><p class="muted">Drop files here, or choose them from the camera roll.</p></div>`],
+  chat: ["Chat", `<div class="card"><p class="muted">Ask Voice anything.</p></div>`],
+  tickets: ["Tickets", `<div class="card"><p class="muted">Four open, one for you.</p></div>`],
+  notes: ["Notes", `<div class="card"><p class="muted">Your notes.</p></div>`],
+};
+
+function studio() {
+  const s = q.get("s") || "sites";
+  const titles = { sites: "Your sites", chat: "Chat", notifications: "Notifications", settings: "Settings" };
+  const at = (x) => keep({ page: "studio", s: x });
+  return `<div class="g-shell">
+    <aside aria-label="Studio">
+      <div class="brand-row"><a class="brand" href="${at("sites")}"><span class="g-mark" aria-hidden="true"></span><b>Studio</b></a>
+        <button class="g-rail-toggle" type="button" data-rail-key="g-rail-dockdemo-studio"></button></div>
+      <nav class="nav-list">
+        ${item(at("sites"), "browsers", "Your sites", s === "sites", 'data-pin="1"')}
+        ${item(at("chat"), "chat-circle", "Chat", s === "chat", 'data-pin="2"')}
+        ${item(at("notifications"), "bell", "Notifications", s === "notifications", 'data-pin="3" data-pin-label="Alerts"', '<span class="badge">2</span>')}
+        ${item(at("settings"), "gear", "Settings", s === "settings")}
+      </nav>
+      ${foot("Ada Reyes", "ada@example.com")}
+    </aside>
+    <main>${bar(titles[s])}<div class="content"><div class="content-page"><div class="card"><p class="muted">${titles[s]} in Studio, inside Command.</p></div></div></div></main>
+    <div class="g-scrim"></div>
+  </div>`;
+}
+
+const at = (p) => keep({ page: p });
+const [title, body] = page === "studio" ? ["Studio", null] : pages[page] || pages.home;
+document.getElementById("app").innerHTML = `<div class="g-shell">
+  <aside aria-label="Main">
+    <div class="brand-row"><a class="brand" href="${at("home")}"><span class="g-mark" aria-hidden="true"></span><b>Command</b></a>
+      <button class="g-rail-toggle" type="button" data-rail-key="g-rail-dockdemo"></button></div>
+    <nav class="nav-list">
+      ${item(at("home"), "house", "Home", page === "home", 'data-pin="1"')}
+      ${item(at("chat"), "chat-circle", "Chat", page === "chat")}
+      ${item(at("upload"), "upload-simple", "Upload", page === "upload")}
+      <div class="nav-group" data-group="life">
+        <button class="nav-item nav-group-toggle" type="button" aria-expanded="true">${icon("heart")}<span class="ellipsis">Life</span><span class="nav-caret" aria-hidden="true"></span></button>
+        <div class="nav-children">
+          ${item(at("calendar"), "calendar-blank", "Calendar", page === "calendar", 'nav-child data-pin="2"')}
+          ${item(at("notes"), "note", "Notes", page === "notes", "nav-child")}
+        </div>
+      </div>
+      <div class="nav-head">Additional tools</div>
+      ${item(at("studio"), "paint-brush", "Studio", page === "studio", 'data-pin="3"')}
+      ${item(at("tickets"), "ticket", "Tickets", page === "tickets", "", '<span class="badge">4</span>')}
+    </nav>
+    ${foot("Gabriel", "gabriel@example.com")}
+  </aside>
+  <main>${page === "studio" ? "" : bar(title)}
+    <div class="content${page === "studio" ? " holds-shell" : ""}">${page === "studio" ? studio() : `<div class="content-page">${body}</div>`}</div>
+  </main>
+  <div class="g-scrim"></div>
+</div>`;
+
+document.addEventListener("click", (e) => {
+  if (e.target.closest("[data-theme-flip]")) {
+    const light = document.documentElement.getAttribute("data-theme") === "light";
+    if (window.g && g.theme) g.theme(light ? "dark" : "light");
+    else document.documentElement.toggleAttribute("data-theme", !light);
+  }
+  if (e.target.closest("#add-todo")) {
+    document.getElementById("todos").insertAdjacentHTML("beforeend",
+      '<div class="list-item"><span class="main"><span>New todo</span></span><span class="end when">Today</span></div>');
+  }
+  const t = e.target.closest(".g-nav-toggle");
+  if (t) t.closest(".g-shell").toggleAttribute("data-nav-open");
+  if (e.target.closest(".g-scrim")) e.target.closest(".g-shell").removeAttribute("data-nav-open");
+});
+wireRails();
+</script>
+</body>
+</html>
