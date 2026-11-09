@@ -67,6 +67,14 @@ for (const out of [join(root, "dist"), join(root, "apps/docs/assets")]) {
   writeFileSync(join(out, "g-admin.js"), adminJs);
 }
 
+// The app kit's rail and its look, and the g mark, for the docs cards that show the shell
+// (components/dock.card.html). Consumers take these through vendor-preact.mjs and vendor.mjs.
+const docsAssets = join(root, "apps/docs/assets");
+mkdirSync(join(docsAssets, "kit"), { recursive: true });
+mkdirSync(join(docsAssets, "brand"), { recursive: true });
+for (const f of ["kit.css", "rail.js"]) cpSync(join(root, "packages/g-ui-preact/src", f), join(docsAssets, "kit", f));
+for (const f of ["mark.svg", "icon.svg"]) cpSync(join(root, "packages/g-brand", f), join(docsAssets, "brand", f));
+
 // 3. Tailwind v4 proof: same tokens through @theme inline, no config file.
 run("npx @tailwindcss/cli -i apps/docs/tailwind/tw-input.css -o apps/docs/assets/tw.css --minify");
 

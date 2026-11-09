@@ -681,7 +681,7 @@
     root.querySelectorAll(".send-btn").forEach(initSend);
     root.querySelectorAll(".dl-btn").forEach(initDownload);
     root.querySelectorAll(".spin-btn").forEach(initSpin);
-    root.querySelectorAll("dialog.cmdk").forEach(initCmdk);
+    root.querySelectorAll("dialog.cmdk:not([data-palette])").forEach(initCmdk);  // the kit's Go palette (rail.js) wires itself
     root.querySelectorAll("dialog.dlg").forEach(initDialog);
   }
   g.init = init;

@@ -147,7 +147,12 @@ Gabriel's corrections. The g-env installer links it into `~/.agents/skills`.
 - The app shell is `.g-shell`: persistent chrome, off-canvas sidebar
   sheet under 720px behind `.g-scrim`, toggled by `.g-nav-toggle`
   (gi-list morphs to an x). Do NOT put a box-shadow on the open sheet: a
-  software-raster compositing bug washes the whole layer light.
+  software-raster compositing bug washes the whole layer light. Its sheet and scrim rules are child selectors
+  (`.g-shell[data-nav-open] > aside`), so a nested shell opens only its
+  own. On the app kit, a rail with pinned items becomes the phone dock
+  instead (`packages/g-ui-preact`, rail.js `wireDock`); the build copies
+  the kit's `kit.css` and `rail.js` and the g mark into
+  `apps/docs/assets/kit/` and `assets/brand/` for the Dock card.
 - Voice rules are enforced in copy: sentence case with a leading capital,
   no em dashes and no middle dots anywhere, hyphens only in technical
   terms. The middle dot is a separator doing a layout job: use a gap off

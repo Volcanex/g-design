@@ -1,0 +1,186 @@
+<!-- @dsCard group="Components" name="Dock" subtitle="The rail's pinned places at the foot of a phone, plus Go, the palette of every place. Under 721px only; resize or open it at 390 wide." viewport="390x844" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dock</title>
+<link rel="stylesheet" href="../assets/g.css">
+<link rel="stylesheet" href="../assets/kit/kit.css">
+<script defer src="../assets/g-ui.js"></script>
+<style>
+  /* The g mark, as the apps draw it (Command chrome.css, Studio auth.css). */
+  .g-mark {
+    display: inline-block; flex: none; width: 24px; height: 24px;
+    background: currentColor;
+    -webkit-mask: url(../assets/brand/mark.svg) center / contain no-repeat;
+    mask: url(../assets/brand/mark.svg) center / contain no-repeat;
+  }
+  /* The app inside the app fills the content edge to edge, as Studio does at Command's /studio. */
+  body[data-route^="studio"] > main > .content { display: flex; flex-direction: column; overflow: hidden; }
+  body[data-route^="studio"] > main > .content > .content-page { flex: 1 1 auto; min-height: 0; max-width: none; padding: 0; gap: 0; display: flex; flex-direction: column; }
+  .guest-host { flex: 1 1 auto; min-height: 0; animation: g-vt-in var(--dur-slow) var(--ease-out) both; }
+  .guest-host > .g-shell { height: 100%; }
+  .fx-list .list-item a { color: inherit; text-decoration: none; }
+</style>
+</head>
+<body class="g-shell" data-rail="pinned">
+  <aside aria-label="Main">
+    <div class="brand-row">
+      <a class="brand" href="#/"><span class="g-mark" aria-hidden="true"></span><b>Command</b></a>
+      <button class="g-rail-toggle" type="button" data-rail-key="g-rail-dockcard" data-rail-default="open" aria-label="Collapse"></button>
+    </div>
+    <nav class="nav-list" aria-label="Pages">
+      <a class="nav-item" href="#/" data-pin="1"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M219.31,108.68l-80-80a16,16,0,0,0-22.62,0l-80,80A15.87,15.87,0,0,0,32,120v96a8,8,0,0,0,8,8h64a8,8,0,0,0,8-8V160h32v56a8,8,0,0,0,8,8h64a8,8,0,0,0,8-8V120A15.87,15.87,0,0,0,219.31,108.68ZM208,208H160V152a8,8,0,0,0-8-8H104a8,8,0,0,0-8,8v56H48V120l80-80,80,80Z"/></svg><span class="ellipsis">Home</span></a>
+      <a class="nav-item" href="#/studio" data-pin="3"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M216,24H72A40,40,0,0,0,32,64v72a24,24,0,0,0,24,24h48l-7.89,46.67A8.42,8.42,0,0,0,96,208a32,32,0,0,0,64,0,8.42,8.42,0,0,0-.11-1.33L152,160h48a24,24,0,0,0,24-24V32A8,8,0,0,0,216,24ZM72,40H176V80a8,8,0,0,0,16,0V40h16v64H48V64A24,24,0,0,1,72,40ZM200,144H152a16,16,0,0,0-15.84,18.26l0,.2L144,208.6a16,16,0,0,1-32,0l7.8-46.14,0-.2A16,16,0,0,0,104,144H56a8,8,0,0,1-8-8V120H208v16A8,8,0,0,1,200,144Z"/></svg><span class="ellipsis">Studio</span></a>
+      <a class="nav-item" href="#/upload"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0ZM93.66,77.66,120,51.31V144a8,8,0,0,0,16,0V51.31l26.34,26.35a8,8,0,0,0,11.32-11.32l-40-40a8,8,0,0,0-11.32,0l-40,40A8,8,0,0,0,93.66,77.66Z"/></svg><span class="ellipsis">Upload</span></a>
+      <div class="nav-group" data-group="life" data-open>
+        <button class="nav-item nav-group-toggle" type="button" aria-expanded="true"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M240,152H199.55a73.54,73.54,0,0,0,.45-8,72,72,0,0,0-144,0,73.54,73.54,0,0,0,.45,8H16a8,8,0,0,0,0,16H240a8,8,0,0,0,0-16ZM72,144a56,56,0,1,1,111.41,8H72.59A56.13,56.13,0,0,1,72,144Zm144,56a8,8,0,0,1-8,8H48a8,8,0,0,1,0-16H208A8,8,0,0,1,216,200ZM72.84,43.58a8,8,0,0,1,14.32-7.16l8,16a8,8,0,0,1-14.32,7.16Zm-56,48.84a8,8,0,0,1,10.74-3.57l16,8a8,8,0,0,1-7.16,14.31l-16-8A8,8,0,0,1,16.84,92.42Zm192,15.16a8,8,0,0,1,3.58-10.73l16-8a8,8,0,1,1,7.16,14.31l-16,8a8,8,0,0,1-10.74-3.58Zm-48-55.16,8-16a8,8,0,0,1,14.32,7.16l-8,16a8,8,0,1,1-14.32-7.16Z"/></svg><span class="ellipsis">Life</span><span class="nav-caret" aria-hidden="true"></span></button>
+        <div class="nav-children">
+          <a class="nav-item nav-child" href="#/calendar" data-pin="2"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208Zm-96-88v64a8,8,0,0,1-16,0V132.94l-4.42,2.22a8,8,0,0,1-7.16-14.32l16-8A8,8,0,0,1,112,120Zm59.16,30.45L152,176h16a8,8,0,0,1,0,16H136a8,8,0,0,1-6.4-12.8l28.78-38.37A8,8,0,1,0,145.07,132a8,8,0,1,1-13.85-8A24,24,0,0,1,176,136,23.76,23.76,0,0,1,171.16,150.45Z"/></svg><span class="ellipsis">Calendar</span></a>
+          <a class="nav-item nav-child" href="#/pulse"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M184,112a8,8,0,0,1-8,8H112a8,8,0,0,1,0-16h64A8,8,0,0,1,184,112Zm-8,24H112a8,8,0,0,0,0,16h64a8,8,0,0,0,0-16Zm48-88V208a16,16,0,0,1-16,16H48a16,16,0,0,1-16-16V48A16,16,0,0,1,48,32H208A16,16,0,0,1,224,48ZM48,208H72V48H48Zm160,0V48H88V208H208Z"/></svg><span class="ellipsis">Pulse</span></a>
+        </div>
+      </div>
+      <div class="nav-group" data-group="system" data-open>
+        <button class="nav-item nav-group-toggle" type="button" aria-expanded="true"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M72,144H32a8,8,0,0,1,0-16H67.72l13.62-20.44a8,8,0,0,1,13.32,0l25.34,38,9.34-14A8,8,0,0,1,136,128h24a8,8,0,0,1,0,16H140.28l-13.62,20.44a8,8,0,0,1-13.32,0L88,126.42l-9.34,14A8,8,0,0,1,72,144ZM178,40c-20.65,0-38.73,8.88-50,23.89C116.73,48.88,98.65,40,78,40a62.07,62.07,0,0,0-62,62c0,.75,0,1.5,0,2.25a8,8,0,1,0,16-.5c0-.58,0-1.17,0-1.75A46.06,46.06,0,0,1,78,56c19.45,0,35.78,10.36,42.6,27a8,8,0,0,0,14.8,0c6.82-16.67,23.15-27,42.6-27a46.06,46.06,0,0,1,46,46c0,53.61-77.76,102.15-96,112.8-10.83-6.31-42.63-26-66.68-52.21a8,8,0,1,0-11.8,10.82c31.17,34,72.93,56.68,74.69,57.63a8,8,0,0,0,7.58,0C136.21,228.66,240,172,240,102A62.07,62.07,0,0,0,178,40Z"/></svg><span class="ellipsis">System</span><span class="nav-caret" aria-hidden="true"></span></button>
+        <div class="nav-children">
+          <a class="nav-item nav-child" href="#/tickets" data-pin="4"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M232,104a8,8,0,0,0,8-8V64a16,16,0,0,0-16-16H32A16,16,0,0,0,16,64V96a8,8,0,0,0,8,8,24,24,0,0,1,0,48,8,8,0,0,0-8,8v32a16,16,0,0,0,16,16H224a16,16,0,0,0,16-16V160a8,8,0,0,0-8-8,24,24,0,0,1,0-48ZM32,167.2a40,40,0,0,0,0-78.4V64H88V192H32Zm192,0V192H104V64H224V88.8a40,40,0,0,0,0,78.4Z"/></svg><span class="ellipsis">Tickets</span><span class="badge badge-info num" aria-label="3 open">3</span></a>
+          <a class="nav-item nav-child" href="#/services"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M208,136H48a16,16,0,0,0-16,16v48a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V152A16,16,0,0,0,208,136Zm0,64H48V152H208v48Zm0-160H48A16,16,0,0,0,32,56v48a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V56A16,16,0,0,0,208,40Zm0,64H48V56H208v48ZM192,80a12,12,0,1,1-12-12A12,12,0,0,1,192,80Zm0,96a12,12,0,1,1-12-12A12,12,0,0,1,192,176Z"/></svg><span class="ellipsis">Services</span></a>
+          <a class="nav-item nav-child" href="#/crons"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"/></svg><span class="ellipsis">Crons</span></a>
+        </div>
+      </div>
+      <div class="nav-head">Additional tools</div>
+      <a class="nav-item" href="#/chat"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M140,128a12,12,0,1,1-12-12A12,12,0,0,1,140,128ZM84,116a12,12,0,1,0,12,12A12,12,0,0,0,84,116Zm88,0a12,12,0,1,0,12,12A12,12,0,0,0,172,116Zm60,12A104,104,0,0,1,79.12,219.82L45.07,231.17a16,16,0,0,1-20.24-20.24l11.35-34.05A104,104,0,1,1,232,128Zm-16,0A88,88,0,1,0,51.81,172.06a8,8,0,0,1,.66,6.54L40,216,77.4,203.53a7.85,7.85,0,0,1,2.53-.42,8,8,0,0,1,4,1.08A88,88,0,0,0,216,128Z"/></svg><span class="ellipsis">Chat</span></a>
+      <a class="nav-item" href="#/notes"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M213.66,66.34l-40-40A8,8,0,0,0,168,24H88A16,16,0,0,0,72,40V56H56A16,16,0,0,0,40,72V216a16,16,0,0,0,16,16H168a16,16,0,0,0,16-16V200h16a16,16,0,0,0,16-16V72A8,8,0,0,0,213.66,66.34ZM168,216H56V72h76.69L168,107.31v84.53c0,.06,0,.11,0,.16s0,.1,0,.16V216Zm32-32H184V104a8,8,0,0,0-2.34-5.66l-40-40A8,8,0,0,0,136,56H88V40h76.69L200,75.31Zm-56-32a8,8,0,0,1-8,8H88a8,8,0,0,1,0-16h48A8,8,0,0,1,144,152Zm0,32a8,8,0,0,1-8,8H88a8,8,0,0,1,0-16h48A8,8,0,0,1,144,184Z"/></svg><span class="ellipsis">Notes</span></a>
+    </nav>
+  </aside>
+  <main>
+    <header class="topbar topbar-slim">
+      <button class="btn btn-tertiary btn-sm btn-icon g-nav-toggle" type="button" aria-label="Open menu" aria-expanded="false"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM40,72H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16ZM216,184H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z"/></svg></button>
+      <span class="topbar-title" data-title>Home</span>
+      <span class="grow"></span>
+    </header>
+    <div class="content" id="main-content"><div class="content-page" data-page></div></div>
+  </main>
+  <div class="g-scrim"></div>
+
+<script type="module">
+  import * as rail from "../assets/kit/rail.js";
+  const ICON = {"house": "M219.31,108.68l-80-80a16,16,0,0,0-22.62,0l-80,80A15.87,15.87,0,0,0,32,120v96a8,8,0,0,0,8,8h64a8,8,0,0,0,8-8V160h32v56a8,8,0,0,0,8,8h64a8,8,0,0,0,8-8V120A15.87,15.87,0,0,0,219.31,108.68ZM208,208H160V152a8,8,0,0,0-8-8H104a8,8,0,0,0-8,8v56H48V120l80-80,80,80Z", "calendar": "M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208Zm-96-88v64a8,8,0,0,1-16,0V132.94l-4.42,2.22a8,8,0,0,1-7.16-14.32l16-8A8,8,0,0,1,112,120Zm59.16,30.45L152,176h16a8,8,0,0,1,0,16H136a8,8,0,0,1-6.4-12.8l28.78-38.37A8,8,0,1,0,145.07,132a8,8,0,1,1-13.85-8A24,24,0,0,1,176,136,23.76,23.76,0,0,1,171.16,150.45Z", "paint-brush-broad": "M216,24H72A40,40,0,0,0,32,64v72a24,24,0,0,0,24,24h48l-7.89,46.67A8.42,8.42,0,0,0,96,208a32,32,0,0,0,64,0,8.42,8.42,0,0,0-.11-1.33L152,160h48a24,24,0,0,0,24-24V32A8,8,0,0,0,216,24ZM72,40H176V80a8,8,0,0,0,16,0V40h16v64H48V64A24,24,0,0,1,72,40ZM200,144H152a16,16,0,0,0-15.84,18.26l0,.2L144,208.6a16,16,0,0,1-32,0l7.8-46.14,0-.2A16,16,0,0,0,104,144H56a8,8,0,0,1-8-8V120H208v16A8,8,0,0,1,200,144Z", "upload-simple": "M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0ZM93.66,77.66,120,51.31V144a8,8,0,0,0,16,0V51.31l26.34,26.35a8,8,0,0,0,11.32-11.32l-40-40a8,8,0,0,0-11.32,0l-40,40A8,8,0,0,0,93.66,77.66Z", "ticket": "M232,104a8,8,0,0,0,8-8V64a16,16,0,0,0-16-16H32A16,16,0,0,0,16,64V96a8,8,0,0,0,8,8,24,24,0,0,1,0,48,8,8,0,0,0-8,8v32a16,16,0,0,0,16,16H224a16,16,0,0,0,16-16V160a8,8,0,0,0-8-8,24,24,0,0,1,0-48ZM32,167.2a40,40,0,0,0,0-78.4V64H88V192H32Zm192,0V192H104V64H224V88.8a40,40,0,0,0,0,78.4Z", "heartbeat": "M72,144H32a8,8,0,0,1,0-16H67.72l13.62-20.44a8,8,0,0,1,13.32,0l25.34,38,9.34-14A8,8,0,0,1,136,128h24a8,8,0,0,1,0,16H140.28l-13.62,20.44a8,8,0,0,1-13.32,0L88,126.42l-9.34,14A8,8,0,0,1,72,144ZM178,40c-20.65,0-38.73,8.88-50,23.89C116.73,48.88,98.65,40,78,40a62.07,62.07,0,0,0-62,62c0,.75,0,1.5,0,2.25a8,8,0,1,0,16-.5c0-.58,0-1.17,0-1.75A46.06,46.06,0,0,1,78,56c19.45,0,35.78,10.36,42.6,27a8,8,0,0,0,14.8,0c6.82-16.67,23.15-27,42.6-27a46.06,46.06,0,0,1,46,46c0,53.61-77.76,102.15-96,112.8-10.83-6.31-42.63-26-66.68-52.21a8,8,0,1,0-11.8,10.82c31.17,34,72.93,56.68,74.69,57.63a8,8,0,0,0,7.58,0C136.21,228.66,240,172,240,102A62.07,62.07,0,0,0,178,40Z", "sun-horizon": "M240,152H199.55a73.54,73.54,0,0,0,.45-8,72,72,0,0,0-144,0,73.54,73.54,0,0,0,.45,8H16a8,8,0,0,0,0,16H240a8,8,0,0,0,0-16ZM72,144a56,56,0,1,1,111.41,8H72.59A56.13,56.13,0,0,1,72,144Zm144,56a8,8,0,0,1-8,8H48a8,8,0,0,1,0-16H208A8,8,0,0,1,216,200ZM72.84,43.58a8,8,0,0,1,14.32-7.16l8,16a8,8,0,0,1-14.32,7.16Zm-56,48.84a8,8,0,0,1,10.74-3.57l16,8a8,8,0,0,1-7.16,14.31l-16-8A8,8,0,0,1,16.84,92.42Zm192,15.16a8,8,0,0,1,3.58-10.73l16-8a8,8,0,1,1,7.16,14.31l-16,8a8,8,0,0,1-10.74-3.58Zm-48-55.16,8-16a8,8,0,0,1,14.32,7.16l-8,16a8,8,0,1,1-14.32-7.16Z", "notebook": "M184,112a8,8,0,0,1-8,8H112a8,8,0,0,1,0-16h64A8,8,0,0,1,184,112Zm-8,24H112a8,8,0,0,0,0,16h64a8,8,0,0,0,0-16Zm48-88V208a16,16,0,0,1-16,16H48a16,16,0,0,1-16-16V48A16,16,0,0,1,48,32H208A16,16,0,0,1,224,48ZM48,208H72V48H48Zm160,0V48H88V208H208Z", "clock": "M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z", "chat-circle-dots": "M140,128a12,12,0,1,1-12-12A12,12,0,0,1,140,128ZM84,116a12,12,0,1,0,12,12A12,12,0,0,0,84,116Zm88,0a12,12,0,1,0,12,12A12,12,0,0,0,172,116Zm60,12A104,104,0,0,1,79.12,219.82L45.07,231.17a16,16,0,0,1-20.24-20.24l11.35-34.05A104,104,0,1,1,232,128Zm-16,0A88,88,0,1,0,51.81,172.06a8,8,0,0,1,.66,6.54L40,216,77.4,203.53a7.85,7.85,0,0,1,2.53-.42,8,8,0,0,1,4,1.08A88,88,0,0,0,216,128Z", "browsers": "M216,40H72A16,16,0,0,0,56,56V72H40A16,16,0,0,0,24,88V200a16,16,0,0,0,16,16H184a16,16,0,0,0,16-16V184h16a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM184,88v16H40V88Zm0,112H40V120H184v80Zm32-32H200V88a16,16,0,0,0-16-16H72V56H216Z", "bell": "M221.8,175.94C216.25,166.38,208,139.33,208,104a80,80,0,1,0-160,0c0,35.34-8.26,62.38-13.81,71.94A16,16,0,0,0,48,200H88.81a40,40,0,0,0,78.38,0H208a16,16,0,0,0,13.8-24.06ZM128,216a24,24,0,0,1-22.62-16h45.24A24,24,0,0,1,128,216ZM48,184c7.7-13.24,16-43.92,16-80a64,64,0,1,1,128,0c0,36.05,8.28,66.73,16,80Z", "files": "M213.66,66.34l-40-40A8,8,0,0,0,168,24H88A16,16,0,0,0,72,40V56H56A16,16,0,0,0,40,72V216a16,16,0,0,0,16,16H168a16,16,0,0,0,16-16V200h16a16,16,0,0,0,16-16V72A8,8,0,0,0,213.66,66.34ZM168,216H56V72h76.69L168,107.31v84.53c0,.06,0,.11,0,.16s0,.1,0,.16V216Zm32-32H184V104a8,8,0,0,0-2.34-5.66l-40-40A8,8,0,0,0,136,56H88V40h76.69L200,75.31Zm-56-32a8,8,0,0,1-8,8H88a8,8,0,0,1,0-16h48A8,8,0,0,1,144,152Zm0,32a8,8,0,0,1-8,8H88a8,8,0,0,1,0-16h48A8,8,0,0,1,144,184Z", "tray": "M208,32H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32Zm0,16V152h-28.7A15.86,15.86,0,0,0,168,156.69L148.69,176H107.31L88,156.69A15.86,15.86,0,0,0,76.69,152H48V48Zm0,160H48V168H76.69L96,187.31A15.86,15.86,0,0,0,107.31,192h41.38A15.86,15.86,0,0,0,160,187.31L179.31,168H208v40Z", "globe": "M128,24h0A104,104,0,1,0,232,128,104.12,104.12,0,0,0,128,24Zm88,104a87.61,87.61,0,0,1-3.33,24H174.16a157.44,157.44,0,0,0,0-48h38.51A87.61,87.61,0,0,1,216,128ZM102,168H154a115.11,115.11,0,0,1-26,45A115.27,115.27,0,0,1,102,168Zm-3.9-16a140.84,140.84,0,0,1,0-48h59.88a140.84,140.84,0,0,1,0,48ZM40,128a87.61,87.61,0,0,1,3.33-24H81.84a157.44,157.44,0,0,0,0,48H43.33A87.61,87.61,0,0,1,40,128ZM154,88H102a115.11,115.11,0,0,1,26-45A115.27,115.27,0,0,1,154,88Zm52.33,0H170.71a135.28,135.28,0,0,0-22.3-45.6A88.29,88.29,0,0,1,206.37,88ZM107.59,42.4A135.28,135.28,0,0,0,85.29,88H49.63A88.29,88.29,0,0,1,107.59,42.4ZM49.63,168H85.29a135.28,135.28,0,0,0,22.3,45.6A88.29,88.29,0,0,1,49.63,168Zm98.78,45.6a135.28,135.28,0,0,0,22.3-45.6h35.66A88.29,88.29,0,0,1,148.41,213.6Z", "hard-drives": "M208,136H48a16,16,0,0,0-16,16v48a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V152A16,16,0,0,0,208,136Zm0,64H48V152H208v48Zm0-160H48A16,16,0,0,0,32,56v48a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V56A16,16,0,0,0,208,40Zm0,64H48V56H208v48ZM192,80a12,12,0,1,1-12-12A12,12,0,0,1,192,80Zm0,96a12,12,0,1,1-12-12A12,12,0,0,1,192,176Z", "list": "M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM40,72H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16ZM216,184H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z", "compass": "M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216ZM172.42,72.84l-64,32a8.05,8.05,0,0,0-3.58,3.58l-32,64A8,8,0,0,0,80,184a8.1,8.1,0,0,0,3.58-.84l64-32a8.05,8.05,0,0,0,3.58-3.58l32-64a8,8,0,0,0-10.74-10.74ZM138,138,97.89,158.11,118,118l40.15-20.07Z", "magnifying-glass": "M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z", "list-bullets": "M80,64a8,8,0,0,1,8-8H216a8,8,0,0,1,0,16H88A8,8,0,0,1,80,64Zm136,56H88a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Zm0,64H88a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16ZM44,52A12,12,0,1,0,56,64,12,12,0,0,0,44,52Zm0,64a12,12,0,1,0,12,12A12,12,0,0,0,44,116Zm0,64a12,12,0,1,0,12,12A12,12,0,0,0,44,180Z"};
+  const svg = (n) => `<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="${ICON[n]}"/></svg>`;
+
+  /* The host's pages. Each is a plain list, enough to scroll and to show where you are. */
+  const PAGES = {
+    "": ["Home", ["Renew the domain", "Send the Hollow Pine invoice", "Dentist at 14:00", "Levels review at 16:00"]],
+    upload: ["Upload", ["Drop files to send them to the drive"]],
+    calendar: ["Calendar", ["Dentist at 14:00", "Levels review at 16:00", "Gym at 18:30"], true],
+    pulse: ["Pulse", ["Three notes today"]],
+    tickets: ["Tickets", ["Backup drive is down", "Renew the certificate", "Rotate the deploy key"]],
+    services: ["Services", ["11 of 12 up"]],
+    crons: ["Crons", ["All ran, last at 03:00"]],
+    chat: ["Chat", ["Chat now lives in the Claude app"]],
+    notes: ["Notes", ["Garden plan", "Reading list"]],
+  };
+  const hostPage = document.querySelector("[data-page]");
+  const title = document.querySelector("[data-title]");
+  const hostLinks = [...document.querySelectorAll("body > aside a.nav-item")];
+  let guest = null;
+
+  function list(rows, base = "#/") {
+    return `<div class="card fx-list"><div class="list">${rows.map((r) =>
+      `<div class="list-item"><span class="main"><span>${r}</span></span></div>`).join("")}</div></div>`;
+  }
+  function lightRail(links, hash) {
+    let best = null, len = -1;
+    for (const a of links) {
+      const h = a.getAttribute("href").replace(/\/$/, "");
+      const at = hash.replace(/\/$/, "");
+      const hit = h === "#" ? (at === "#" || at === "") : (at === h || at.startsWith(h + "/"));
+      if (hit && h.length > len) { best = a; len = h.length; }
+    }
+    links.forEach((a) => a.removeAttribute("aria-current"));
+    if (best) best.setAttribute("aria-current", "page");
+    return best;
+  }
+
+  /* The guest: a second app in this one's content, as Studio sits in Command. Its rail
+     changes with the scope (outside a site, or in one), so the dock watches it. */
+  const GUEST_OUT = [
+    ["#/studio/sites", "browsers", "Your sites", 1],
+    ["#/studio/chat", "chat-circle-dots", "Chat", 2, 2],
+    ["#/studio/notifications", "bell", "Notifications", 3],
+    "Admin",
+    ["#/studio/admin", "globe", "All sites"],
+  ];
+  const GUEST_IN = [
+    ["#/studio/site/ada", "globe", "Ada Reyes ceramics", 1],
+    ["#/studio/site/ada/pages", "files", "Pages", 2],
+    ["#/studio/chat", "chat-circle-dots", "Chat", 3, 2],
+    ["#/studio/site/ada/enquiries", "tray", "Enquiries", 4, 2],
+    "Site",
+    ["#/studio/site/ada/media", "browsers", "Media"],
+    ["#/studio/sites", "browsers", "Your sites"],
+  ];
+  function guestRail(items) {
+    return items.map((it) => typeof it === "string" ? `<div class="nav-head">${it}</div>` :
+      `<a class="nav-item" href="${it[0]}"${it[3] ? ` data-pin="${it[3]}"` : ""}>${svg(it[1])}<span class="ellipsis">${it[2]}</span>${it[4] ? `<span class="badge badge-info num">${it[4]}</span>` : ""}</a>`).join("");
+  }
+  function mountGuest() {
+    if (guest) return guest;
+    hostPage.innerHTML = `<div class="guest-host"><div class="g-shell" data-rail="collapsed">
+      <aside aria-label="Studio">
+        <div class="brand-row"><a class="brand" href="#/studio/sites"><span class="g-mark" aria-hidden="true"></span><b>Studio</b></a>
+          <button class="g-rail-toggle" type="button" data-rail-key="g-rail-dockcard-guest" aria-label="Keep open"></button></div>
+        <nav class="nav-list" aria-label="Sections"></nav>
+      </aside>
+      <main>
+        <header class="topbar"><button class="btn btn-tertiary btn-sm btn-icon g-nav-toggle" type="button" aria-label="Open menu">${svg("list")}</button>
+          <span class="topbar-title" data-gtitle></span><span class="grow"></span></header>
+        <div class="content"><div class="content-page" data-gpage></div></div>
+      </main>
+      <div class="g-scrim"></div>
+    </div></div>`;
+    const shell = hostPage.querySelector(".g-shell");
+    guest = { shell, nav: shell.querySelector(".nav-list"), page: shell.querySelector("[data-gpage]"), title: shell.querySelector("[data-gtitle]"), scope: null };
+    rail.wireRailToggle(shell.querySelector(".g-rail-toggle"));
+    guest.unwire = rail.wireDock ? rail.wireDock(shell) : () => {};
+    return guest;
+  }
+  function unmountGuest() {
+    if (!guest) return;
+    guest.unwire && guest.unwire();
+    guest = null;
+  }
+  function routeGuest(hash) {
+    const g = mountGuest();
+    const inSite = hash.startsWith("#/studio/site/");
+    const scope = inSite ? "in" : "out";
+    if (g.scope !== scope) { g.nav.innerHTML = guestRail(inSite ? GUEST_IN : GUEST_OUT); g.scope = scope; }
+    const cur = lightRail([...g.nav.querySelectorAll("a.nav-item")], hash === "#/studio" ? "#/studio/sites" : hash);
+    const name = cur ? cur.querySelector(".ellipsis").textContent : "Your sites";
+    g.title.textContent = name;
+    if (name === "Your sites") g.page.innerHTML = `<div class="card fx-list"><div class="list">
+        <div class="list-item"><a class="main" href="#/studio/site/ada/pages"><span>Ada Reyes ceramics</span><span class="sub">Open its pages</span></a></div>
+        <div class="list-item"><span class="main"><span>Hollow Pine</span></span></div></div></div>`;
+    else if (name === "Chat") g.page.innerHTML = `${list(["Ada: can we move the shop page up", "You: yes, done"])}<label class="field"><span class="label">Reply</span><textarea class="input" rows="3" placeholder="Write a reply"></textarea></label>`;
+    else g.page.innerHTML = list(name === "Pages" ? ["Home", "About", "Work", "Exhibitions", "Shop", "Contact"] : [`${name} for Ada Reyes ceramics`]);
+  }
+
+  function route() {
+    const hash = location.hash || "#/";
+    const key = hash.replace(/^#\/?/, "").split("/")[0];
+    document.body.dataset.route = key || "home";
+    const cur = lightRail(hostLinks, hash);
+    title.textContent = cur ? cur.querySelector(".ellipsis").textContent : "Home";
+    if (key === "studio") { routeGuest(hash); return; }
+    unmountGuest();
+    const [name, rows, field] = PAGES[key] || PAGES[""];
+    hostPage.innerHTML = list(rows) + (field ? `<label class="field"><span class="label">New event</span><input class="input" placeholder="Add an event"></label>` : "")
+      + list(Array.from({ length: 12 }, (_, i) => `${name}, earlier entry ${i + 1}`));
+  }
+  addEventListener("hashchange", route);
+  route();
+  rail.wireRails();
+</script>
+</body>
+</html>

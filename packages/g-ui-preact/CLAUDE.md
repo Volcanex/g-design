@@ -29,8 +29,10 @@ same rule set before and after.
   nothing to animate. Keep it mounted with `open=false` and clear `x` in
   `onExited`.
 - `shell.js` `AppShell`, `NavItem`, `NavGroup` (one level of nesting: a disclosure row, open
-  by default, never a page), `NavToggle`, `useNavSheet`, `Brand`, `RailToggle`,
-  `UserFoot`, `currentTheme`, `setTheme`, `themeMenuItem`.
+  by default, never a page), `NavToggle`, `useNavSheet(closeKey, ref?)` (state only: the
+  shell renders `data-nav-open` itself), `useDock(ref, opts)`, `Brand`, `RailToggle`,
+  `UserFoot`, `currentTheme`, `setTheme`, `themeMenuItem`. `AppShell` wires its own dock
+  (`dock=false` leaves it out); a screen that draws its own `.g-shell` calls `useDock`.
 - `rail.js` the rail, plain DOM with no imports: `wireRails`, `wireRailToggle`, `wireGroups`,
   `applyRail`, `railPinned`, `setGroupOpen`, `groupOpen`. A server-rendered page loads it as
   a module; `Brand` (with `RailToggle`), `AppShell` and `NavGroup` use it in Preact. From 721px
@@ -39,7 +41,16 @@ same rule set before and after.
   pointer leaves, when focus leaves, or on Escape. The button beside the brand pins it open
   ("Keep open", the content then makes room) and collapses it again ("Collapse"). Pinned is
   remembered per viewer under a `railKey` in localStorage (value `pinned`), closed groups under
-  `<railKey>:closed`; every access is guarded. Phones keep the sheet with the whole tree.
+  `<railKey>:closed`; every access is guarded.
+  `wireDock(shell, {key})` (also run by `wireRails` for every shell whose aside has
+  `a.nav-item[data-pin]`) draws the dock and Go (g-navigation R1a): `nav.g-dock` and
+  `dialog.g-palette[data-palette]` appended to the shell; shell attributes `data-dock`,
+  `data-go`, `data-go-open`, `data-dock-typing`, and `data-dock-guest` on a host whose content
+  holds a docked shell; slot memory and history in sessionStorage under `<key>:dock:*`;
+  events `g-dock:navigate` (cancelable, `{href, replace}`), `g-palette:open`,
+  `g-palette:close`. It returns `unwire()`. Two copies of rail.js on one page (Command and
+  Studio's bundle) coordinate only through those attributes and sessionStorage. A rail with
+  no pins keeps the phone sheet with the whole tree.
 - `cursor.js` your own cursor, plain DOM with no imports: `wireOwnCursor`,
   `paintOwnCursor`, `cursorSvgs`, `cursorUrl`, `cursorRgb`, `ownCursorColor`,
   `CURSOR_KEY`, `DEFAULT_CURSOR`. Studio's coworking pointer as every app's default,
@@ -89,6 +100,14 @@ message moves under Details.
 - Two shells on one page (Studio inside Command) each wire their own rail; every rule and
   listener keeps to its own `:scope > aside`, so hovering one never opens the other. Give
   each its own `railKey`.
+- The dock and the phone palette are `position: fixed` inside their shell. A guest shell
+  under an ancestor with a transform, filter, `contain` or `will-change: transform` would
+  pin them to that ancestor instead of the screen. Command's `.studio-host` entrance
+  (`g-vt-in`, 4px, fill `both`) moves the guest dock with it for its 200ms, while the dock
+  fades in; once it ends the dock sits on the screen's foot (measured in WebKit). A lasting
+  transform would not.
+- `g-ui.js` skips `dialog.cmdk[data-palette]`: the Go palette wires its own Cmd+K. A page
+  that also has its own `dialog.cmdk` gets both on Cmd+K.
 
 - Studio imports `kit.css` first in its app.css, ahead of its own
   styles, so Studio overrides still win on equal specificity.
