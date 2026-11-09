@@ -48,7 +48,11 @@ same rule set before and after.
   `data-go`, `data-go-open`, `data-dock-typing`, and `data-dock-guest` on a host whose content
   holds a docked shell; slot memory and history in sessionStorage under `<key>:dock:*`;
   events `g-dock:navigate` (cancelable, `{href, replace}`), `g-palette:open`,
-  `g-palette:close`. It returns `unwire()`. Two copies of rail.js on one page (Command and
+  `g-palette:close`. It returns `unwire()`. Go lists every place at once (the rail's tree,
+  groups open; typing filters). A touch on a dock slot acts on pointerdown, the click after it
+  is spent. Inside an iPhone shell (`html[data-gshell]`) kit.css draws the dock as a
+  translucent material the page runs on under, and the top bar without its rule ("native:
+  the phone shell"); g.css carries the token half (`components/native.css`). Two copies of rail.js on one page (Command and
   Studio's bundle) coordinate only through those attributes and sessionStorage. A rail with
   no pins keeps the phone sheet with the whole tree.
 - `cursor.js` your own cursor, plain DOM with no imports: `wireOwnCursor`,

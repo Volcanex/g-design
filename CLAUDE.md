@@ -129,6 +129,16 @@ Gabriel's corrections. The g-env installer links it into `~/.agents/skills`.
   consumers. `packages/g-tokens/dist/fonts/` and
   `packages/g-ui-react/demo/public/fonts/` are build intermediates and
   gitignored. An Arial-based metric-matched fallback prevents swap shift.
+- The phone layer (`packages/g-ui/src/components/native.css`, plus kit.css "native: the
+  phone shell"): on a touch phone (max-width 720px, coarse pointer) it drops the web page's
+  habits (tap flash, double-tap delay, callouts and selection on chrome, input zoom under
+  16px, stuck hover, page rubber-band) and makes page loads instant (no view-transition
+  fade, no `.enter` stagger). Inside an iPhone shell (`html[data-gshell]`, set by the
+  shell's bridge) at phone width it re-points tokens to iOS's look: `--font-size-body` 17px,
+  `--font-size-ui` 15px, `--h-control*` a step up, `--card-border` and `--card-highlight`
+  off with a filled `--card-bg`, a grey `--surface-1` page in light, `--well-border` off;
+  plus semibold headings and filled secondary buttons. Prefer a token over a rule when
+  extending it, so it follows the web. Desktop and hover pointers are untouched.
 - MPA view transitions are on by default (`@view-transition` in g-ui.css)
   with a two-page demo at `guidelines/vt/`. Cross-document transitions
   need same-origin real navigation; the pane iframe still shows them.

@@ -16,8 +16,8 @@ newer and sit beside the rules they belong with.
 strips in the top bar, no tile pages, no second navigation in the content. A separate URL
 with its own data is a rail entry. The dock is not a second surface: it is the rail's
 pinned items (`data-pin="1"` to `"4"` on a `.nav-item`, at most four) drawn at the foot of
-a phone, plus Go, the palette of every place in the rail (Recent, then All places, the
-whole tree with its groups open; typing filters). Pin what the person reaches for most,
+a phone, plus Go, the palette of every place in the rail (the whole tree with its groups
+open, at once, with no step before it; typing filters). Pin what the person reaches for most,
 from the real pages, and never add a place to the dock that the rail lacks. An app never
 draws its own bottom bar or tab bar.
 
@@ -25,8 +25,10 @@ draws its own bottom bar or tab bar.
 slot at least 44px, the current one lit with a filled pill. The aside stays in the DOM,
 hidden, and the menu button goes. Each slot reopens the last page under it, and switching
 slots replaces the history entry (an edge-swipe back never jumps between slots) with the
-shell's `selection` haptic. The dock steps aside while a field has focus. Go opens a sheet
-above the dock, the list over the field, never focusing the field on a touch. From 721px
+shell's `selection` haptic. A touch acts on the finger going down, as a native tab bar does;
+a mouse or keyboard on click. The dock steps aside while a field has focus. Go opens a sheet
+above the dock, the list over the field, never focusing the field on a touch. The sheet
+moves like iOS's: in on the iOS curve in 240ms, out in 160ms, one edge at its top. From 721px
 there is no dock and Go is Cmd+K or Ctrl+K, the same palette as a centred dialog. An app
 inside another (Studio inside Command) swaps the dock for its own: its first slot is the
 host's G mark, back to the host's last place, and the host's dock and top bar hide, so a
