@@ -41,6 +41,33 @@ annotate.js/annotations.py). Baseline's stays untouched for now.
   reads the host page's `:root` for `--sp-1..--sp-8`; if absent, falls
   back to the g scale (4/8/12/16/24/32/48/64).
 
+## Docking (client side)
+
+By default the bar is fixed over the top 28px of the page, so it shifts no
+host layout and any g site gets it with no changes. A host whose own chrome
+sits there can give the bar a slot instead:
+
+    <meta name="g-admin-dock" content=".g-admin-dock">
+
+- `content` is a CSS selector. The first match is the slot. The bar's
+  element (`<g-admin-dock>`, its own shadow root with the same sheet and
+  the same theme and accent mirroring) is appended into it and the bar
+  renders in flow, 28px, at the slot's width. The slot is the host's
+  reserved space: an empty slot is 0px, the open overlay makes it 28px
+  and pushes what follows down. Nothing is covered.
+- The fixed layers (stage, inspector, hint) stay on the main `<g-admin>`
+  element on `body`. Docked, they start at the bar's foot on screen, so
+  the bar and everything above it stay clickable in every mode.
+- No meta, a selector that is not valid, or one that matches nothing: the
+  fixed bar, exactly as before. The slot is looked for again whenever the
+  page's tree changes, so a single page app that redraws its chrome on
+  navigation keeps the bar docked, and a page without a slot gets the
+  fixed bar back.
+- The slot must not be inside a shadow root (the selector is resolved on
+  `document`). "Off" removes the bar from the slot, which closes back to 0px.
+- The g-ui-preact `AppShell` carries an empty `.g-admin-dock` under its top
+  bar; an app opts in by adding the meta.
+
 ## Endpoints (server side)
 
 All under `{base}`, gated by the project's existing admin auth (cookie

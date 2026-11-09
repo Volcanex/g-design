@@ -31,7 +31,12 @@ scales.
 
 `{base}` is `/api/gadmin` unless `<meta name="g-admin-base">` says otherwise.
 `<meta name="g-admin-project">` names the project in the bar; without it the
-bar shows the hostname. `<meta name="g-command">` is the g-command-web origin
+bar shows the hostname. `<meta name="g-admin-dock" content="selector">` docks the bar in flow in
+that slot instead of fixed over the page's top 28px (contract, Docking): the
+bar moves into a second shadow root on a `<g-admin-dock>` element in the
+slot, the fixed layers stay on `<g-admin>` and start at `--ga-under`, the
+bar's foot. Every "is this ours" check goes through `mine()`, which knows
+both elements. `<meta name="g-command">` is the g-command-web origin
 the ticket count and the "Command centre" link go to. Without it the count is
 plain text and the link is left out.
 

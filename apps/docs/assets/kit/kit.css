@@ -222,6 +222,9 @@ button.nav-item { width: 100%; }
 /* The slim bar (g-navigation R7): 48px with its rule at every width, for an app whose bar
    carries a title and a few actions rather than a document's state. */
 .topbar.topbar-slim { min-height: var(--h-5); padding-block: 0; }
+/* The g-admin bar's slot under the top bar (g-admin contract, Docking): 0px when empty, the
+   28px bar in flow when the overlay is up, so nothing in the shell is covered. */
+.g-admin-dock { flex: none; min-width: 0; }
 /* Where the page sits: Parent, a caret, Page. The parent is a link; the page is the title. */
 .topbar-crumbs { display: flex; align-items: center; gap: var(--sp-1); min-width: 0; font-size: 15px; line-height: var(--lh-2); }
 .topbar-crumbs a { color: var(--text-secondary); text-decoration: none; white-space: nowrap; flex: none; }

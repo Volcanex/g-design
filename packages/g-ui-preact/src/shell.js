@@ -132,7 +132,9 @@ export function UserFoot({ name, email, initials, items, menuLabel = "Account", 
    .app-topbar, plus .has-actions when it carries actions, so an app can drop a bar that is only
    the menu button wherever the rail sits beside the content. Under 721px a rail with pinned
    items (NavItem data-pin="1".."4") becomes the dock, and Go opens the palette (rail.js
-   wireDock); dock=false leaves both out. */
+   wireDock); dock=false leaves both out. .g-admin-dock under the top bar is the g-admin bar's
+   slot (agents/g-admin-contract.md, Docking): empty and 0px until an owner opens the overlay
+   on a page whose head names it with <meta name="g-admin-dock" content=".g-admin-dock">. */
 export function AppShell({ brand, nav, foot, title, actions, topbar = true, closeKey, railKey = RAIL_KEY, railOpen = false, dock = true, children }) {
   const ref = useRef(null);
   const [open, setOpen] = useNavSheet(closeKey, ref);
@@ -152,6 +154,7 @@ export function AppShell({ brand, nav, foot, title, actions, topbar = true, clos
         <span class="grow"></span>
         ${actions}
       </header>`}
+      <div class="g-admin-dock"></div>
       <div class="content" id="main-content">${children}</div>
     </main>
     <div class="g-scrim" onClick=${() => setOpen(false)}></div>

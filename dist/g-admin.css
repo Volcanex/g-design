@@ -2932,6 +2932,9 @@ dialog.cmdk {
      touch custom properties, so the token block above survives it. */
   all: initial;
   display: block;
+  /* Where the fixed layers under the bar start. The script overrides it
+     inline while the bar is docked (see .ga-bar). */
+  --ga-under: var(--h-2);
 
   /* @font-face is document-scoped and cannot be declared inside a shadow
      root, so these resolve to whatever the host page loaded and fall through
@@ -2952,7 +2955,11 @@ dialog.cmdk {
 
 /* Fixed, 28px, above everything the host page can draw. It covers the top
    28px of the page rather than pushing the page down: the overlay changes no
-   host layout, and "off" gives the whole strip back. */
+   host layout, and "off" gives the whole strip back.
+
+   Docked (the host named a slot with <meta name="g-admin-dock">), the bar is
+   in flow in that slot instead: the host reserves the space by having the
+   slot, and the bar is just a 28px block in it. */
 .ga-bar {
   position: fixed;
   inset: 0 0 auto 0;
@@ -2969,8 +2976,9 @@ dialog.cmdk {
   white-space: nowrap;
   overflow: hidden;
 }
-.ga-bar .ga-who { display: flex; align-items: baseline; gap: var(--sp-2); min-width: 0; }
-.ga-bar .ga-project { color: var(--text-primary); font-weight: 500; }
+/* The identification gives way to the controls: it truncates, never runs under them. */
+.ga-bar .ga-who { display: flex; align-items: baseline; gap: var(--sp-2); min-width: 0; overflow: hidden; white-space: nowrap; }
+.ga-bar .ga-project { color: var(--text-primary); font-weight: 500; overflow: hidden; text-overflow: ellipsis; }
 .ga-bar .ga-page { font-family: var(--font-mono); font-size: 11px; overflow: hidden; text-overflow: ellipsis; }
 .ga-bar .ga-spacer { flex: 1; }
 .ga-bar a { color: var(--text-secondary); text-decoration: none; }
@@ -2989,6 +2997,13 @@ dialog.cmdk {
 @media (max-width: 720px) {
   .ga-bar .ga-page { display: none; }
 }
+/* On a phone the project name would truncate to a letter or two: the controls
+   take the whole strip. */
+@media (max-width: 480px) {
+  .ga-bar .ga-who { display: none; }
+}
+/* Docked, it lines up with the host chrome above it: same page gutter. */
+:host([data-docked]) .ga-bar { position: relative; inset: auto; z-index: auto; padding: 0 var(--gutter); }
 
 /* ----------------------------------------------------------------- stage */
 
@@ -3000,8 +3015,12 @@ dialog.cmdk {
   position: fixed;
   inset: 0;
   z-index: 2147482000;
+  pointer-events: none;
 }
-.ga-hit { position: absolute; inset: 0; cursor: crosshair; }
+.ga-hit { position: absolute; inset: 0; cursor: crosshair; pointer-events: auto; }
+/* A docked bar is in the page's own stacking, under the stage, so the hit
+   layer starts at the bar's foot: the bar stays reachable in every mode. */
+:host([data-docked]) .ga-hit { top: var(--ga-under); }
 .ga-stage[data-tool="pen"] .ga-hit { cursor: cell; }
 .ga-stage[data-text] .ga-hit { cursor: text; }
 /* A gap chip is a target, and the hit layer is the only thing the pointer ever
@@ -3124,11 +3143,15 @@ dialog.cmdk {
 .ga-hint {
   position: fixed;
   pointer-events: none;
-  top: calc(var(--h-2) + var(--sp-3));
+  top: calc(var(--ga-under) + var(--sp-3));
   left: 50%;
   transform: translateX(-50%);
-  padding: 0 var(--sp-3);
-  height: var(--h-2);
+  /* One line wherever it fits: a centred box shrinks to half the viewport
+     and would wrap a long hint over its own border. */
+  width: max-content;
+  max-width: calc(100vw - 2 * var(--sp-4));
+  padding: 2px var(--sp-3);
+  min-height: var(--h-2);
   display: flex;
   align-items: center;
   gap: var(--sp-2);
@@ -3263,7 +3286,7 @@ dialog.cmdk {
 
 .ga-side {
   position: fixed;
-  top: var(--h-2);
+  top: var(--ga-under);
   right: 0;
   bottom: 0;
   z-index: 2147482500;
