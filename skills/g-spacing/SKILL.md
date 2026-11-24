@@ -51,7 +51,9 @@ page that uses those numbers still goes wrong.
     clearly offset. ("everything needs to line up a little more", "put them on a grid")
 11. A shared element sits in the same place on every sibling screen: titles, menus,
     nav, toolbars, and the columns of tables that share them. (a title 350px off
-    from its siblings)
+    from its siblings) A part lays out the same on every page that shows it: a
+    page's own rules never reach into a part's pieces. (a tap rule on every button
+    pulled a map's labels under its canvas on one page only)
 12. Same-kind siblings are the same size: icons, badges and buttons in a row. ("why
     is it green and slightly bigger than the one next to it")
 
@@ -111,7 +113,10 @@ detectors). In a stress state only sideways scroll and text on text block.
 
 A g-site page file is compiled fresh and served over the running g-site, so it
 checks the edit, not the deploy. Pass sibling screens together and their
-landmarks are compared. Grid numbers come from g-design's `rhythm-audit.mjs`,
+landmarks are compared, along with each part's pieces: a class that is out of flow
+on every element on one page and in flow on another blocks, because a page rule
+has moved a part's pieces. Under `glevels check` a repo's pages.json pages are
+compared this way on every run. Grid numbers come from g-design's `rhythm-audit.mjs`,
 through the shared `packages/g-ui/scripts/rhythm-measure.mjs`. A canvas page
 (Flutter, a game) only shows its HTML to the geometry: judge the canvas from the
 screenshots.
