@@ -1041,8 +1041,11 @@ dialog.cmdk {
 
 /* Reduced motion: feedback stays, movement goes. Crossfades, not nothing. */
 @media (prefers-reduced-motion: reduce) {
+  /* A loop runs once: cut to 1 ms and left infinite, it lands on a random phase every frame, which is how the
+     spinner strobed (g-levels subframe-loop, 2026-11-24). With no fill it then rests in its own style. */
   *, *::before, *::after {
     animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 1ms !important;
   }
   .enter > * { animation: g-fade 1ms backwards; }
